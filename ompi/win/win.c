@@ -17,6 +17,8 @@
  * Copyright (c) 2015-2017 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -74,8 +76,39 @@ static void ompi_win_destruct(ompi_win_t *win);
 OBJ_CLASS_INSTANCE(ompi_win_t, opal_infosubscriber_t,
                    ompi_win_construct, ompi_win_destruct);
 
-int
-ompi_win_init(void)
+
+static void ompi_win_dump (ompi_win_t *win)
+{
+    opal_output(0, "Dumping information for window: %s\n", win->w_name);
+    opal_output(0,"  Fortran window handle: %d, window size: %d\n",
+                win->w_f_to_c_index, ompi_group_size (win->w_group));
+}
+
+static int ompi_win_finalize(void)
+{
+    size_t size = opal_pointer_array_get_size (&ompi_mpi_windows);
+    /* start at 1 to skip win null */
+    for (size_t i = 1 ; i < size ; ++i) {
+        ompi_win_t *win =
+            (ompi_win_t *) opal_pointer_array_get_item (&ompi_mpi_windows, i);
+        if (NULL != win) {
+            if (ompi_debug_show_handle_leaks && !ompi_win_invalid(win)){
+                opal_output(0,"WARNING: MPI_Win still allocated in MPI_Finalize\n");
+                ompi_win_dump (win);
+            }
+            ompi_win_free (win);
+        }
+    }
+
+    OBJ_DESTRUCT(&ompi_mpi_win_null.win);
+    OBJ_DESTRUCT(&ompi_mpi_windows);
+    OBJ_RELEASE(ompi_win_accumulate_ops);
+    OBJ_RELEASE(ompi_win_accumulate_order);
+
+    return OMPI_SUCCESS;
+}
+
+int ompi_win_init (void)
 {
     int ret;
 
@@ -106,36 +139,7 @@ ompi_win_init(void)
         return ret;
     }
 
-    return OMPI_SUCCESS;
-}
-
-static void ompi_win_dump (ompi_win_t *win)
-{
-    opal_output(0, "Dumping information for window: %s\n", win->w_name);
-    opal_output(0,"  Fortran window handle: %d, window size: %d\n",
-                win->w_f_to_c_index, ompi_group_size (win->w_group));
-}
-
-int ompi_win_finalize(void)
-{
-    size_t size = opal_pointer_array_get_size (&ompi_mpi_windows);
-    /* start at 1 to skip win null */
-    for (size_t i = 1 ; i < size ; ++i) {
-        ompi_win_t *win =
-            (ompi_win_t *) opal_pointer_array_get_item (&ompi_mpi_windows, i);
-        if (NULL != win) {
-            if (ompi_debug_show_handle_leaks && !ompi_win_invalid(win)){
-                opal_output(0,"WARNING: MPI_Win still allocated in MPI_Finalize\n");
-                ompi_win_dump (win);
-            }
-            ompi_win_free (win);
-        }
-    }
-
-    OBJ_DESTRUCT(&ompi_mpi_win_null.win);
-    OBJ_DESTRUCT(&ompi_mpi_windows);
-    OBJ_RELEASE(ompi_win_accumulate_ops);
-    OBJ_RELEASE(ompi_win_accumulate_order);
+    ompi_mpi_instance_append_finalize (ompi_win_finalize);
 
     return OMPI_SUCCESS;
 }
@@ -260,6 +264,24 @@ ompi_win_create(void *base, size_t size,
     return OMPI_SUCCESS;
 }
 
+int ompi_win_create_from_group (void *base, size_t size, int disp_unit, ompi_group_t *group,
+                                const char *tag, opal_info_t *info, ompi_win_t** newwin)
+{
+    /* NTH: dummy implementation until the osc modules are updated for group communicator
+    * creation. This implemention will probably continue to exist for modules that do
+    * not provide group-based window creation. */
+    ompi_communicator_t *comm;
+    int rc;
+
+    rc = ompi_comm_create_from_group (group, tag, info, MPI_ERRHANDLER_NULL, &comm);
+    if (OPAL_UNLIKELY(OMPI_SUCCESS == rc)) {
+        return rc;
+    }
+
+    rc = ompi_win_create (base, size, disp_unit, comm, info, newwin);
+    ompi_comm_free (&comm);
+    return rc;
+}
 
 int
 ompi_win_allocate(size_t size, int disp_unit, opal_info_t *info,
@@ -291,6 +313,25 @@ ompi_win_allocate(size_t size, int disp_unit, opal_info_t *info,
     *newwin = win;
 
     return OMPI_SUCCESS;
+}
+
+int ompi_win_allocate_from_group (size_t size, int disp_unit, opal_info_t *info, ompi_group_t *group,
+                                  const char *tag, void *baseptr, ompi_win_t** newwin)
+{
+    /* NTH: dummy implementation until the osc modules are updated for group communicator
+    * creation. This implemention will probably continue to exist for modules that do
+    * not provide group-based window creation. */
+    ompi_communicator_t *comm;
+    int rc;
+
+    rc = ompi_comm_create_from_group (group, tag, info, MPI_ERRHANDLER_NULL, &comm);
+    if (OPAL_UNLIKELY(OMPI_SUCCESS == rc)) {
+        return rc;
+    }
+
+    rc = ompi_win_allocate (size, disp_unit, info, comm, baseptr, newwin);
+    ompi_comm_free (&comm);
+    return rc;
 }
 
 
@@ -326,6 +367,25 @@ ompi_win_allocate_shared(size_t size, int disp_unit, opal_info_t *info,
     return OMPI_SUCCESS;
 }
 
+int ompi_win_allocate_shared_from_group (size_t size, int disp_unit, opal_info_t *info, ompi_group_t *group,
+                                         const char *tag, void *baseptr, ompi_win_t** newwin)
+{
+    /* NTH: dummy implementation until the osc modules are updated for group communicator
+    * creation. This implemention will probably continue to exist for modules that do
+    * not provide group-based window creation. */
+    ompi_communicator_t *comm;
+    int rc;
+
+    rc = ompi_comm_create_from_group (group, tag, info, MPI_ERRHANDLER_NULL, &comm);
+    if (OPAL_UNLIKELY(OMPI_SUCCESS == rc)) {
+        return rc;
+    }
+
+    rc = ompi_win_allocate_shared (size, disp_unit, info, comm, baseptr, newwin);
+    ompi_comm_free (&comm);
+    return rc;
+}
+
 
 int
 ompi_win_create_dynamic(opal_info_t *info, ompi_communicator_t *comm, ompi_win_t **newwin)
@@ -354,6 +414,25 @@ ompi_win_create_dynamic(opal_info_t *info, ompi_communicator_t *comm, ompi_win_t
     *newwin = win;
 
     return OMPI_SUCCESS;
+}
+
+int ompi_win_create_dynamic_from_group (opal_info_t *info, ompi_group_t *group, const char *tag,
+                                        ompi_win_t** newwin)
+{
+    /* NTH: dummy implementation until the osc modules are updated for group communicator
+    * creation. This implemention will probably continue to exist for modules that do
+    * not provide group-based window creation. */
+    ompi_communicator_t *comm;
+    int rc;
+
+    rc = ompi_comm_create_from_group (group, tag, info, MPI_ERRHANDLER_NULL, &comm);
+    if (OPAL_UNLIKELY(OMPI_SUCCESS == rc)) {
+        return rc;
+    }
+
+    rc = ompi_win_create_dynamic (info, comm, newwin);
+    ompi_comm_free (&comm);
+    return rc;
 }
 
 

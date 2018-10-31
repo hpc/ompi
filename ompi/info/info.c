@@ -199,6 +199,8 @@ int ompi_mpiinfo_init(void)
         opal_info_set(&ompi_mpi_info_env.info.super, "ompi_positioned_file_dir", ompi_process_info.proc_session_dir);
     }
 
+    ompi_mpi_instance_append_finalize (ompi_mpiinfo_finalize);
+
     /* All done */
 
     return OMPI_SUCCESS;
@@ -368,6 +370,31 @@ static void info_destructor(ompi_info_t *info)
 
 }
 
+ompi_info_t *ompi_info_allocate (void)
+{
+    ompi_info_t *new_info;
+    int rc;
+
+    rc = ompi_mpi_instance_retain ();
+    if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
+        /* NTH: seriously, what can we do other than abort () or return? we failed to
+         * set up the most basic infrastructure! */
+        return NULL;
+    }
+
+    /*
+     * Call the object create function. This function not only
+     * allocates the space for MPI_Info, but also calls all the
+     * relevant init functions. Should I check if the fortran
+     * handle is valid
+     */
+    new_info = OBJ_NEW(ompi_info_t);
+    if (NULL == new_info) {
+        return NULL;
+    }
+
+    return new_info;
+}
 
 /*
  * Free an info handle and all of its keys and values.
@@ -377,5 +404,9 @@ int ompi_info_free (ompi_info_t **info)
     (*info)->i_freed = true;
     OBJ_RELEASE(*info);
     *info = MPI_INFO_NULL;
+
+    /* release the retain() from info create/dup */
+    ompi_mpi_instance_release ();
+
     return MPI_SUCCESS;
 }

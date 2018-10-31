@@ -45,7 +45,6 @@ typedef struct ompi_op_base_selected_module_t {
     ompi_op_base_module_t *op_module;
 } ompi_op_base_selected_module_t;
 
-
 /**
  * Find all available op components.
  */

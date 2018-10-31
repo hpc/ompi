@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -12,6 +13,8 @@
  * Copyright (c) 2012-2013 Inria.  All rights reserved.
  * Copyright (c) 2014      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -101,7 +104,7 @@ static int init_query(const mca_base_component_t *m,
        happened in the topo framework before v2.2.0, so don't bother
        supporting anything before then. */
     if (2 == m->mca_type_major_version &&
-        2 == m->mca_type_minor_version &&
+        (2 == m->mca_type_minor_version || 3 == m->mca_type_minor_version) &&
         0 == m->mca_type_release_version) {
         ret = init_query_2_2_0(m, entry, enable_progress_threads,
                                enable_mpi_threads);
@@ -140,8 +143,8 @@ static int init_query_2_2_0(const mca_base_component_t *component,
                             bool enable_progress_threads,
                             bool enable_mpi_threads)
 {
-    mca_topo_base_component_2_2_0_t *topo =
-        (mca_topo_base_component_2_2_0_t *) component;
+    mca_topo_base_component_2_3_0_t *topo =
+        (mca_topo_base_component_2_3_0_t *) component;
 
     return topo->topoc_init_query(enable_progress_threads,
                                   enable_mpi_threads);

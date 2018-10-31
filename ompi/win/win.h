@@ -15,6 +15,8 @@
  * Copyright (c) 2013-2015 Los Alamos National Security, LLC.  All rights
  *                         reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -131,16 +133,26 @@ OMPI_DECLSPEC extern ompi_predefined_win_t ompi_mpi_win_null;
 OMPI_DECLSPEC extern ompi_predefined_win_t *ompi_mpi_win_null_addr;
 
 int ompi_win_init(void);
-int ompi_win_finalize(void);
 
 int ompi_win_create(void *base, size_t size, int disp_unit,
                     ompi_communicator_t *comm, opal_info_t *info,
                     ompi_win_t **newwin);
+int ompi_win_create_from_group (void *base, size_t size, int disp_unit,
+                                ompi_group_t *group, const char *tag, opal_info_t *info,
+                                ompi_win_t **newwin);
 int ompi_win_allocate(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
+int ompi_win_allocate_from_group (size_t size, int disp_unit, opal_info_t *info,
+                                  ompi_group_t *group, const char *tag, void *baseptr,
+                                  ompi_win_t **newwin);
 int ompi_win_allocate_shared(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
+int ompi_win_allocate_shared_from_group (size_t size, int disp_unit, opal_info_t *info,
+                                         ompi_group_t *group, const char *tag, void *baseptr,
+                                         ompi_win_t **newwin);
 int ompi_win_create_dynamic(opal_info_t *info, ompi_communicator_t *comm, ompi_win_t **newwin);
+int ompi_win_create_dynamic_from_group (opal_info_t *info, ompi_group_t *group, const char *tag,
+                                        ompi_win_t **newwin);
 
 int ompi_win_free(ompi_win_t *win);
 

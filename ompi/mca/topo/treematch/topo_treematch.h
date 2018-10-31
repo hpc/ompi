@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011-2015 The University of Tennessee and The University
  *                         of Tennessee Research Foundation.  All rights
@@ -7,6 +8,8 @@
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -38,13 +41,13 @@ BEGIN_C_DECLS
 /*
  * Public component instance
  */
-typedef struct mca_topo_treematch_component_2_2_0_t {
-    mca_topo_base_component_2_2_0_t super;
+typedef struct mca_topo_treematch_component_2_3_0_t {
+    mca_topo_base_component_2_3_0_t super;
 
     int reorder_mode;
-} mca_topo_treematch_component_2_2_0_t;
+} mca_topo_treematch_component_2_3_0_t;
 
-OMPI_MODULE_DECLSPEC extern mca_topo_treematch_component_2_2_0_t
+OMPI_MODULE_DECLSPEC extern mca_topo_treematch_component_2_3_0_t
     mca_topo_treematch_component;
 
 /*
