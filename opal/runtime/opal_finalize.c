@@ -111,9 +111,9 @@ void opal_finalize_append_cleanup(opal_cleanup_fn_t cleanup_fn, const char *fn_n
     (void) fn_name;
 #endif
 
-    opal_mutex_lock(&opal_finalize_cleanup_fns_lock);
-    opal_list_append(&current_finalize_domain->super, &cleanup_item->super);
-    opal_mutex_unlock(&opal_finalize_cleanup_fns_lock);
+    opal_mutex_lock (&opal_finalize_cleanup_fns_lock);
+    opal_list_append (&current_finalize_domain->super, &cleanup_item->super);
+    opal_mutex_unlock (&opal_finalize_cleanup_fns_lock);
 }
 
 void opal_finalize_domain_init(opal_finalize_domain_t *domain, const char *domain_name)

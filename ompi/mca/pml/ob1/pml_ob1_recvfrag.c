@@ -476,8 +476,8 @@ void mca_pml_ob1_recv_frag_callback_match (mca_btl_base_module_t *btl,
          * this pending queue will be searched and all matching fragments
          * moved to the right communicator.
          */
-        append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending,
-                             btl, hdr, segments, num_segments, NULL );
+        append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending, btl,
+                             (mca_pml_ob1_hdr_t *) hdr, segments, num_segments, NULL );
         return;
     }
     comm = (mca_pml_ob1_comm_t *)comm_ptr->c_pml_comm;
@@ -971,7 +971,7 @@ static mca_pml_ob1_recv_request_t *match_one (mca_btl_base_module_t *btl,
         append_frag_to_umq(comm->umq, btl, hdr, segments,
                             num_segments, frag);
 #else
-        append_frag_to_list(&proc->unexpected_frags, btl, hdr, segments,
+        append_frag_to_list(&proc->unexpected_frags, btl, (mca_pml_ob1_hdr_t *)hdr, segments,
                             num_segments, frag);
 #endif
         SPC_RECORD(OMPI_SPC_UNEXPECTED, 1);
@@ -1037,8 +1037,8 @@ static int mca_pml_ob1_recv_frag_match (mca_btl_base_module_t *btl,
          * this pending queue will be searched and all matching fragments
          * moved to the right communicator.
          */
-        append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending,
-                             btl, hdr, segments, num_segments, NULL );
+        append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending, btl,
+                             (mca_pml_ob1_hdr_t *)hdr, segments, num_segments, NULL );
         return OMPI_SUCCESS;
     }
     comm = (mca_pml_ob1_comm_t *)comm_ptr->c_pml_comm;
@@ -1201,3 +1201,67 @@ mca_pml_ob1_recv_frag_match_proc (mca_btl_base_module_t *btl,
     return OMPI_SUCCESS;
 }
 
+void mca_pml_ob1_handle_cid (ompi_communicator_t *comm, int src, mca_pml_ob1_cid_hdr_t *hdr_cid)
+{
+    mca_pml_ob1_comm_proc_t *ob1_proc = mca_pml_ob1_peer_lookup (comm, src);
+    bool had_comm_index = (-1 != ob1_proc->comm_index);
+
+    if (!had_comm_index) {
+        /* avoid sending too many extra packets. if this doesn't work well then a flag can be added to
+         * the proc to indicate that this packet has been sent */
+        ob1_proc->comm_index = hdr_cid->hdr_src_comm_index;
+
+        (void) mca_pml_ob1_send_cid (ob1_proc->ompi_proc, comm);
+    }
+}
+
+void mca_pml_ob1_recv_frag_callback_cid (mca_btl_base_module_t* btl,
+                                         mca_btl_base_tag_t tag,
+                                         mca_btl_base_descriptor_t* des,
+                                         void* cbdata)
+{
+    mca_btl_base_segment_t segments[MCA_BTL_DES_MAX_SEGMENTS];
+    mca_pml_ob1_hdr_t *hdr = (mca_pml_ob1_hdr_t *) des->des_segments[0].seg_addr.pval;
+    mca_pml_ob1_match_hdr_t *hdr_match = &hdr->hdr_ext_match.hdr_match;
+    size_t num_segments = des->des_segment_count;
+    ompi_communicator_t *comm;
+
+    memcpy (segments, des->des_segments, num_segments * sizeof (segments[0]));
+    assert (segments->seg_len >= sizeof (hdr->hdr_cid));
+
+    ob1_hdr_ntoh (hdr, hdr->hdr_common.hdr_type);
+
+    /* NTH: this should be ok as as all BTLs create a dummy segment */
+    segments->seg_len -= offsetof (mca_pml_ob1_ext_match_hdr_t, hdr_match);
+    segments->seg_addr.pval = (void *) hdr_match;
+
+    /* find the communicator with this extended CID */
+    comm = ompi_comm_lookup_cid (hdr->hdr_cid.hdr_cid);
+    if (OPAL_UNLIKELY(NULL == comm)) {
+        if (segments->seg_len > 0) {
+            /* This is a special case. A message for a not yet existing
+             * communicator can happens. Instead of doing a matching we
+             * will temporarily add it the a pending queue in the PML.
+             * Later on, when the communicator is completely instantiated,
+             * this pending queue will be searched and all matching fragments
+             * moved to the right communicator.
+             */
+            append_frag_to_list (&mca_pml_ob1.non_existing_communicator_pending,
+                                 btl, hdr, des->des_segments, num_segments, NULL);
+        }
+
+        /* nothing more to do */
+        return;
+    }
+
+    mca_pml_ob1_handle_cid (comm, hdr->hdr_cid.hdr_src, &hdr->hdr_cid);
+    hdr_match->hdr_ctx = comm->c_index;
+
+    if (segments->seg_len == 0) {
+        /* just a response */
+        return;
+    }
+
+    mca_pml_ob1_recv_frag_match (btl, hdr_match, segments, des->des_segment_count,
+                                 hdr_match->hdr_common.hdr_type);
+}

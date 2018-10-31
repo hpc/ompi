@@ -32,12 +32,25 @@
 static char *ompi_mpi_dynamics_disabled_msg = "Enabled";
 
 
+static int ompi_mpi_dynamics_finalize (void)
+{
+    // If dynamics were disabled, then we have a message to free
+    if (!ompi_mpi_dynamics_enabled) {
+        free(ompi_mpi_dynamics_disabled_msg);
+        ompi_mpi_dynamics_disabled_msg = NULL;
+    }
+
+    return OMPI_SUCCESS;
+}
+
 void ompi_mpi_dynamics_disable(const char *msg)
 {
     assert(msg);
 
     ompi_mpi_dynamics_enabled = false;
     ompi_mpi_dynamics_disabled_msg = strdup(msg);
+
+    ompi_mpi_instance_append_finalize (ompi_mpi_dynamics_finalize);
 }
 
 bool ompi_mpi_dynamics_is_enabled(const char *function)
@@ -52,13 +65,4 @@ bool ompi_mpi_dynamics_is_enabled(const char *function)
                    function,
                    ompi_mpi_dynamics_disabled_msg);
     return false;
-}
-
-void ompi_mpi_dynamics_finalize(void)
-{
-    // If dynamics were disabled, then we have a message to free
-    if (!ompi_mpi_dynamics_enabled) {
-        free(ompi_mpi_dynamics_disabled_msg);
-        ompi_mpi_dynamics_disabled_msg = NULL;
-    }
 }

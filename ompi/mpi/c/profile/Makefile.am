@@ -72,6 +72,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pcancel.c \
         pcart_coords.c \
         pcart_create.c \
+        pcart_create_from_group.c \
         pcartdim_get.c \
         pcart_get.c \
         pcart_map.c \
@@ -86,6 +87,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pcomm_connect.c \
         pcomm_create.c \
         pcomm_create_errhandler.c \
+        pcomm_create_from_group.c \
         pcomm_create_group.c \
         pcomm_create_keyval.c \
         pcomm_delete_attr.c \
@@ -109,7 +111,9 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pcomm_set_attr.c \
         pcomm_set_info.c \
         pdist_graph_create.c \
+        pdist_graph_create_from_group.c \
         pdist_graph_create_adjacent.c \
+        pdist_graph_create_adjacent_from_group.c \
         pdist_graph_neighbors.c \
         pdist_graph_neighbors_count.c \
         pcomm_set_errhandler.c \
@@ -158,6 +162,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pfile_iwrite_all.c \
         pfile_iwrite_shared.c \
         pfile_open.c \
+        pfile_open_from_group.c \
         pfile_preallocate.c \
         pfile_read_all_begin.c \
         pfile_read_all.c \
@@ -207,6 +212,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pget_processor_name.c \
         pget_version.c \
         pgraph_create.c \
+        pgraph_create_from_group.c \
         pgraph_get.c \
         pgraph_map.c \
         pgraph_neighbors_count.c \
@@ -220,6 +226,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pgroup_excl.c \
         pgroup_f2c.c \
         pgroup_free.c \
+        pgroup_from_session_pset.c \
         pgroup_incl.c \
         pgroup_intersection.c \
         pgroup_range_excl.c \
@@ -246,6 +253,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pinit_thread.c \
         pinitialized.c \
         pintercomm_create.c \
+        pintercomm_create_from_groups.c \
         pintercomm_merge.c \
         piprobe.c \
         pirecv.c \
@@ -320,6 +328,22 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         psend_init.c \
         psendrecv.c \
         psendrecv_replace.c \
+        psession_c2f.c \
+        psession_create_errhandler.c \
+        psession_create_keyval.c \
+        psession_delete_attr.c \
+        psession_get_attr.c \
+        psession_get_info.c \
+        psession_get_num_psets.c \
+        psession_get_nth_pset.c \
+        psession_get_pset_info.c \
+        psession_get_psetlen.c \
+        psession_init.c \
+        psession_f2c.c \
+        psession_finalize.c \
+        psession_free_keyval.c \
+        psession_set_attr.c \
+        psession_set_info.c \
         pssend_init.c \
         pssend.c \
         pstart.c \

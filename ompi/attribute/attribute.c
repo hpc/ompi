@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -14,6 +15,8 @@
  *                         reserved.
  * Copyright (c) 2017      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -240,6 +243,7 @@
 #include "ompi/datatype/ompi_datatype.h"
 #include "ompi/communicator/communicator.h"  /* ompi_communicator_t generated in [COPY|DELETE]_ATTR_CALLBACKS */
 #include "ompi/win/win.h"                    /* ompi_win_t generated in [COPY|DELETE]_ATTR_CALLBACKS */
+#include "ompi/instance/instance.h"
 #include "ompi/mpi/fortran/base/fint_2_int.h"
 
 /*
@@ -255,6 +259,7 @@
 #define attr_communicator_f c_f_to_c_index
 #define attr_datatype_f d_f_to_c_index
 #define attr_win_f w_f_to_c_index
+#define attr_instance_f i_f_to_c_index
 
 #define CREATE_KEY(key) opal_bitmap_find_and_set_first_unset_bit(key_bitmap, (key))
 
@@ -424,6 +429,7 @@ static MPI_Fint translate_to_fint(attribute_value_t *val);
 static MPI_Aint translate_to_aint(attribute_value_t *val);
 
 static int compare_attr_sequence(const void *attr1, const void *attr2);
+static int ompi_attr_finalize (void);
 
 
 /*
@@ -560,6 +566,8 @@ int ompi_attr_init(void)
         return ret;
     }
 
+    ompi_mpi_instance_append_finalize (ompi_attr_finalize);
+
     return OMPI_SUCCESS;
 }
 
@@ -567,7 +575,7 @@ int ompi_attr_init(void)
 /*
  * Cleanup everything during MPI_Finalize().
  */
-int ompi_attr_finalize(void)
+static int ompi_attr_finalize (void)
 {
     ompi_attr_free_predefined();
     OBJ_DESTRUCT(&attribute_lock);
@@ -635,11 +643,22 @@ int ompi_attr_create_keyval(ompi_attribute_type_t type,
                             void *bindings_extra_state)
 {
     ompi_attribute_fortran_ptr_t es_tmp;
+    int rc;
+
+    rc = ompi_mpi_instance_retain ();
+    if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
+        return rc;
+    }
 
     es_tmp.c_ptr = extra_state;
-    return ompi_attr_create_keyval_impl(type, copy_attr_fn, delete_attr_fn,
-                                        key, &es_tmp, flags,
-                                        bindings_extra_state);
+    rc = ompi_attr_create_keyval_impl(type, copy_attr_fn, delete_attr_fn,
+                                      key, &es_tmp, flags,
+                                      bindings_extra_state);
+    if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
+        ompi_mpi_instance_release ();
+    }
+
+    return rc;
 }
 
 int ompi_attr_create_keyval_fint(ompi_attribute_type_t type,
@@ -706,6 +725,9 @@ int ompi_attr_free_keyval(ompi_attribute_type_t type, int *key,
 
     opal_atomic_wmb();
     OPAL_THREAD_UNLOCK(&attribute_lock);
+
+    /* balance out retain in keyval_create */
+    ompi_mpi_instance_release ();
 
     return MPI_SUCCESS;
 }
@@ -929,6 +951,10 @@ int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
         return MPI_SUCCESS;
     }
 
+    if (INSTANCE_ATTR == type) {
+        return MPI_ERR_ARG;
+    }
+
     OPAL_THREAD_LOCK(&attribute_lock);
 
     /* Get the first attribute in the object's hash */
@@ -1053,7 +1079,7 @@ static int ompi_attr_delete_impl(ompi_attribute_type_t type, void *object,
         goto exit;
     }
 
-    /* Check if the key is valid for the communicator/window/dtype. If
+    /* Check if the key is valid for the communicator/window/dtype/instance. If
        yes, then delete the attribute and key entry from the object's
        hash */
     ret = opal_hash_table_get_value_uint32(attr_hash, key, (void**) &attr);
@@ -1069,6 +1095,10 @@ static int ompi_attr_delete_impl(ompi_attribute_type_t type, void *object,
 
         case TYPE_ATTR:
             DELETE_ATTR_CALLBACKS(datatype, attr, keyval, object, ret);
+            break;
+
+        case INSTANCE_ATTR:
+            DELETE_ATTR_CALLBACKS(instance, attr, keyval, object, ret);
             break;
 
         default:
@@ -1228,6 +1258,10 @@ static int set_value(ompi_attribute_type_t type, void *object,
 
         case TYPE_ATTR:
             DELETE_ATTR_CALLBACKS(datatype, old_attr, keyval, object, ret);
+            break;
+
+        case INSTANCE_ATTR:
+            DELETE_ATTR_CALLBACKS(instance, old_attr, keyval, object, ret);
             break;
 
         default:

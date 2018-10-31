@@ -37,6 +37,7 @@
 #include "opal/class/opal_list.h"
 #include "opal/class/opal_hash_table.h"
 #include "opal/mca/threads/mutex.h"
+#include "ompi/instance/instance.h"
 
 BEGIN_C_DECLS
 
@@ -241,12 +242,6 @@ void ompi_mpi_dynamics_disable(const char *msg);
  * this function will opal_show_help() a message and return false.
  */
 bool ompi_mpi_dynamics_is_enabled(const char *function);
-
-/**
- * Clean up memory / resources by the MPI dynamics process
- * functionality checker
- */
-void ompi_mpi_dynamics_finalize(void);
 
 END_C_DECLS
 

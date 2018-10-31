@@ -92,6 +92,7 @@ libmpi_c_mpi_la_SOURCES = \
         cancel.c \
         cart_coords.c \
         cart_create.c \
+        cart_create_from_group.c \
         cartdim_get.c \
         cart_get.c \
         cart_map.c \
@@ -106,6 +107,7 @@ libmpi_c_mpi_la_SOURCES = \
         comm_connect.c \
         comm_create.c \
         comm_create_errhandler.c \
+        comm_create_from_group.c \
         comm_create_group.c \
         comm_create_keyval.c \
         comm_delete_attr.c \
@@ -129,7 +131,9 @@ libmpi_c_mpi_la_SOURCES = \
         comm_set_attr.c \
         comm_set_info.c \
         dist_graph_create.c \
+        dist_graph_create_from_group.c \
         dist_graph_create_adjacent.c \
+        dist_graph_create_adjacent_from_group.c \
         dist_graph_neighbors.c \
         dist_graph_neighbors_count.c \
         comm_set_errhandler.c \
@@ -178,6 +182,7 @@ libmpi_c_mpi_la_SOURCES = \
         file_iwrite_all.c \
         file_iwrite_shared.c \
         file_open.c \
+        file_open_from_group.c \
         file_preallocate.c \
         file_read_all_begin.c \
         file_read_all.c \
@@ -227,6 +232,7 @@ libmpi_c_mpi_la_SOURCES = \
         get_processor_name.c \
         get_version.c \
         graph_create.c \
+        graph_create_from_group.c \
         graph_get.c \
         graph_map.c \
         graph_neighbors_count.c \
@@ -240,6 +246,7 @@ libmpi_c_mpi_la_SOURCES = \
         group_excl.c \
         group_f2c.c \
         group_free.c \
+        group_from_session_pset.c \
         group_incl.c \
         group_intersection.c \
         group_range_excl.c \
@@ -266,6 +273,7 @@ libmpi_c_mpi_la_SOURCES = \
         init_thread.c \
         initialized.c \
         intercomm_create.c \
+        intercomm_create_from_groups.c \
         intercomm_merge.c \
         iprobe.c \
         irecv.c \
@@ -340,6 +348,22 @@ libmpi_c_mpi_la_SOURCES = \
         send_init.c \
         sendrecv.c \
         sendrecv_replace.c \
+        session_c2f.c \
+        session_create_errhandler.c \
+        session_create_keyval.c \
+        session_delete_attr.c \
+        session_get_attr.c \
+        session_get_info.c \
+        session_get_num_psets.c \
+        session_get_nth_pset.c \
+        session_get_pset_info.c \
+        session_get_psetlen.c \
+        session_init.c \
+        session_f2c.c \
+        session_finalize.c \
+        session_free_keyval.c \
+        session_set_attr.c \
+        session_set_info.c \
         ssend_init.c \
         ssend.c \
         start.c \
@@ -407,7 +431,9 @@ libmpi_c_mpi_la_SOURCES = \
         get.c \
         put.c \
 	win_allocate.c \
+	win_allocate_from_group.c \
 	win_allocate_shared.c \
+	win_allocate_shared_from_group.c \
 	win_attach.c \
         win_c2f.c \
         win_call_errhandler.c \
@@ -415,7 +441,9 @@ libmpi_c_mpi_la_SOURCES = \
         win_create_errhandler.c \
         win_create_keyval.c \
         win_create.c \
+        win_create_from_group.c \
 	win_create_dynamic.c \
+	win_create_dynamic_from_group.c \
         win_delete_attr.c \
 	win_detach.c \
         win_f2c.c \

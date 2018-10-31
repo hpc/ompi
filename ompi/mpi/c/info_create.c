@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2007 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -11,6 +12,8 @@
  *                         All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -49,6 +52,8 @@ static const char FUNC_NAME[] = "MPI_Info_create";
  */
 int MPI_Info_create(MPI_Info *info)
 {
+    OPAL_CR_NOOP_PROGRESS();
+
     if (MPI_PARAM_CHECK) {
         OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
         if (NULL == info) {
@@ -57,13 +62,7 @@ int MPI_Info_create(MPI_Info *info)
         }
     }
 
-    /*
-     * Call the object create function. This function not only
-     * allocates the space for MPI_Info, but also calls all the
-     * relevant init functions. Should I check if the fortran
-     * handle is valid
-     */
-    (*info) = OBJ_NEW(ompi_info_t);
+    *info = ompi_info_allocate ();
     if (NULL == (*info)) {
         return OMPI_ERRHANDLER_NOHANDLE_INVOKE(MPI_ERR_NO_MEM,
                                       FUNC_NAME);

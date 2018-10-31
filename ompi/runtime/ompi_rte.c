@@ -978,6 +978,8 @@ int ompi_rte_finalize(void)
     opal_pmix_finalize_nspace_tracker();
 
 
+    opal_finalize ();
+
     return OMPI_SUCCESS;
 }
 

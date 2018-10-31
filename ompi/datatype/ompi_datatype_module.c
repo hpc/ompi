@@ -18,6 +18,8 @@
  * Copyright (c) 2015-2018 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2018 FUJITSU LIMITED.  All rights reserved.
+ * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -36,8 +38,11 @@
 #include "opal/class/opal_pointer_array.h"
 #include "ompi/datatype/ompi_datatype.h"
 #include "ompi/datatype/ompi_datatype_internal.h"
+#include "ompi/instance/instance.h"
 
 #include "mpi.h"
+
+static int ompi_datatype_finalize (void);
 
 /**
  * This is the number of predefined datatypes. It is different than the MAX_PREDEFINED
@@ -670,11 +675,12 @@ int32_t ompi_datatype_init( void )
         }
     }
     ompi_datatype_default_convertors_init();
+    ompi_mpi_instance_append_finalize (ompi_datatype_finalize);
     return OMPI_SUCCESS;
 }
 
 
-int32_t ompi_datatype_finalize( void )
+static int ompi_datatype_finalize (void)
 {
     /* As the synonyms are just copies of the internal data we should not free them.
      * Anyway they are over the limit of OMPI_DATATYPE_MPI_MAX_PREDEFINED so they will never get freed.

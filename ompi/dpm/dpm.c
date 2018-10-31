@@ -21,7 +21,7 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
- * Copyright (c) 2021      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -492,10 +492,9 @@ bcast_rportlen:
                          NULL  ,                   /* remote_procs */
                          NULL,                     /* attrs */
                          comm->error_handler,      /* error handler */
-                         NULL,                     /* topo component */
                          group,                    /* local group */
-                         new_group_pointer         /* remote group */
-                         );
+                         new_group_pointer,        /* remote group */
+                         0);                       /* flags */
     if (OMPI_SUCCESS != rc) {
         goto exit;
     }
@@ -1703,7 +1702,6 @@ int ompi_dpm_dyn_init(void)
     return OMPI_SUCCESS;
 }
 
-
 /*
  * finalize the module
  */
@@ -1741,9 +1739,9 @@ int ompi_dpm_dyn_finalize(void)
             return OMPI_ERR_OUT_OF_RESOURCE;
         }
 
-        max = opal_pointer_array_get_size(&ompi_mpi_communicators);
+        max = opal_pointer_array_get_size(&ompi_comm_array);
         for (i=3; i<max; i++) {
-            comm = (ompi_communicator_t*)opal_pointer_array_get_item(&ompi_mpi_communicators,i);
+            comm = (ompi_communicator_t*)opal_pointer_array_get_item(&ompi_comm_array,i);
             if (NULL != comm &&  OMPI_COMM_IS_DYNAMIC(comm)) {
                 objs[j++] = disconnect_init(comm);
             }

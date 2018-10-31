@@ -155,6 +155,15 @@ OMPI_DECLSPEC int ompi_info_value_to_bool(char *value, bool *interp);
 OMPI_DECLSPEC int ompi_info_get_nkeys(ompi_info_t *info, int *nkeys);
 
 
+/**
+ * @brief Allocate a new info object
+ *
+ * This helper function ensures that the minimum infrastructure is initialized
+ * for creation/modification/destruction of an info object. Do not call
+ * OBJ_NEW(opal_info_t) directly.
+ */
+OMPI_DECLSPEC ompi_info_t *ompi_info_allocate (void);
+
 END_C_DECLS
 
 /**

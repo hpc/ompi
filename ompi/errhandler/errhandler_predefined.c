@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -17,6 +18,8 @@
  *                         All rights reserved.
  * Copyright (c) 2016-2019 Intel, Inc.  All rights reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -41,8 +44,10 @@
 #include "ompi/communicator/communicator.h"
 #include "ompi/file/file.h"
 #include "ompi/win/win.h"
+#include "ompi/instance/instance.h"
 #include "opal/util/printf.h"
 #include "opal/util/output.h"
+#include "ompi/runtime/mpiruntime.h"
 
 /*
  * Local functions
@@ -172,6 +177,25 @@ void ompi_mpi_errors_abort_win_handler(struct ompi_win_t **win,
   va_end(arglist);
 }
 
+void ompi_mpi_errors_are_fatal_instance_handler (struct ompi_instance_t **instance,
+                                                 int *error_code, ...)
+{
+  char *name;
+  struct ompi_communicator_t *abort_comm = NULL;
+  va_list arglist;
+
+  va_start(arglist, error_code);
+
+  if (NULL != instance) {
+      name = (*instance)->i_name;
+  } else {
+      name = NULL;
+  }
+  /* NTH: for now we still call these "sessions" */
+  backend_fatal("session", abort_comm, name, error_code, arglist);
+  va_end(arglist);
+}
+
 void ompi_mpi_errors_return_comm_handler(struct ompi_communicator_t **comm,
                                          int *error_code, ...)
 {
@@ -198,6 +222,18 @@ void ompi_mpi_errors_return_file_handler(struct ompi_file_t **file,
 
 void ompi_mpi_errors_return_win_handler(struct ompi_win_t **win,
                                         int *error_code, ...)
+{
+    /* Don't need anything more -- just need this function to exist */
+    /* Silence some compiler warnings */
+
+    va_list arglist;
+    va_start(arglist, error_code);
+    va_end(arglist);
+}
+
+
+void ompi_mpi_errors_return_instance_handler (struct ompi_instance_t **instance,
+                                              int *error_code, ...)
 {
     /* Don't need anything more -- just need this function to exist */
     /* Silence some compiler warnings */

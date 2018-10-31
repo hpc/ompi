@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -16,6 +17,8 @@
  * Copyright (c) 2014-2015 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
+ * Copyright (c) 2018      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -56,6 +59,13 @@ mca_topo_base_comm_select(const ompi_communicator_t*  comm,
                           mca_topo_base_module_t**    selected_module,
                           uint32_t                    type);
 
+/* Select a topo module for a particular type of topology */
+OMPI_DECLSPEC int
+mca_topo_base_group_select (const ompi_group_t *group,
+                            mca_topo_base_module_t *preferred_module,
+                            mca_topo_base_module_t **selected_module,
+                            uint32_t type);
+
 /* Find all components that want to be considered in this job */
 OMPI_DECLSPEC int
 mca_topo_base_find_available(bool enable_progress_threads,
@@ -78,6 +88,13 @@ mca_topo_base_cart_create(mca_topo_base_module_t *topo_module,
                           const int *periods,
                           bool reorder,
                           ompi_communicator_t** comm_topo);
+
+OMPI_DECLSPEC int
+mca_topo_base_cart_create_from_group (mca_topo_base_module_t *topo_module, ompi_group_t *group,
+                                      const char *tag, opal_info_t *info,
+                                      ompi_errhandler_t *errhandler, int ndims, const int *dims,
+                                      const int *periods, bool reorder,
+                                      ompi_communicator_t **comm_topo);
 
 OMPI_DECLSPEC int
 mca_topo_base_cart_coords(ompi_communicator_t *comm,
@@ -133,6 +150,12 @@ mca_topo_base_graph_create(mca_topo_base_module_t *topo_module,
                            ompi_communicator_t** new_comm);
 
 OMPI_DECLSPEC int
+mca_topo_base_graph_create_from_group (mca_topo_base_module_t *topo_module, ompi_group_t *group,
+                                       const char *tag, opal_info_t *info,
+                                       ompi_errhandler_t *errhandler, int nnodes, const int *index,
+                                       const int *edges, bool reorder, ompi_communicator_t **new_comm);
+
+OMPI_DECLSPEC int
 mca_topo_base_graph_get(ompi_communicator_t *comm,
                         int maxindex,
                         int maxedges,
@@ -176,6 +199,13 @@ mca_topo_base_dist_graph_create(mca_topo_base_module_t* module,
                                 ompi_communicator_t **new_comm);
 
 OMPI_DECLSPEC int
+mca_topo_base_dist_graph_create_from_group (mca_topo_base_module_t *module, ompi_group_t *group,
+                                            const char *tag, ompi_errhandler_t *errhandler, int n,
+                                            const int nodes[], const int degrees[], const int targets[],
+                                            const int weights[], opal_info_t *info, int reorder,
+                                            ompi_communicator_t **new_comm);
+
+OMPI_DECLSPEC int
 mca_topo_base_dist_graph_create_adjacent(mca_topo_base_module_t* module,
                                          ompi_communicator_t *old_comm,
                                          int indegree, const int sources[],
@@ -183,6 +213,14 @@ mca_topo_base_dist_graph_create_adjacent(mca_topo_base_module_t* module,
                                          const int destinations[], const int destweights[],
                                          opal_info_t *info, int reorder,
                                          ompi_communicator_t **comm_dist_graph);
+
+OMPI_DECLSPEC int
+mca_topo_base_dist_graph_create_adjacent_from_group (mca_topo_base_module_t* module, ompi_group_t *group,
+                                                     const char *tag, ompi_errhandler_t *errhandler,
+                                                     int indegree, const int sources[], const int sourceweights[],
+                                                     int outdegree, const int destinations[],
+                                                     const int destweights[], opal_info_t *info, int reorder,
+                                                     ompi_communicator_t **comm_dist_graph);
 
 OMPI_DECLSPEC int
 mca_topo_base_dist_graph_neighbors(ompi_communicator_t *comm,
