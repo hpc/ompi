@@ -589,7 +589,7 @@ static int ompi_mpi_instance_init_common (void)
     return OMPI_SUCCESS;
 }
 
-int ompi_mpi_instance_init (MPI_Flags *flags, opal_info_t *info, ompi_errhandler_t *errhandler, ompi_instance_t **instance)
+int ompi_mpi_instance_init (int ts_level,  opal_info_t *info, ompi_errhandler_t *errhandler, ompi_instance_t **instance)
 {
     ompi_instance_t *new_instance;
     int ret;
@@ -598,7 +598,7 @@ int ompi_mpi_instance_init (MPI_Flags *flags, opal_info_t *info, ompi_errhandler
 
     /* If thread support was enabled, then setup OPAL to allow for them by deault. This must be done
      * early to prevent a race condition that can occur with orte_init(). */
-    if (*flags & MPI_FLAG_THREAD_CONCURRENT) {
+    if (ts_level == MPI_THREAD_MULTIPLE) {
         opal_set_using_threads(true);
     }
 
