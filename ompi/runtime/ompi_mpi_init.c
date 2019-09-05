@@ -386,28 +386,9 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
         }
     }
 
-    /* Figure out the final MPI thread levels.  If we were not
-       compiled for support for MPI threads, then don't allow
-       MPI_THREAD_MULTIPLE.  Set this stuff up here early in the
-       process so that other components can make decisions based on
-       this value. */
-
     ompi_mpi_thread_level(requested, provided);
 
-    MPI_Flags flags;
-    switch (*provided) {
-    case MPI_THREAD_SINGLE:
-    case MPI_THREAD_FUNNELED:
-    case MPI_THREAD_SERIALIZED:
-        flags = MPI_FLAG_THREAD_NONCONCURRENT_SINGLE;
-        break;
-    case MPI_THREAD_MULTIPLE:
-        flags = MPI_FLAG_THREAD_CONCURRENT;
-        break;
-    }
-
-
-    ret = ompi_mpi_instance_init (&flags, &ompi_mpi_info_null.info.super, MPI_ERRORS_ARE_FATAL, &ompi_mpi_instance_default);
+    ret = ompi_mpi_instance_init (*provided, &ompi_mpi_info_null.info.super, MPI_ERRORS_ARE_FATAL, &ompi_mpi_instance_default);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
         error = "ompi_mpi_init: ompi_mpi_instance_init failed";
         goto error;

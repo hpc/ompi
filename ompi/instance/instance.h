@@ -118,11 +118,11 @@ void ompi_mpi_instance_release (void);
 /**
  * @brief Create a new MPI instance
  *
- * @param[inout] flags     instance flags (see mpi.h)
+ * @param[in]    ts_level  thread support level (see mpi.h)
  * @param[in]    info      info object
  * @param[in]    errhander errhandler to set on the instance
  */
-OMPI_DECLSPEC int ompi_mpi_instance_init (MPI_Flags *flags, opal_info_t *info, ompi_errhandler_t *errhandler, ompi_instance_t **instance);
+OMPI_DECLSPEC int ompi_mpi_instance_init (int ts_level, opal_info_t *info, ompi_errhandler_t *errhandler, ompi_instance_t **instance);
 
 /**
  * @brief Destroy an MPI instance and set it to MPI_SESSION_NULL

@@ -1294,6 +1294,11 @@ int ompi_comm_create_from_group (ompi_group_t *group, const char *tag, opal_info
     snprintf(newcomp->c_name, MPI_MAX_OBJECT_NAME, "MPI COMM %s FROM GROUP",
 	     ompi_comm_print_cid (newcomp));
 
+    newcomp->super.s_info = OBJ_NEW(opal_info_t);
+    if (NULL == newcomp->super.s_info) {
+        return OMPI_ERR_OUT_OF_RESOURCE;
+    }
+
     /* NTH: HACK IN SLEEPY STUFF */
     {
         opal_info_entry_t *info_entry;

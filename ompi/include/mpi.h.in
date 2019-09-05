@@ -485,8 +485,6 @@ typedef int (MPI_Grequest_query_function)(void *, MPI_Status *);
 typedef int (MPI_Grequest_free_function)(void *);
 typedef int (MPI_Grequest_cancel_function)(void *, int);
 
-typedef unsigned long MPI_Flags;
-
 /*
  * Deprecated typedefs.  Usage is discouraged, as these may be deleted
  * in future versions of the MPI Standard.
@@ -1854,7 +1852,7 @@ OMPI_DECLSPEC  int MPI_Session_get_num_psets (MPI_Session session, int *npset_na
 OMPI_DECLSPEC  int MPI_Session_get_nth_pset (MPI_Session session, int n, int len, char *pset_name);
 OMPI_DECLSPEC  int MPI_Session_get_pset_info (MPI_Session session, const char *pset_name, MPI_Info *info_used);
 OMPI_DECLSPEC  int MPI_Session_get_psetlen (MPI_Session session, int n, int *pset_name_len);
-OMPI_DECLSPEC  int MPI_Session_init (MPI_Flags *flags, MPI_Info info, MPI_Errhandler errhandler,
+OMPI_DECLSPEC  int MPI_Session_init (MPI_Info info, MPI_Errhandler errhandler,
                                      MPI_Session *session);
 OMPI_DECLSPEC  MPI_Session MPI_Session_f2c (MPI_Fint session);
 OMPI_DECLSPEC  int MPI_Session_set_attr (MPI_Session session, int session_keyval, void *attribute_val);
@@ -2582,7 +2580,7 @@ OMPI_DECLSPEC  int PMPI_Session_get_num_psets (MPI_Session session, int *npset_n
 OMPI_DECLSPEC  int PMPI_Session_get_nth_pset (MPI_Session session, int n, int len, char *pset_name);
 OMPI_DECLSPEC  int PMPI_Session_get_pset_info (MPI_Session session, const char *pset_name, MPI_Info *info_used);
 OMPI_DECLSPEC  int PMPI_Session_get_psetlen (MPI_Session session, int n, int *pset_name_len);
-OMPI_DECLSPEC  int PMPI_Session_init (MPI_Flags *flags, MPI_Info info, MPI_Errhandler errhandler,
+OMPI_DECLSPEC  int PMPI_Session_init (MPI_Info info, MPI_Errhandler errhandler,
                                      MPI_Session *session);
 OMPI_DECLSPEC  MPI_Session PMPI_Session_f2c (MPI_Fint session);
 OMPI_DECLSPEC  int PMPI_Session_set_attr (MPI_Session session, int session_keyval, void *attribute_val);
