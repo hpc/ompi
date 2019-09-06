@@ -51,7 +51,6 @@
 #include "ompi/dpm/dpm.h"
 #include "ompi/memchecker.h"
 #include "ompi/instance/instance.h"
-#include "ompi/mpi/fortran/use-mpi-f08/constants.h"
 
 /*
 ** Table for Fortran <-> C communicator handle conversion
@@ -123,25 +122,26 @@ int ompi_comm_init(void)
      */
 
     if (OPAL_SUCCESS != opal_pointer_array_set_item(&ompi_comm_f_to_c_table,
-                                                      OMPI_MPI_COMM_NULL,
+                                                      0,
                                                       (void *)-1L)) {
         return OMPI_ERROR;
     }
 
     if (OPAL_SUCCESS != opal_pointer_array_set_item(&ompi_comm_f_to_c_table,
-                                                      OMPI_MPI_COMM_WORLD,
+                                                      1,
                                                       (void *)-1L)) {
         return OMPI_ERROR;
     }
 
     if (OPAL_SUCCESS != opal_pointer_array_set_item(&ompi_comm_f_to_c_table,
-                                                      OMPI_MPI_COMM_SELF,
+                                                      2,
                                                       (void *)-1L)) {
         return OMPI_ERROR;
     }
 
     /* Setup MPI_COMM_NULL */
     OBJ_CONSTRUCT(&ompi_mpi_comm_null, ompi_communicator_t);
+    assert(ompi_mpi_comm_null.comm.c_f_to_c_index == 2);
     ompi_mpi_comm_null.comm.c_local_group  = &ompi_mpi_group_null.group;
     ompi_mpi_comm_null.comm.c_remote_group = &ompi_mpi_group_null.group;
     OBJ_RETAIN(&ompi_mpi_group_null.group);
@@ -170,6 +170,9 @@ int ompi_comm_init(void)
     /* initialize communicator requests (for ompi_comm_idup) */
     ompi_comm_request_init ();
 
+    /* get a reference on the attributes subsys */
+    ompi_attr_get_ref();
+
     ompi_mpi_instance_append_finalize (ompi_comm_finalize);
 
     return OMPI_SUCCESS;
@@ -185,7 +188,7 @@ int ompi_comm_init_mpi3 (void)
 
     /* Setup MPI_COMM_WORLD */
     OBJ_CONSTRUCT(&ompi_mpi_comm_world, ompi_communicator_t);
-    assert(ompi_mpi_comm_world.comm.c_f_to_c_index == OMPI_MPI_COMM_WORLD);
+    assert(ompi_mpi_comm_world.comm.c_f_to_c_index == 0);
 
     ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://world", &group);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
@@ -239,7 +242,7 @@ int ompi_comm_init_mpi3 (void)
     }
     /* Setup MPI_COMM_SELF */
     OBJ_CONSTRUCT(&ompi_mpi_comm_self, ompi_communicator_t);
-    assert(ompi_mpi_comm_self.comm.c_f_to_c_index == OMPI_MPI_COMM_SELF);
+    assert(ompi_mpi_comm_self.comm.c_f_to_c_index == 1);
 
     ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://self", &group);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
@@ -271,36 +274,11 @@ int ompi_comm_init_mpi3 (void)
        MPI_COMM_SELF, the keyhash will automatically be created. */
     ompi_mpi_comm_self.comm.c_keyhash = NULL;
 
-    /* Setup MPI_COMM_NULL */
-    OBJ_CONSTRUCT(&ompi_mpi_comm_null, ompi_communicator_t);
-    assert(ompi_mpi_comm_null.comm.c_f_to_c_index == 2);
-    ompi_mpi_comm_null.comm.c_local_group  = &ompi_mpi_group_null.group;
-    ompi_mpi_comm_null.comm.c_remote_group = &ompi_mpi_group_null.group;
-    OBJ_RETAIN(&ompi_mpi_group_null.group);
-    OBJ_RETAIN(&ompi_mpi_group_null.group);
+    /*
+     * finally here we set the predefined attribute keyvals
+     */
+    ompi_attr_create_predefined();
 
-/* HPP TODO */
-    (void) ompi_comm_extended_cid_block_new (&ompi_mpi_comm_world.comm.c_contextidb,
-                                             &ompi_mpi_comm_null.comm.c_contextidb, false);
-    ompi_mpi_comm_null.comm.c_contextid    = ompi_mpi_comm_null.comm.c_contextidb.block_cid;
-    ompi_mpi_comm_null.comm.c_index        = 2;
-    ompi_mpi_comm_null.comm.c_my_rank      = MPI_PROC_NULL;
-
-    /* unlike world, self, and parent, comm_null does not inherit the initial error
-     * handler */
-    ompi_mpi_comm_null.comm.error_handler  = &ompi_mpi_errors_are_fatal.eh;
-    OBJ_RETAIN( ompi_mpi_comm_null.comm.error_handler );
-    opal_pointer_array_set_item (&ompi_mpi_communicators, 2, &ompi_mpi_comm_null);
-
-    opal_string_copy(ompi_mpi_comm_null.comm.c_name, "MPI_COMM_NULL",
-                     sizeof(ompi_mpi_comm_null.comm.c_name));
-    ompi_mpi_comm_null.comm.c_flags |= OMPI_COMM_NAMEISSET | OMPI_COMM_INTRINSIC |
-        OMPI_COMM_GLOBAL_INDEX;
-
-    /* Initialize the parent communicator to MPI_COMM_NULL */
-    ompi_mpi_comm_parent = &ompi_mpi_comm_null.comm;
-    OBJ_RETAIN(&ompi_mpi_comm_null);
-    OBJ_RETAIN(&ompi_mpi_group_null.group);
     OBJ_RETAIN(&ompi_mpi_errors_are_fatal.eh);
     /* During dyn_init, the comm_parent error handler will be set to the same
      * as comm_world (thus, the initial error handler). */
@@ -337,7 +315,7 @@ ompi_communicator_t *ompi_comm_allocate ( int local_size, int remote_size )
 
 static int ompi_comm_finalize (void)
 {
-    int max, i;
+    int max, i, ret = OMPI_SUCCESS;
     ompi_communicator_t *comm;
 
     /* disconnect all dynamic communicators */
@@ -430,7 +408,10 @@ static int ompi_comm_finalize (void)
     /* finalize communicator requests */
     ompi_comm_request_fini ();
 
-    return OMPI_SUCCESS;
+    /* release a reference to the attributes subsys */
+    ret = ompi_attr_put_ref();
+
+    return ret;
 }
 
 /********************************************************************************/
@@ -457,9 +438,9 @@ static void ompi_comm_construct(ompi_communicator_t* comm)
     /*
      * magic numerology - see TOPDIR/ompi/include/mpif-values.pl
      */
-    idx = (comm == ompi_mpi_comm_world_addr) ? OMPI_MPI_COMM_WORLD :
-              (comm == ompi_mpi_comm_self_addr) ? OMPI_MPI_COMM_SELF :
-                  (comm == ompi_mpi_comm_null_addr) ? OMPI_MPI_COMM_NULL : -1;
+    idx = (comm == (ompi_communicator_t*)ompi_mpi_comm_world_addr) ? 0 :
+              (comm == (ompi_communicator_t*)ompi_mpi_comm_self_addr) ? 1 :
+                  (comm == (ompi_communicator_t*)ompi_mpi_comm_null_addr) ? 2 : -1;
     if (-1 == idx) {
         comm->c_f_to_c_index = opal_pointer_array_add(&ompi_comm_f_to_c_table,
                                                       comm);

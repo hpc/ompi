@@ -18,6 +18,8 @@
 #                         and Technology (RIST).  All rights reserved.
 # Copyright (c) 2016      IBM Corporation.  All rights reserved.
 # Copyright (c) 2018      FUJITSU LIMITED.  All rights reserved.
+# Copyright (c) 2019      Triad National Security, LLC. All rights
+#                         reserved.
 # $COPYRIGHT$
 #
 # Additional copyrights may follow
@@ -167,6 +169,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         comm_connect_f.c \
         comm_create_errhandler_f.c \
         comm_create_f.c \
+        comm_create_from_group_f.c \
         comm_create_group_f.c \
         comm_create_keyval_f.c \
         comm_delete_attr_f.c \
@@ -288,6 +291,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         group_compare_f.c \
         group_difference_f.c \
         group_excl_f.c \
+        group_from_session_pset_f.c \
         group_free_f.c \
         group_incl_f.c \
         group_intersection_f.c \
@@ -329,6 +333,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         initialized_f.c \
         init_thread_f.c \
         intercomm_create_f.c \
+        intercomm_from_groups_f.c \
         intercomm_merge_f.c \
         iprobe_f.c \
         irecv_f.c \
@@ -388,6 +393,12 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         send_init_f.c \
         sendrecv_f.c \
         sendrecv_replace_f.c \
+        session_get_info_f.c \
+        session_get_nth_pset_f.c \
+        session_get_num_psets_f.c \
+        session_get_pset_info_f.c \
+        session_init_f.c \
+        session_finalize_f.c \
         ssend_f.c \
         ssend_init_f.c \
         startall_f.c \

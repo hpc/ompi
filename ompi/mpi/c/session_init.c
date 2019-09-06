@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -43,7 +43,7 @@ int MPI_Session_init (MPI_Info info, MPI_Errhandler errhandler, MPI_Session *ses
     }
 
     if (MPI_INFO_NULL != info) {
-        (void) ompi_info_get (info, "thread_support_level", MPI_MAX_INFO_VAL, info_value, &flag);
+        (void) ompi_info_get (info, "mpi_thread_support_level", MPI_MAX_INFO_VAL, info_value, &flag);
         if (flag) {
             if(strncmp(info_value, ts_level_multi, strlen(ts_level_multi)) == 0) {
                 ts_level = MPI_THREAD_MULTIPLE;

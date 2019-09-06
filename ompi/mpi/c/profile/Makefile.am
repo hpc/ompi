@@ -337,7 +337,6 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         psession_get_num_psets.c \
         psession_get_nth_pset.c \
         psession_get_pset_info.c \
-        psession_get_psetlen.c \
         psession_init.c \
         psession_f2c.c \
         psession_finalize.c \

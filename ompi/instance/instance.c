@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -34,7 +34,6 @@
 #include "ompi/mpiext/mpiext.h"
 
 #include "ompi/mca/hook/base/base.h"
-#include "ompi/mca/rte/base/base.h"
 #include "ompi/mca/op/base/base.h"
 #include "opal/mca/allocator/base/base.h"
 #include "opal/mca/rcache/base/base.h"
@@ -49,6 +48,8 @@
 
 #include "opal/mca/mpool/base/mpool_base_tree.h"
 #include "ompi/mca/pml/base/pml_base_bsend.h"
+#include "ompi/util/timings.h"
+#include "opal/mca/pmix/pmix-internal.h"
 
 ompi_predefined_instance_t ompi_mpi_instance_null = {{{{0}}}};
 
@@ -89,7 +90,7 @@ OBJ_CLASS_INSTANCE(ompi_instance_t, opal_infosubscriber_t, ompi_instance_constru
 
 /* NTH: frameworks needed by MPI */
 static mca_base_framework_t *ompi_framework_dependencies[] = {
-    &ompi_hook_base_framework, &ompi_rte_base_framework, &ompi_op_base_framework,
+    &ompi_hook_base_framework, &ompi_op_base_framework,
     &opal_allocator_base_framework, &opal_rcache_base_framework, &opal_mpool_base_framework,
     &ompi_bml_base_framework, &ompi_pml_base_framework, &ompi_coll_base_framework,
     &ompi_osc_base_framework, NULL,
@@ -277,17 +278,39 @@ int ompi_mpi_instance_retain (void)
     return OMPI_SUCCESS;
 }
 
+static void fence_release(pmix_status_t status, void *cbdata)
+{
+    volatile bool *active = (volatile bool*)cbdata;
+    OPAL_ACQUIRE_OBJECT(active);
+    *active = false;
+    OPAL_POST_OBJECT(active);
+}
+
+static void evhandler_reg_callbk(pmix_status_t status,
+                                 size_t evhandler_ref,
+                                 void *cbdata)
+{
+    opal_pmix_lock_t *lock = (opal_pmix_lock_t*)cbdata;
+
+    lock->status = status;
+    OPAL_PMIX_WAKEUP_THREAD(lock);
+}
+
 /**
  * @brief Function that starts up the common components needed by all instances
  */
 static int ompi_mpi_instance_init_common (void)
 {
-    ompi_errhandler_errtrk_t errtrk;
+    int ret;
     ompi_proc_t **procs;
     size_t nprocs;
-    opal_list_t info;
-    opal_value_t *kv;
-    int ret;
+    volatile bool active;
+    bool background_fence = false;
+    pmix_info_t info[2];
+    pmix_status_t rc;
+    opal_pmix_lock_t mylock;
+    OMPI_TIMING_INIT(64);
+
 
     ret = ompi_mpi_instance_retain ();
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
@@ -340,35 +363,39 @@ static int ompi_mpi_instance_init_common (void)
         }
     }
 
+    OMPI_TIMING_NEXT("initialization");
+
     /* Setup RTE */
     if (OMPI_SUCCESS != (ret = ompi_rte_init (NULL, NULL))) {
         return ompi_instance_print_error ("ompi_mpi_init: ompi_rte_init failed", ret);
     }
 
+    OMPI_TIMING_NEXT("rte_init");
+    OMPI_TIMING_IMPORT_OPAL("orte_ess_base_app_setup");
+    OMPI_TIMING_IMPORT_OPAL("rte_init");
+
     ompi_rte_initialized = true;
 
     /* Register the default errhandler callback  */
-    errtrk.status = OPAL_ERROR;
-    errtrk.active = true;
     /* we want to go first */
-    OBJ_CONSTRUCT(&info, opal_list_t);
-    kv = OBJ_NEW(opal_value_t);
-    kv->key = strdup(OPAL_PMIX_EVENT_HDLR_PREPEND);
-    opal_list_append(&info, &kv->super);
+    PMIX_INFO_LOAD(&info[0], PMIX_EVENT_HDLR_PREPEND, NULL, PMIX_BOOL);
     /* give it a name so we can distinguish it */
-    kv = OBJ_NEW(opal_value_t);
-    kv->key = strdup(OPAL_PMIX_EVENT_HDLR_NAME);
-    kv->type = OPAL_STRING;
-    kv->data.string = strdup("MPI-Default");
-    opal_list_append(&info, &kv->super);
-    opal_pmix.register_evhandler(NULL, &info, ompi_errhandler_callback,
-                                 ompi_errhandler_registration_callback,
-                                 (void*)&errtrk);
-    OMPI_LAZY_WAIT_FOR_COMPLETION(errtrk.active);
+    PMIX_INFO_LOAD(&info[1], PMIX_EVENT_HDLR_NAME, "MPI-Default", PMIX_STRING);
+    OPAL_PMIX_CONSTRUCT_LOCK(&mylock);
+    PMIx_Register_event_handler(NULL, 0, info, 2, ompi_errhandler_callback, evhandler_reg_callbk, (void*)&mylock);
+    OPAL_PMIX_WAIT_THREAD(&mylock);
+    rc = mylock.status;
+    OPAL_PMIX_DESTRUCT_LOCK(&mylock);
+    PMIX_INFO_DESTRUCT(&info[0]);
+    PMIX_INFO_DESTRUCT(&info[1]);
+    if (PMIX_SUCCESS != rc) {
+        ret = opal_pmix_convert_status(rc);
+        return ret;
+    }
 
-    OPAL_LIST_DESTRUCT(&info);
-    if (OPAL_SUCCESS != errtrk.status) {
-        return ompi_instance_print_error ("Error handler registration", errtrk.status);
+    /* initialize info */
+    if (OMPI_SUCCESS != (ret = ompi_mpiinfo_init_mpi3())) {
+        return ompi_instance_print_error ("ompi_info_init_mpi3() failed", ret);
     }
 
     /* declare our presence for interlib coordination, and
@@ -415,11 +442,77 @@ static int ompi_mpi_instance_init_common (void)
         return ompi_instance_print_error ("mca_pml_base_select() failed", ret);
     }
 
+    OMPI_TIMING_IMPORT_OPAL("orte_init");
+    OMPI_TIMING_NEXT("rte_init-commit");
+
     /* exchange connection info - this function may also act as a barrier
      * if data exchange is required. The modex occurs solely across procs
      * in our job. If a barrier is required, the "modex" function will
      * perform it internally */
-    opal_pmix.commit ();
+    rc = PMIx_Commit();
+    if (PMIX_SUCCESS != rc) {
+        ret = opal_pmix_convert_status(rc);
+        return ret;  /* TODO: need to fix this */
+    }
+
+   OMPI_TIMING_NEXT("commit");
+#if (OPAL_ENABLE_TIMING)
+    if (OMPI_TIMING_ENABLED && !opal_pmix_base_async_modex &&
+            opal_pmix_collect_all_data && !ompi_singleton) {
+        if (PMIX_SUCCESS != (rc = PMIx_Fence(NULL, 0, NULL, 0))) {
+            ret = opal_pmix_convert_status(rc);
+            return ompi_instance_print_error ("timing: pmix-barrier-1 failed", ret);
+        }
+        OMPI_TIMING_NEXT("pmix-barrier-1");
+        if (PMIX_SUCCESS != (rc = PMIx_Fence(NULL, 0, NULL, 0))) {
+            return ompi_instance_print_error ("timing: pmix-barrier-2 failed", ret);
+        }
+        OMPI_TIMING_NEXT("pmix-barrier-2");
+    }
+#endif
+
+   if (!ompi_singleton) {
+        if (opal_pmix_base_async_modex) {
+            /* if we are doing an async modex, but we are collecting all
+             * data, then execute the non-blocking modex in the background.
+             * All calls to modex_recv will be cached until the background
+             * modex completes. If collect_all_data is false, then we skip
+             * the fence completely and retrieve data on-demand from the
+             * source node.
+             */
+            if (opal_pmix_collect_all_data) {
+                /* execute the fence_nb in the background to collect
+                 * the data */
+                background_fence = true;
+                active = true;
+                OPAL_POST_OBJECT(&active);
+                PMIX_INFO_LOAD(&info[0], PMIX_COLLECT_DATA, &opal_pmix_collect_all_data, PMIX_BOOL);
+                if( PMIX_SUCCESS != (rc = PMIx_Fence_nb(NULL, 0, NULL, 0,
+                                                        fence_release,
+                                                        (void*)&active))) {
+                    ret = opal_pmix_convert_status(rc);
+                    return ompi_instance_print_error ("PMIx_Fence_nb() failed", ret);
+                }
+            }
+        } else {
+            /* we want to do the modex - we block at this point, but we must
+             * do so in a manner that allows us to call opal_progress so our
+             * event library can be cycled as we have tied PMIx to that
+             * event base */
+            active = true;
+            OPAL_POST_OBJECT(&active);
+            PMIX_INFO_LOAD(&info[0], PMIX_COLLECT_DATA, &opal_pmix_collect_all_data, PMIX_BOOL);
+            rc = PMIx_Fence_nb(NULL, 0, info, 1, fence_release, (void*)&active);
+            if( PMIX_SUCCESS != rc) {
+                ret = opal_pmix_convert_status(rc);
+                return ompi_instance_print_error ("PMIx_Fence() failed", ret);
+            }
+            /* cannot just wait on thread as we need to call opal_progress */
+            OMPI_LAZY_WAIT_FOR_COMPLETION(active);
+        }
+    }
+
+    OMPI_TIMING_NEXT("modex");
 
     /* select buffered send allocator component to be used */
     if (OMPI_SUCCESS != (ret = mca_pml_base_bsend_init ())) {
@@ -474,11 +567,6 @@ static int ompi_mpi_instance_init_common (void)
     /* initialize windows */
     if (OMPI_SUCCESS != (ret = ompi_win_init ())) {
         return ompi_instance_print_error ("ompi_win_init() failed", ret);
-    }
-
-    /* initialize attribute meta-data structure for comm/win/dtype */
-    if (OMPI_SUCCESS != (ret = ompi_attr_init ())) {
-        return ompi_instance_print_error ("ompi_attr_init() failed", ret);
     }
 
     /* Setup the dynamic process management (DPM) subsystem */
@@ -540,12 +628,48 @@ static int ompi_mpi_instance_init_common (void)
         return ompi_instance_print_error ("ompi_mpi_init: ompi_comm_cid_init failed", ret);
     }
 
-    /* Check whether we have been spawned or not.  We introduce that
-       at the very end, since we need collectives, datatypes, ptls
-       etc. up and running here.... */
-    if (OMPI_SUCCESS != (ret = ompi_dpm_dyn_init())) {
-        return ompi_instance_print_error ("ompi_dpm_dyn_init() failed", ret);
+    /* Do we need to wait for a debugger? */
+    ompi_rte_wait_for_debugger();
+
+    /* Next timing measurement */
+    OMPI_TIMING_NEXT("modex-barrier");
+
+    if (!ompi_singleton) {
+        /* if we executed the above fence in the background, then
+         * we have to wait here for it to complete. However, there
+         * is no reason to do two barriers! */
+        if (background_fence) {
+            OMPI_LAZY_WAIT_FOR_COMPLETION(active);
+        } else if (!ompi_async_mpi_init) {
+            /* wait for everyone to reach this point - this is a hard
+             * barrier requirement at this time, though we hope to relax
+             * it at a later point */
+            bool flag = false;
+            active = true;
+            OPAL_POST_OBJECT(&active);
+            PMIX_INFO_LOAD(&info[0], PMIX_COLLECT_DATA, &flag, PMIX_BOOL);
+            if (PMIX_SUCCESS != (rc = PMIx_Fence_nb(NULL, 0, info, 1,
+                                                    fence_release, (void*)&active))) {
+                ret = opal_pmix_convert_status(rc);
+                return ompi_instance_print_error ("PMIx_Fence_nb() failed", ret);
+            }
+            OMPI_LAZY_WAIT_FOR_COMPLETION(active);
+        }
     }
+
+    /* check for timing request - get stop time and report elapsed
+       time if so, then start the clock again */
+    OMPI_TIMING_NEXT("barrier");
+
+#if OPAL_ENABLE_PROGRESS_THREADS == 0
+    /* Start setting up the event engine for MPI operations.  Don't
+       block in the event library, so that communications don't take
+       forever between procs in the dynamic code.  This will increase
+       CPU utilization for the remainder of MPI_INIT when we are
+       blocking on RTE-level events, but may greatly reduce non-TCP
+       latency. */
+    opal_progress_set_event_flag(OPAL_EVLOOP_NONBLOCK);
+#endif
 
     /* Undo OPAL calling opal_progress_event_users_increment() during
        opal_init, to get better latency when not using TCP.  Do
@@ -635,6 +759,7 @@ int ompi_mpi_instance_init (int ts_level,  opal_info_t *info, ompi_errhandler_t 
     }
 
     *instance = new_instance;
+    opal_mutex_unlock (&instance_lock);
 
     return OMPI_SUCCESS;
 }
@@ -713,6 +838,8 @@ static int ompi_mpi_instance_finalize_common (void)
         }
     }
 
+    ompi_proc_finalize();
+
     OBJ_DESTRUCT(&ompi_mpi_instance_null);
 
     ompi_mpi_instance_release ();
@@ -747,28 +874,43 @@ int ompi_mpi_instance_finalize (ompi_instance_t **instance)
     return ret;
 }
 
-static void ompi_instance_get_num_psets_complete (int status, opal_list_t *info,
-                                                  void *cbdata, opal_pmix_release_cbfunc_t release_fn,
+static void ompi_instance_get_num_psets_complete (pmix_status_t status, 
+		                                  pmix_info_t *info,
+		                                  size_t ninfo,
+                                                  void *cbdata, 
+                                                  pmix_release_cbfunc_t release_fn,
                                                   void *release_cbdata)
 {
-    opal_pmix_lock_t *lock = (opal_pmix_lock_t *) cbdata;
-    opal_value_t *kv;
+    size_t n;
+    pmix_status_t rc;
+    size_t sz;
+    size_t num_pmix_psets = 0;
+    char *pset_names = NULL;
 
-    OPAL_LIST_FOREACH(kv, info, opal_value_t) {
-        if (0 == strcmp (kv->key, OPAL_PMIX_QUERY_NUM_PSETS)) {
-            if (kv->data.size != ompi_mpi_instance_num_pmix_psets) {
+    opal_pmix_lock_t *lock = (opal_pmix_lock_t *) cbdata;
+
+    for (n=0; n < ninfo; n++) {
+        if (0 == strcmp(info[n].key,PMIX_QUERY_NUM_PSETS)) {
+            PMIX_VALUE_UNLOAD(rc,
+                              &info[n].value,
+                              (void **)&num_pmix_psets,
+                              &sz);
+            if (num_pmix_psets != ompi_mpi_instance_num_pmix_psets) {
                 opal_argv_free (ompi_mpi_instance_pmix_psets);
                 ompi_mpi_instance_pmix_psets = NULL;
             }
-
-            ompi_mpi_instance_num_pmix_psets = kv->data.size;
-        } else if (0 == strcmp (kv->key, OPAL_PMIX_QUERY_PSET_NAMES)) {
+            ompi_mpi_instance_num_pmix_psets = num_pmix_psets;
+        } else if (0 == strcmp (info[n].key, PMIX_QUERY_PSET_NAMES)) {
             if (ompi_mpi_instance_pmix_psets) {
                 opal_argv_free (ompi_mpi_instance_pmix_psets);
             }
-
-            ompi_mpi_instance_pmix_psets = opal_argv_split (kv->data.string, ',');
+            PMIX_VALUE_UNLOAD(rc,
+                              &info[n].value,
+                              (void **)&pset_names,
+                              &sz);
+            ompi_mpi_instance_pmix_psets = opal_argv_split (pset_names, ',');
             ompi_mpi_instance_num_pmix_psets = opal_argv_count (ompi_mpi_instance_pmix_psets);
+            free(pset_names);
         }
     }
 
@@ -780,25 +922,31 @@ static void ompi_instance_get_num_psets_complete (int status, opal_list_t *info,
 
 static void ompi_instance_refresh_pmix_psets (const char *key)
 {
-    opal_list_t pmix_query_list;
-    opal_pmix_query_t query;
+    pmix_status_t rc;
+    pmix_query_t query;
     opal_pmix_lock_t lock;
+    bool refresh = true;
 
     opal_mutex_lock (&instance_lock);
 
-    OBJ_CONSTRUCT(&pmix_query_list, opal_list_t);
-    OBJ_CONSTRUCT(&query, opal_pmix_query_t);
+    PMIX_QUERY_CONSTRUCT(&query);
+    PMIX_ARGV_APPEND(rc, query.keys, key);
+    PMIX_INFO_CREATE(query.qualifiers, 1);
+    query.nqual = 1;
+    PMIX_INFO_LOAD(&query.qualifiers[0], PMIX_QUERY_REFRESH_CACHE, &refresh, PMIX_BOOL);
+
     OPAL_PMIX_CONSTRUCT_LOCK(&lock);
 
-    opal_argv_append_nosize(&query.keys, key);
-    opal_list_append (&pmix_query_list, &query.super);
+    /*
+     * TODO: need to handle this better
+     */
+    if (PMIX_SUCCESS != (rc = PMIx_Query_info_nb(&query, 1, 
+                                                 ompi_instance_get_num_psets_complete,
+                                                 (void*)&lock))) {
+       opal_mutex_unlock (&instance_lock);
+    }
 
-    opal_pmix.query (&pmix_query_list, ompi_instance_get_num_psets_complete, (void *) &lock);
     OPAL_PMIX_WAIT_THREAD(&lock);
-
-    opal_list_remove_item (&pmix_query_list, &query.super);
-    OBJ_DESTRUCT(&query);
-    OBJ_DESTRUCT(&pmix_query_list);
     OPAL_PMIX_DESTRUCT_LOCK(&lock);
 
     opal_mutex_unlock (&instance_lock);
@@ -807,45 +955,35 @@ static void ompi_instance_refresh_pmix_psets (const char *key)
 
 int ompi_instance_get_num_psets (ompi_instance_t *instance, int *npset_names)
 {
-    ompi_instance_refresh_pmix_psets (OPAL_PMIX_QUERY_NUM_PSETS);
+    ompi_instance_refresh_pmix_psets (PMIX_QUERY_NUM_PSETS);
     *npset_names = ompi_instance_builtin_count + ompi_mpi_instance_num_pmix_psets;
 
     return OMPI_SUCCESS;
 }
 
-int ompi_instance_get_psetlen (ompi_instance_t *instance, int n, int *pset_name_len)
+int ompi_instance_get_nth_pset (ompi_instance_t *instance, int n, int *len, char *pset_name)
 {
     if (NULL == ompi_mpi_instance_pmix_psets && n >= ompi_instance_builtin_count) {
-        ompi_instance_refresh_pmix_psets (OPAL_PMIX_QUERY_PSET_NAMES);
+        ompi_instance_refresh_pmix_psets (PMIX_QUERY_PSET_NAMES);
     }
 
     if ((size_t) n >= (ompi_instance_builtin_count + ompi_mpi_instance_num_pmix_psets) || n < 0) {
         return OMPI_ERR_BAD_PARAM;
     }
 
-    if (n < ompi_instance_builtin_count) {
-        *pset_name_len = strlen (ompi_instance_builtin_psets[n]);
-    } else {
-        *pset_name_len = strlen (ompi_mpi_instance_pmix_psets[n - ompi_instance_builtin_count]);
-    }
-
-    return OMPI_SUCCESS;
-}
-
-int ompi_instance_get_nth_pset (ompi_instance_t *instance, int n, int len, char *pset_name)
-{
-    if (NULL == ompi_mpi_instance_pmix_psets && n >= ompi_instance_builtin_count) {
-        ompi_instance_refresh_pmix_psets (OPAL_PMIX_QUERY_PSET_NAMES);
-    }
-
-    if ((size_t) n >= (ompi_instance_builtin_count + ompi_mpi_instance_num_pmix_psets) || n < 0) {
-        return OMPI_ERR_BAD_PARAM;
+    if (0 == *len) {
+        if (n < ompi_instance_builtin_count) {
+            *len = strlen(ompi_instance_builtin_psets[n]) + 1;
+        } else {
+            *len = strlen (ompi_mpi_instance_pmix_psets[n - ompi_instance_builtin_count]) + 1;
+        }
+        return OMPI_SUCCESS;
     }
 
     if (n < ompi_instance_builtin_count) {
-        strncpy (pset_name, ompi_instance_builtin_psets[n], len + 1);
+        strncpy (pset_name, ompi_instance_builtin_psets[n], *len);
     } else {
-        strncpy (pset_name, ompi_mpi_instance_pmix_psets[n - ompi_instance_builtin_count], len + 1);
+        strncpy (pset_name, ompi_mpi_instance_pmix_psets[n - ompi_instance_builtin_count], *len);
     }
 
     return OMPI_SUCCESS;
@@ -896,7 +1034,7 @@ static int ompi_instance_group_shared (ompi_instance_t *instance, ompi_group_t *
     wildcard_rank.jobid = OMPI_PROC_MY_NAME->jobid;
     wildcard_rank.vpid = OMPI_NAME_WILDCARD->vpid;
 
-    OPAL_MODEX_RECV_VALUE(ret, OPAL_PMIX_LOCAL_PEERS, &wildcard_rank, &val, OPAL_STRING);
+    OPAL_MODEX_RECV_VALUE(ret, PMIX_LOCAL_PEERS, &wildcard_rank, &val, PMIX_STRING);
     if (OPAL_SUCCESS != ret || NULL == val) {
         return OMPI_ERROR;
     }
@@ -963,7 +1101,11 @@ static int ompi_instance_group_self (ompi_instance_t *instance, ompi_group_t **g
 
 static int ompi_instance_group_pmix_pset (ompi_instance_t *instance, const char *pset_name, ompi_group_t **group_out)
 {
+    pmix_status_t rc;
+    pmix_proc_t p;
     ompi_group_t *group;
+    pmix_value_t *pval = NULL;
+    char *stmp = NULL;
     size_t size = 0;
 
     /* make the group large enough to hold world */
@@ -972,22 +1114,28 @@ static int ompi_instance_group_pmix_pset (ompi_instance_t *instance, const char 
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
+
     for (size_t i = 0 ; i < ompi_process_info.num_procs ; ++i) {
         opal_process_name_t name = {.vpid = i, .jobid = OMPI_PROC_MY_NAME->jobid};
-        opal_value_t *val = NULL;
-        int ret;
 
-        ret = opal_pmix.get (&name, OPAL_PMIX_PSET_NAME, NULL, &val);
-        if (OPAL_UNLIKELY(OPAL_SUCCESS != ret)) {
+        OPAL_PMIX_CONVERT_NAME(&p, &name);
+        rc = PMIx_Get(&p, PMIX_PSET_NAME, NULL, 0, &pval);
+        if (OPAL_UNLIKELY(PMIX_SUCCESS != rc)) {
             OBJ_RELEASE(group);
-            return ret;
+            return opal_pmix_convert_status(rc);
         }
 
-        if (0 != strcmp (pset_name, val->data.string)) {
-            OBJ_RELEASE(val);
+        PMIX_VALUE_UNLOAD(rc,
+                          pval,
+                          (void **)&stmp,
+                          &size);
+        if (0 != strcmp (pset_name, stmp)) {
+            PMIX_VALUE_RELEASE(pval);
+            free(stmp);
             continue;
         }
-        OBJ_RELEASE(val);
+        PMIX_VALUE_RELEASE(pval);
+        free(stmp);
 
         /* look for existing ompi_proc_t that matches this name */
         group->grp_proc_pointers[size] = (ompi_proc_t *) ompi_proc_lookup (name);
@@ -1022,20 +1170,29 @@ static int ompi_instance_group_pmix_pset (ompi_instance_t *instance, const char 
 
 static int ompi_instance_get_pmix_pset_size (ompi_instance_t *instance, const char *pset_name, size_t *size_out)
 {
+    pmix_status_t rc;
+    pmix_proc_t p;
+    pmix_value_t *pval = NULL;
     size_t size = 0;
+    char *stmp = NULL;
 
     for (size_t i = 0 ; i < ompi_process_info.num_procs ; ++i) {
         opal_process_name_t name = {.vpid = i, .jobid = OMPI_PROC_MY_NAME->jobid};
-        opal_value_t *val = NULL;
-        int ret;
 
-        ret = opal_pmix.get (&name, OPAL_PMIX_PSET_NAME, NULL, &val);
-        if (OPAL_UNLIKELY(OPAL_SUCCESS != ret)) {
-            return ret;
+        OPAL_PMIX_CONVERT_NAME(&p, &name);
+        rc = PMIx_Get(&p, PMIX_PSET_NAME, NULL, 0, &pval);
+        if (OPAL_UNLIKELY(PMIX_SUCCESS != rc)) {
+            return rc;
         }
 
-        size += (0 == strcmp (pset_name, val->data.string));
-        OBJ_RELEASE(val);
+        PMIX_VALUE_UNLOAD(rc,
+                          pval,
+                          (void **)&stmp,
+                          &size);
+
+        size += (0 == strcmp (pset_name, stmp));
+        PMIX_VALUE_RELEASE(pval);
+        free(stmp);
 
         ++size;
     }
@@ -1067,7 +1224,7 @@ int ompi_instance_get_pset_info (ompi_instance_t *instance, const char *pset_nam
 {
     ompi_info_t *info = ompi_info_allocate ();
     char tmp[16];
-    size_t size;
+    size_t size = 0UL;
     int ret;
 
     *info_used = (opal_info_t *) MPI_INFO_NULL;

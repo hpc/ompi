@@ -357,7 +357,6 @@ libmpi_c_mpi_la_SOURCES = \
         session_get_num_psets.c \
         session_get_nth_pset.c \
         session_get_pset_info.c \
-        session_get_psetlen.c \
         session_init.c \
         session_f2c.c \
         session_finalize.c \

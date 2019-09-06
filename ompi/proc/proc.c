@@ -273,9 +273,6 @@ int ompi_proc_init(void)
     }
 #endif
 
-    /* make sure we clean up on finalize */
-    ompi_mpi_instance_append_finalize (ompi_proc_finalize);
-
     return OMPI_SUCCESS;
 }
 

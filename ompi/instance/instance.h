@@ -15,7 +15,7 @@
 #include "opal/class/opal_hash_table.h"
 #include "opal/util/info_subscriber.h"
 #include "ompi/errhandler/errhandler.h"
-#include "opal/threads/mutex.h"
+#include "opal/mca/threads/mutex.h"
 #include "ompi/communicator/comm_request.h"
 
 #include "mpi.h"
@@ -146,8 +146,7 @@ OMPI_DECLSPEC int ompi_mpi_instance_finalize (ompi_instance_t **instance);
 OMPI_DECLSPEC int ompi_group_from_pset (ompi_instance_t *instance, const char *pset_name, struct ompi_group_t **group_out);
 
 OMPI_DECLSPEC int ompi_instance_get_num_psets (ompi_instance_t *instance, int *npset_names);
-OMPI_DECLSPEC int ompi_instance_get_psetlen (ompi_instance_t *instance, int n, int *pset_name_len);
-OMPI_DECLSPEC int ompi_instance_get_nth_pset (ompi_instance_t *instance, int n, int len, char *pset_name);
+OMPI_DECLSPEC int ompi_instance_get_nth_pset (ompi_instance_t *instance, int n, int *len, char *pset_name);
 OMPI_DECLSPEC int ompi_instance_get_pset_info (ompi_instance_t *instance, const char *pset_name, opal_info_t **info_used);
 
 /**

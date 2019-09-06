@@ -65,7 +65,7 @@ int MPI_Initialized(int *flag)
         }
     }
 
-    *flag = ompi_instance_count > 0;
+    *flag = (state >= OMPI_MPI_STATE_INIT_COMPLETED);
 
     ompi_hook_base_mpi_initialized_bottom(flag);
 

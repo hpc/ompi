@@ -13,7 +13,7 @@
  * Copyright (c) 2006-2012 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -59,6 +59,17 @@ MPI_Info MPI_Info_f2c(MPI_Fint info)
     /* Per MPI-2:4.12.4, do not invoke an error handler if we get an
        invalid fortran handle.  If we get an invalid fortran handle,
        return an invalid C handle. */
+    /*
+     * Deal with special pre-defined cases for MPI 4.0
+     */
+
+    if (info_index == 0) {
+        return MPI_INFO_NULL;
+    }
+
+    if (info_index == 1) {
+        return MPI_INFO_ENV;
+    }
 
     if (info_index < 0 ||
         info_index >=

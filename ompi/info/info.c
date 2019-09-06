@@ -17,7 +17,7 @@
  * Copyright (c) 2015-2018 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
- * Copyright (c) 2019      Triad National Security, LLC. All rights
+ * Copyright (c) 2019-2020 Triad National Security, LLC. All rights
  *                         reserved.
  * Copyright (c) 2020      Intel, Inc.  All rights reserved.
  * $COPYRIGHT$
@@ -83,12 +83,10 @@ opal_pointer_array_t ompi_info_f_to_c_table = {{0}};
 
 /*
  * This function is called during ompi_init and initializes the
- * fortran to C translation table. It also fills in the values
- * for the MPI_INFO_GET_ENV object
+ * fortran to C translation table. 
  */
 int ompi_mpiinfo_init(void)
 {
-    char *cptr, **tmp;
 
     /* initialize table */
 
@@ -102,9 +100,25 @@ int ompi_mpiinfo_init(void)
     OBJ_CONSTRUCT(&ompi_mpi_info_null.info, ompi_info_t);
     assert(ompi_mpi_info_null.info.i_f_to_c_index == 0);
 
-    /* Create MPI_INFO_ENV */
+    /* Create MPI_INFO_ENV  - we create here for the f_to_c.  Can't fill in 
+       here because most info needed is only available after a call to
+       ompi_rte_init. */
     OBJ_CONSTRUCT(&ompi_mpi_info_env.info, ompi_info_t);
     assert(ompi_mpi_info_env.info.i_f_to_c_index == 1);
+
+    ompi_mpi_instance_append_finalize (ompi_mpiinfo_finalize);
+
+    /* All done */
+
+    return OMPI_SUCCESS;
+}
+
+/*
+ * Fill in the MPI_INFO_ENV if using MPI3 initialization
+ */
+int ompi_mpiinfo_init_mpi3(void)
+{
+    char *cptr, **tmp;
 
     /* fill the env info object */
 
@@ -198,8 +212,6 @@ int ompi_mpiinfo_init(void)
     if (NULL != ompi_process_info.proc_session_dir) {
         opal_info_set(&ompi_mpi_info_env.info.super, "ompi_positioned_file_dir", ompi_process_info.proc_session_dir);
     }
-
-    ompi_mpi_instance_append_finalize (ompi_mpiinfo_finalize);
 
     /* All done */
 

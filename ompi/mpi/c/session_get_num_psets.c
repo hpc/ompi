@@ -26,7 +26,7 @@
 static const char FUNC_NAME[] = "MPI_Session_get_num_psets";
 
 
-int MPI_Session_get_num_psets (MPI_Session session, int *npset_names)
+int MPI_Session_get_num_psets (MPI_Session session, MPI_Info info, int *npset_names)
 {
     int rc;
 
