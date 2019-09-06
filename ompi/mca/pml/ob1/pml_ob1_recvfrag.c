@@ -20,6 +20,9 @@
  * Copyright (c) 2018      Sandia National Laboratories
  *                         All rights reserved.
  * Copyright (c) 2020      Google, LLC. All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC. All rights
+ *                         reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -1211,7 +1214,12 @@ void mca_pml_ob1_handle_cid (ompi_communicator_t *comm, int src, mca_pml_ob1_cid
          * the proc to indicate that this packet has been sent */
         ob1_proc->comm_index = hdr_cid->hdr_src_comm_index;
 
-        (void) mca_pml_ob1_send_cid (ob1_proc->ompi_proc, comm);
+        /*
+         * if the proc to send to is myself,  no need to do the send
+         */
+        if(ob1_proc->ompi_proc != ompi_proc_local()) {
+            (void) mca_pml_ob1_send_cid (ob1_proc->ompi_proc, comm);
+        }
     }
 }
 

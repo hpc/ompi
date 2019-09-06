@@ -16,6 +16,9 @@
  *                         reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
  * Copyright (c) 2020      Intel, Inc.  All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC. All rights
+ *                         reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -83,10 +86,16 @@ OMPI_DECLSPEC extern ompi_predefined_info_t *ompi_mpi_info_null_addr;
 OMPI_DECLSPEC OBJ_CLASS_DECLARATION(ompi_info_t);
 
 /**
- * This function is invoked during ompi_mpi_init() and sets up
+ * This function is invoked during ompi_instance_retain() and sets up
  * MPI_Info handling.
  */
 int ompi_mpiinfo_init(void);
+
+/**
+ * This function is invoked during ompi_mpi_init() and sets up
+ * the MPI_INFO_ENV object
+ */
+int ompi_mpiinfo_init_mpi3(void);
 
 /**
  * This function is used to free a ompi level info

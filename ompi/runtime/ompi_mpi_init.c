@@ -64,7 +64,6 @@
 #include "opal/mca/mpool/base/base.h"
 #include "opal/mca/btl/base/base.h"
 #include "opal/mca/pmix/base/base.h"
-#include "opal/util/timings.h"
 #include "opal/util/opal_environ.h"
 
 #include "ompi/constants.h"
@@ -285,41 +284,6 @@ void ompi_mpi_thread_level(int requested, int *provided)
                                 MPI_THREAD_MULTIPLE);
 }
 
-static int ompi_register_mca_variables(void)
-{
-    int ret;
-
-    /* Register MPI variables */
-    if (OMPI_SUCCESS != (ret = ompi_mpi_register_params())) {
-        return ret;
-    }
-
-    /* check to see if we want timing information */
-    /* TODO: enable OMPI init and OMPI finalize timings if
-     * this variable was set to 1!
-     */
-    ompi_enable_timing = false;
-    (void) mca_base_var_register("ompi", "ompi", NULL, "timing",
-                                 "Request that critical timing loops be measured",
-                                 MCA_BASE_VAR_TYPE_BOOL, NULL, 0, 0,
-                                 OPAL_INFO_LVL_9,
-                                 MCA_BASE_VAR_SCOPE_READONLY,
-                                 &ompi_enable_timing);
-
-#if OPAL_ENABLE_FT_MPI
-    /* Before loading any other part of the MPI library, we need to load
-     * the ft-mpi tune file to override default component selection when
-     * FT is desired ON; this does override openmpi-params.conf, but not
-     * command line or env.
-     */
-    if( ompi_ftmpi_enabled ) {
-        mca_base_var_load_extra_files("ft-mpi", false);
-    }
-#endif /* OPAL_ENABLE_FT_MPI */
-
-    return OMPI_SUCCESS;
-}
-
 static void fence_release(pmix_status_t status, void *cbdata)
 {
     volatile bool *active = (volatile bool*)cbdata;
@@ -351,8 +315,6 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
     pmix_status_t codes[1] = { PMIX_ERR_PROC_ABORTED };
     pmix_status_t rc;
     OMPI_TIMING_INIT(64);
-    opal_pmix_lock_t mylock;
-    opal_process_name_t pname;
 
     ompi_hook_base_mpi_init_top(argc, argv, requested, provided);
 
@@ -417,7 +379,21 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
         goto error;
     }
 
-    OMPI_TIMING_NEXT("commit");
+    /* if we were not externally started, then we need to setup
+     * some envars so the MPI_INFO_ENV can get the cmd name
+     * and argv (but only if the user supplied a non-NULL argv!), and
+     * the requested thread level
+     */
+    if (NULL == getenv("OMPI_COMMAND") && NULL != argv && NULL != argv[0]) {
+        opal_setenv("OMPI_COMMAND", argv[0], true, &environ);
+    }
+    if (NULL == getenv("OMPI_ARGV") && 1 < argc) {
+        char *tmp;
+        tmp = opal_argv_join(&argv[1], ' ');
+        opal_setenv("OMPI_ARGV", tmp, true, &environ);
+        free(tmp);
+    }
+
 #if (OPAL_ENABLE_TIMING)
     if (OMPI_TIMING_ENABLED && !opal_pmix_base_async_modex &&
             opal_pmix_collect_all_data && !ompi_singleton) {
@@ -589,6 +565,13 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
         if( OMPI_SUCCESS != rc ) return rc;
     }
 #endif
+
+    /* Check whether we have been spawned or not.  We introduce that
+       at the very end, since we need collectives, datatypes, ptls
+       etc. up and running here.... */
+    if (OMPI_SUCCESS != (ret = ompi_dpm_dyn_init())) {
+        return ret;
+    }
 
     /* Fall through */
  error:

@@ -689,7 +689,7 @@ static int dpm_convert(opal_list_t *infos,
     char *ck, *ptr, *help_str = NULL;
     int rc;
     char **tmp;
-    dpm_conflicts_t *modifiers;
+    dpm_conflicts_t *modifiers = NULL;
     const char *attr;
 
     /* pick the modifiers to be checked */
@@ -1699,14 +1699,6 @@ int ompi_dpm_dyn_init(void)
     snprintf(newcomm->c_name, MPI_MAX_OBJECT_NAME, "MPI_COMM_PARENT");
     newcomm->c_flags |= OMPI_COMM_NAMEISSET;
 
-    return OMPI_SUCCESS;
-}
-
-/*
- * finalize the module
- */
-int ompi_dpm_finalize(void)
-{
     return OMPI_SUCCESS;
 }
 

@@ -13,6 +13,7 @@
  * Copyright (c) 2006-2012 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC.  All rights reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -40,6 +41,7 @@ static const char FUNC_NAME[] = "MPI_Errhandler_f2c";
 MPI_Errhandler MPI_Errhandler_f2c(MPI_Fint errhandler_f)
 {
     int eh_index = OMPI_FINT_2_INT(errhandler_f);
+    MPI_Errhandler c_err_handler;
 
     /* Error checking */
 
@@ -51,12 +53,32 @@ MPI_Errhandler MPI_Errhandler_f2c(MPI_Fint errhandler_f)
        invalid fortran handle.  If we get an invalid fortran handle,
        return an invalid C handle. */
 
-    if (eh_index < 0 ||
-        eh_index >=
-        opal_pointer_array_get_size(&ompi_errhandler_f_to_c_table)) {
-        return NULL;
+    /*
+     * special cases for MPI_ERRORS_ARE_FATAL and MPI_ERRORS_RETURN -
+     * needed for MPI 4.0
+     */
+
+    switch(eh_index) {
+    case  OMPI_ERRHANDLER_NULL_FORTRAN:
+        c_err_handler = MPI_ERRHANDLER_NULL;
+        break;
+    case  OMPI_ERRORS_ARE_FATAL_FORTRAN:
+        c_err_handler = MPI_ERRORS_ARE_FATAL;
+        break;
+    case  OMPI_ERRORS_RETURN_FORTRAN:
+        c_err_handler = MPI_ERRORS_RETURN;
+        break;
+    default:
+        if (eh_index < 0 ||
+            eh_index >=
+                 opal_pointer_array_get_size(&ompi_errhandler_f_to_c_table)) {
+                c_err_handler = NULL;
+        } else {
+            c_err_handler = (MPI_Errhandler)opal_pointer_array_get_item(&ompi_errhandler_f_to_c_table,
+                                                                           eh_index);
+        }
+        break;
     }
 
-    return (MPI_Errhandler)opal_pointer_array_get_item(&ompi_errhandler_f_to_c_table,
-                                                       eh_index);
+    return c_err_handler;
 }

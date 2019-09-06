@@ -17,7 +17,7 @@
  * Copyright (c) 2015-2017 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -86,6 +86,8 @@ static void ompi_win_dump (ompi_win_t *win)
 
 static int ompi_win_finalize(void)
 {
+    int ret = OMPI_SUCCESS;
+
     size_t size = opal_pointer_array_get_size (&ompi_mpi_windows);
     /* start at 1 to skip win null */
     for (size_t i = 1 ; i < size ; ++i) {
@@ -105,7 +107,10 @@ static int ompi_win_finalize(void)
     OBJ_RELEASE(ompi_win_accumulate_ops);
     OBJ_RELEASE(ompi_win_accumulate_order);
 
-    return OMPI_SUCCESS;
+    /* release a reference to the attributes subsys */
+    ret = ompi_attr_put_ref();
+
+    return ret;
 }
 
 int ompi_win_init (void)
@@ -136,6 +141,12 @@ int ompi_win_init (void)
 
     ret = mca_base_var_enum_create_flag ("accumulate_order", accumulate_order_flags, &ompi_win_accumulate_order);
     if (OPAL_SUCCESS != ret) {
+        return ret;
+    }
+
+    /* get a reference to the attributes subsys */
+    ret = ompi_attr_get_ref();
+    if (OMPI_SUCCESS != ret) {
         return ret;
     }
 

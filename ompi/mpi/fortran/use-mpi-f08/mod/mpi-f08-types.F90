@@ -8,6 +8,7 @@
 ! Copyright (c) 2018      FUJITSU LIMITED.  All rights reserved.
 ! Copyright (c) 2020      The University of Tennessee and The University
 !                         of Tennessee Research Foundation.  All rights
+! Copyright (c) 2019      Triad National Security, LLC. All rights
 !                         reserved.
 ! $COPYRIGHT$
 !
@@ -70,6 +71,18 @@ module mpi_f08_types
    type, BIND(C) :: MPI_Win
       integer :: MPI_VAL
    end type MPI_Win
+
+   type, BIND(C) :: MPI_Session
+      integer :: MPI_VAL
+   end type MPI_Session
+
+   type, BIND(C) :: MPI_Status
+      integer :: MPI_SOURCE
+      integer :: MPI_TAG
+      integer :: MPI_ERROR
+      integer(C_INT)    OMPI_PRIVATE :: c_cancelled
+      integer(C_SIZE_T) OMPI_PRIVATE :: c_count
+   end type MPI_Status
 
   !
   ! Pre-defined handles

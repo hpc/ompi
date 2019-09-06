@@ -18,6 +18,7 @@
  *                         reserved.
  * Copyright (c) 2015-2016 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC. All rights
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -629,7 +630,7 @@ bool ompi_group_overlap (const ompi_group_t *group1, const ompi_group_t *group2)
     for (int i = 0 ; i < group1->grp_proc_count ; ++i) {
         opal_process_name_t proc1 = ompi_group_get_proc_name (group1, i);
         for (int j = 0 ; j < group2->grp_proc_count ; ++j) {
-            opal_process_name_t proc2 = ompi_group_get_proc_name (group2, i);
+            opal_process_name_t proc2 = ompi_group_get_proc_name (group2, j);
             if (0 == opal_compare_proc (proc1, proc2)) {
                 return true;
             }

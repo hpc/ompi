@@ -108,9 +108,6 @@ static void fence_cbfunc(pmix_status_t status, void *cbdata)
 int ompi_mpi_finalize(void)
 {
     int ret = MPI_SUCCESS;
-    volatile bool active;
-    uint32_t key;
-    ompi_datatype_t * datatype;
     pmix_status_t rc;
 
     ompi_hook_base_mpi_finalize_top();

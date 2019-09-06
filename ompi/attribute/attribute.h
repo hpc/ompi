@@ -13,9 +13,9 @@
  * Copyright (c) 2007      Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2017      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
  *                         reserved.
-  * $COPYRIGHT$
+ * $COPYRIGHT$
  *
  * Additional copyrights may follow
  *
@@ -206,13 +206,23 @@ int ompi_attr_hash_init(opal_hash_table_t **hash)
 }
 
 /**
- * Initialize the main attribute hash that stores the keyvals and meta data
+ * Increase the reference count on the attributes subsystem.  Instantiate subsys if
+ * not yet instantiated.
  *
  * @return OMPI return code
  */
 
-int ompi_attr_init(void);
+int ompi_attr_get_ref(void);
 
+
+/**
+ * Decrease the reference count on the attributes subsystem.  Attributes subsystem
+ * resources are released when the count drops to zero.
+ *
+ * @return OMPI return code
+ */
+
+int ompi_attr_put_ref(void);
 
 /**
  * Create a new key for use by attribute of Comm/Win/Datatype/Instance

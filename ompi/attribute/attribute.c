@@ -15,7 +15,7 @@
  *                         reserved.
  * Copyright (c) 2017      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -246,6 +246,7 @@
 #include "ompi/instance/instance.h"
 #include "ompi/mpi/fortran/base/fint_2_int.h"
 
+
 /*
  * Macros
  */
@@ -261,9 +262,9 @@
 #define attr_win_f w_f_to_c_index
 #define attr_instance_f i_f_to_c_index
 
-#define CREATE_KEY(key) opal_bitmap_find_and_set_first_unset_bit(key_bitmap, (key))
+#define CREATE_KEY(key) opal_bitmap_find_and_set_first_unset_bit(attr_subsys->key_bitmap, (key))
 
-#define FREE_KEY(key) opal_bitmap_clear_bit(key_bitmap, (key))
+#define FREE_KEY(key) opal_bitmap_clear_bit(attr_subsys->key_bitmap, (key))
 
 
 /* Not checking for NULL_DELETE_FN here, since according to the
@@ -290,7 +291,7 @@
 
 #define DELETE_ATTR_CALLBACKS(type, attribute, keyval_obj, object, err)     \
 do { \
-    OPAL_THREAD_UNLOCK(&attribute_lock); \
+    opal_mutex_unlock(&attribute_lock); \
     if (0 != (keyval_obj->attr_flag & OMPI_KEYVAL_F77)) { \
         MPI_Fint f_key = OMPI_INT_2_FINT(key); \
         MPI_Fint f_err; \
@@ -325,7 +326,7 @@ do { \
              key, attr_val,                                             \
              keyval_obj->extra_state.c_ptr);                            \
     } \
-    OPAL_THREAD_LOCK(&attribute_lock); \
+    opal_mutex_lock(&attribute_lock); \
 } while (0)
 
 /* See the big, long comment above from DELETE_ATTR_CALLBACKS -- most of
@@ -333,7 +334,7 @@ do { \
 
 #define COPY_ATTR_CALLBACKS(type, old_object, keyval_obj, in_attr, new_object, out_attr, err) \
 do { \
-    OPAL_THREAD_UNLOCK(&attribute_lock); \
+    opal_mutex_unlock(&attribute_lock); \
     if (0 != (keyval_obj->attr_flag & OMPI_KEYVAL_F77)) { \
         MPI_Fint f_key = OMPI_INT_2_FINT(key); \
         MPI_Fint f_err; \
@@ -384,7 +385,7 @@ do { \
             out_attr->av_value = out;                                   \
         }                                                               \
     } \
-    OPAL_THREAD_LOCK(&attribute_lock); \
+    opal_mutex_lock(&attribute_lock); \
 } while (0)
 
 /*
@@ -411,6 +412,15 @@ typedef struct attribute_value_t {
     int av_sequence;
 } attribute_value_t;
 
+/*
+ * struct to hold state of attr subsys
+ */
+
+typedef  struct attr_subsys_t {
+    opal_object_t            super;
+    opal_hash_table_t *keyval_hash;
+    opal_bitmap_t *key_bitmap;
+ } attr_subsys_t;
 
 /*
  * Local functions
@@ -418,6 +428,8 @@ typedef struct attribute_value_t {
 static void attribute_value_construct(attribute_value_t *item);
 static void ompi_attribute_keyval_construct(ompi_attribute_keyval_t *keyval);
 static void ompi_attribute_keyval_destruct(ompi_attribute_keyval_t *keyval);
+static void attr_subsys_construct(attr_subsys_t *subsys);
+static void attr_subsys_destruct(attr_subsys_t *subsys);
 static int set_value(ompi_attribute_type_t type, void *object,
                      opal_hash_table_t **attr_hash, int key,
                      attribute_value_t *new_attr,
@@ -429,8 +441,14 @@ static MPI_Fint translate_to_fint(attribute_value_t *val);
 static MPI_Aint translate_to_aint(attribute_value_t *val);
 
 static int compare_attr_sequence(const void *attr1, const void *attr2);
-static int ompi_attr_finalize (void);
 
+/*
+ * attribute_subsys_t class
+ */
+static OBJ_CLASS_INSTANCE(attr_subsys_t,
+                          opal_object_t,
+                          attr_subsys_construct,
+                          attr_subsys_destruct);
 
 /*
  * attribute_value_t class
@@ -454,19 +472,17 @@ static OBJ_CLASS_INSTANCE(ompi_attribute_keyval_t,
  * Static variables
  */
 
-static opal_hash_table_t *keyval_hash;
-static opal_bitmap_t *key_bitmap;
-static int attr_sequence;
+static attr_subsys_t *attr_subsys = NULL;
 static unsigned int int_pos = 12345;
 static unsigned int integer_pos = 12345;
+static int attr_sequence;
 
 /*
  * MPI attributes are *not* high performance, so just use a One Big Lock
  * approach. However, this lock is released before a user provided callback is
  * triggered and acquired right after, allowing for recursive behaviors.
  */
-static opal_mutex_t attribute_lock;
-
+static opal_mutex_t attribute_lock = OPAL_MUTEX_STATIC_INIT; 
 
 /*
  * attribute_value_t constructor function
@@ -513,34 +529,60 @@ ompi_attribute_keyval_destruct(ompi_attribute_keyval_t *keyval)
             free(keyval->bindings_extra_state);
         }
 
-        opal_hash_table_remove_value_uint32(keyval_hash, keyval->key);
+        opal_hash_table_remove_value_uint32(attr_subsys->keyval_hash, keyval->key);
         FREE_KEY(keyval->key);
     }
 }
 
 
-/*
- * This will initialize the main list to store key- attribute
- * items. This will be called one time, during MPI_INIT().
- */
-int ompi_attr_init(void)
+int ompi_attr_get_ref(void)
+{
+    int ret = OMPI_SUCCESS;
+
+    opal_mutex_lock(&attribute_lock);
+
+    if (NULL == attr_subsys) {
+        attr_subsys = OBJ_NEW(attr_subsys_t);
+	if (NULL == attr_subsys) {
+            ret = OMPI_ERR_OUT_OF_RESOURCE;
+	    goto fn_exit;
+	}
+    } else {
+        OBJ_RETAIN(attr_subsys);
+    }
+
+fn_exit:
+    opal_mutex_unlock(&attribute_lock);
+
+    return ret;
+}
+
+int ompi_attr_put_ref(void)
+{
+    if (NULL != attr_subsys) {
+        OBJ_RELEASE(attr_subsys);
+    }
+    return OMPI_SUCCESS;
+}
+
+static void attr_subsys_construct(attr_subsys_t *subsys)
 {
     int ret;
     void *bogus = (void*) 1;
     int *p = (int *) &bogus;
 
-    keyval_hash = OBJ_NEW(opal_hash_table_t);
-    if (NULL == keyval_hash) {
-        return OMPI_ERR_OUT_OF_RESOURCE;
-    }
-    key_bitmap = OBJ_NEW(opal_bitmap_t);
+    subsys->keyval_hash = OBJ_NEW(opal_hash_table_t);
+    assert (NULL != subsys->keyval_hash);
+
+    subsys->key_bitmap = OBJ_NEW(opal_bitmap_t);
+
     /*
      * Set the max size to OMPI_FORTRAN_HANDLE_MAX to enforce bound
      */
-    opal_bitmap_set_max_size (key_bitmap, OMPI_FORTRAN_HANDLE_MAX);
-    if (0 != opal_bitmap_init(key_bitmap, 32)) {
-        return OMPI_ERR_OUT_OF_RESOURCE;
-    }
+    opal_bitmap_set_max_size (subsys->key_bitmap, 
+                              OMPI_FORTRAN_HANDLE_MAX);
+    ret = opal_bitmap_init(subsys->key_bitmap, 32);
+    assert(OPAL_SUCCESS == ret);
 
     for (int_pos = 0; int_pos < (sizeof(void*) / sizeof(int));
          ++int_pos) {
@@ -556,33 +598,21 @@ int ompi_attr_init(void)
         }
     }
 
-    OBJ_CONSTRUCT(&attribute_lock, opal_mutex_t);
+    ret = opal_hash_table_init(subsys->keyval_hash, ATTR_TABLE_SIZE);
+    assert (OPAL_SUCCESS == ret);
 
-    if (OMPI_SUCCESS != (ret = opal_hash_table_init(keyval_hash,
-                                                    ATTR_TABLE_SIZE))) {
-        return ret;
-    }
-    if (OMPI_SUCCESS != (ret = ompi_attr_create_predefined())) {
-        return ret;
-    }
-
-    ompi_mpi_instance_append_finalize (ompi_attr_finalize);
-
-    return OMPI_SUCCESS;
+    attr_sequence = 0;    
 }
 
 
 /*
- * Cleanup everything during MPI_Finalize().
+ * Cleanup everything when no more refs to the attr subsys
  */
-static int ompi_attr_finalize (void)
+static void attr_subsys_destruct(attr_subsys_t *subsys)
 {
     ompi_attr_free_predefined();
-    OBJ_DESTRUCT(&attribute_lock);
-    OBJ_RELEASE(keyval_hash);
-    OBJ_RELEASE(key_bitmap);
-
-    return OMPI_SUCCESS;
+    OBJ_RELEASE(subsys->keyval_hash);
+    OBJ_RELEASE(subsys->key_bitmap);
 }
 
 /*****************************************************************************/
@@ -616,11 +646,12 @@ static int ompi_attr_create_keyval_impl(ompi_attribute_type_t type,
     keyval->bindings_extra_state = bindings_extra_state;
 
     /* Create a new unique key and fill the hash */
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
     ret = CREATE_KEY(key);
     if (OMPI_SUCCESS == ret) {
         keyval->key = *key;
-        ret = opal_hash_table_set_value_uint32(keyval_hash, *key, keyval);
+        ret = opal_hash_table_set_value_uint32(attr_subsys->keyval_hash,
+                                               *key, keyval);
     }
 
     if (OMPI_SUCCESS != ret) {
@@ -630,7 +661,7 @@ static int ompi_attr_create_keyval_impl(ompi_attribute_type_t type,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -670,6 +701,12 @@ int ompi_attr_create_keyval_fint(ompi_attribute_type_t type,
                                  void *bindings_extra_state)
 {
     ompi_attribute_fortran_ptr_t es_tmp;
+    int rc;
+
+    rc = ompi_mpi_instance_retain ();
+    if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
+        return rc;
+    }
 
     es_tmp.f_integer = extra_state;
 #if SIZEOF_INT == OMPI_SIZEOF_FORTRAN_INTEGER
@@ -689,6 +726,12 @@ int ompi_attr_create_keyval_aint(ompi_attribute_type_t type,
                                  void *bindings_extra_state)
 {
     ompi_attribute_fortran_ptr_t es_tmp;
+    int rc;
+
+    rc = ompi_mpi_instance_retain ();
+    if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
+        return rc;
+    }
 
     es_tmp.f_address = extra_state;
     return ompi_attr_create_keyval_impl(type, copy_attr_fn, delete_attr_fn,
@@ -705,13 +748,13 @@ int ompi_attr_free_keyval(ompi_attribute_type_t type, int *key,
     ompi_attribute_keyval_t *keyval;
 
     /* Find the key-value pair */
-    OPAL_THREAD_LOCK(&attribute_lock);
-    ret = opal_hash_table_get_value_uint32(keyval_hash, *key,
+    opal_mutex_lock(&attribute_lock);
+    ret = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, *key,
                                            (void **) &keyval);
     if ((OMPI_SUCCESS != ret) || (NULL == keyval) ||
         (keyval->attr_type != type) ||
         ((!predefined) && (keyval->attr_flag & OMPI_KEYVAL_PREDEFINED))) {
-        OPAL_THREAD_UNLOCK(&attribute_lock);
+        opal_mutex_unlock(&attribute_lock);
         return OMPI_ERR_BAD_PARAM;
     }
 
@@ -724,7 +767,7 @@ int ompi_attr_free_keyval(ompi_attribute_type_t type, int *key,
     OBJ_RELEASE(keyval);
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
 
     /* balance out retain in keyval_create */
     ompi_mpi_instance_release ();
@@ -748,7 +791,7 @@ int ompi_attr_set_c(ompi_attribute_type_t type, void *object,
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     new_attr->av_value = attribute;
     new_attr->av_set_from = OMPI_ATTRIBUTE_C;
@@ -758,7 +801,7 @@ int ompi_attr_set_c(ompi_attribute_type_t type, void *object,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
 
     return ret;
 }
@@ -778,7 +821,7 @@ int ompi_attr_set_int(ompi_attribute_type_t type, void *object,
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     new_attr->av_value = (void *) 0;
     *new_attr->av_int_pointer = attribute;
@@ -789,7 +832,7 @@ int ompi_attr_set_int(ompi_attribute_type_t type, void *object,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
 
     return ret;
 }
@@ -810,7 +853,7 @@ int ompi_attr_set_fint(ompi_attribute_type_t type, void *object,
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     new_attr->av_value = (void *) 0;
     *new_attr->av_fint_pointer = attribute;
@@ -821,7 +864,7 @@ int ompi_attr_set_fint(ompi_attribute_type_t type, void *object,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
 
     return ret;
 }
@@ -842,7 +885,7 @@ int ompi_attr_set_aint(ompi_attribute_type_t type, void *object,
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     new_attr->av_value = (void *) attribute;
     new_attr->av_set_from = OMPI_ATTRIBUTE_AINT;
@@ -852,7 +895,7 @@ int ompi_attr_set_aint(ompi_attribute_type_t type, void *object,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
 
     return ret;
 }
@@ -869,7 +912,7 @@ int ompi_attr_get_c(opal_hash_table_t *attr_hash, int key,
     attribute_value_t *val = NULL;
     int ret;
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     ret = get_value(attr_hash, key, &val, flag);
     if (MPI_SUCCESS == ret && 1 == *flag) {
@@ -877,7 +920,7 @@ int ompi_attr_get_c(opal_hash_table_t *attr_hash, int key,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -892,7 +935,7 @@ int ompi_attr_get_fint(opal_hash_table_t *attr_hash, int key,
     attribute_value_t *val = NULL;
     int ret;
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     ret = get_value(attr_hash, key, &val, flag);
     if (MPI_SUCCESS == ret && 1 == *flag) {
@@ -900,7 +943,7 @@ int ompi_attr_get_fint(opal_hash_table_t *attr_hash, int key,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -915,7 +958,7 @@ int ompi_attr_get_aint(opal_hash_table_t *attr_hash, int key,
     attribute_value_t *val = NULL;
     int ret;
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     ret = get_value(attr_hash, key, &val, flag);
     if (MPI_SUCCESS == ret && 1 == *flag) {
@@ -923,7 +966,7 @@ int ompi_attr_get_aint(opal_hash_table_t *attr_hash, int key,
     }
 
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -955,7 +998,7 @@ int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
         return MPI_ERR_ARG;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     /* Get the first attribute in the object's hash */
     ret = opal_hash_table_get_first_key_uint32(oldattr_hash, &key,
@@ -968,7 +1011,7 @@ int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
 
         /* Get the keyval in the main keyval hash - so that we know
            what the copy_attr_fn is */
-        err = opal_hash_table_get_value_uint32(keyval_hash, key,
+        err = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, key,
                                                (void **) &hash_value);
         if (OMPI_SUCCESS != err) {
             /* This should not happen! */
@@ -1043,7 +1086,7 @@ int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
  out:
     /* All done */
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -1063,7 +1106,7 @@ static int ompi_attr_delete_impl(ompi_attribute_type_t type, void *object,
     attribute_value_t *attr;
 
     /* Check if the key is valid in the master keyval hash */
-    ret = opal_hash_table_get_value_uint32(keyval_hash, key,
+    ret = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, key,
                                            (void **) &keyval);
 
     if ((OMPI_SUCCESS != ret) || (NULL == keyval) ||
@@ -1138,10 +1181,10 @@ int ompi_attr_delete(ompi_attribute_type_t type, void *object,
 {
     int ret;
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
     ret = ompi_attr_delete_impl(type, object, attr_hash, key, predefined);
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -1162,18 +1205,18 @@ int ompi_attr_delete_all(ompi_attribute_type_t type, void *object,
         return MPI_SUCCESS;
     }
 
-    OPAL_THREAD_LOCK(&attribute_lock);
+    opal_mutex_lock(&attribute_lock);
 
     /* Make an array that contains all attributes in local object's hash */
     num_attrs = opal_hash_table_get_size(attr_hash);
     if (0 == num_attrs) {
-        OPAL_THREAD_UNLOCK(&attribute_lock);
+        opal_mutex_unlock(&attribute_lock);
         return MPI_SUCCESS;
     }
 
     attrs = malloc(sizeof(attribute_value_t *) * num_attrs);
     if (NULL == attrs) {
-        OPAL_THREAD_UNLOCK(&attribute_lock);
+        opal_mutex_unlock(&attribute_lock);
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
@@ -1205,7 +1248,7 @@ int ompi_attr_delete_all(ompi_attribute_type_t type, void *object,
 
     free(attrs);
     opal_atomic_wmb();
-    OPAL_THREAD_UNLOCK(&attribute_lock);
+    opal_mutex_unlock(&attribute_lock);
     return ret;
 }
 
@@ -1228,7 +1271,7 @@ static int set_value(ompi_attribute_type_t type, void *object,
     /* Note that this function can be invoked by ompi_attr_copy_all()
        to set attributes on the new object (in addition to the
        top-level MPI_* functions that set attributes). */
-    ret = opal_hash_table_get_value_uint32(keyval_hash, key,
+    ret = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, key,
                                            (void **) &keyval);
 
     /* If key not found */
@@ -1276,7 +1319,7 @@ static int set_value(ompi_attribute_type_t type, void *object,
         had_old = true;
     }
 
-    ret = opal_hash_table_get_value_uint32(keyval_hash, key,
+    ret = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, key,
                                            (void **) &keyval);
     if ((OMPI_SUCCESS != ret ) || (NULL == keyval)) {
         /* Keyval has disappeared underneath us -- this shouldn't
@@ -1322,7 +1365,7 @@ static int get_value(opal_hash_table_t *attr_hash, int key,
        with the key, then the call is valid and returns FALSE in the
        flag argument */
     *flag = 0;
-    ret = opal_hash_table_get_value_uint32(keyval_hash, key,
+    ret = opal_hash_table_get_value_uint32(attr_subsys->keyval_hash, key,
                                            (void**) &keyval);
     if (OMPI_ERR_NOT_FOUND == ret) {
         return MPI_KEYVAL_INVALID;

@@ -10,6 +10,8 @@
 ! Copyright (c) 2015-2020 Research Organization for Information Science
 !                         and Technology (RIST).  All rights reserved.
 ! Copyright (c) 2017-2018 FUJITSU LIMITED.  All rights reserved.
+! Copyright (c) 2019      Triad National Security, LLC. All rights
+!                         reserved.
 ! $COPYRIGHT$
 !
 ! This file provides the interface specifications for the MPI Fortran
@@ -20,6 +22,8 @@
 #include "ompi/mpi/fortran/configure-fortran-output.h"
 
 #define OMPI_BUILD_MPI_PROFILING 1
+
+module pmpi_f08_interfaces
 
 #include "mpi-f08-rename.h"
 
