@@ -15,6 +15,8 @@
  *                         reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2019      Triad National Security, LLC.  All rights reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -78,10 +80,10 @@ void ompi_session_init_f(MPI_Fint *info, MPI_Fint *errhandler, MPI_Fint *session
     c_info = PMPI_Info_f2c(*info);
     c_errhandler = PMPI_Errhandler_f2c(*errhandler);
 
-    c_ierr = PMPI_Session_init(c_info, c_errhandler, &session);
+    c_ierr = PMPI_Session_init(c_info, c_errhandler, &c_session);
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
 
     if (MPI_SUCCESS == c_ierr) {
-        *session = PMPI_Session_c2f(session);
+        *session = PMPI_Session_c2f(c_session);
     }
 }

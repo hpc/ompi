@@ -15,6 +15,8 @@
  *                         reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2019      Triad National Security, LLC.  All rights reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -45,6 +47,7 @@ OMPI_GENERATE_F77_BINDINGS (PMPI_SESSION_FINALIZE,
                             (session, ierr) )
 #endif
 #endif
+
 
 #if OPAL_HAVE_WEAK_SYMBOLS
 #pragma weak MPI_SESSION_FINALIZE = ompi_session_finalize_f
@@ -77,8 +80,4 @@ void ompi_session_finalize_f(MPI_Fint *session, MPI_Fint *ierr)
 
     c_ierr = PMPI_Session_finalize(&c_session);
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
-
-    if (MPI_SUCCESS == c_ierr) {
-        *session = PMPI_Session_c2f(c_session);
-    }
 }

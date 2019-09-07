@@ -7,7 +7,7 @@
 !                         and Technology (RIST).  All rights reserved.
 ! $COPYRIGHT$
 
-subroutine MPI_Session_finalize_f08(session,ierror)
+subroutine PMPI_Session_finalize_f08(session,ierror)
    use :: mpi_f08_types, only : MPI_Session
    use :: ompi_mpifh_bindings, only : ompi_session_finalize_f
    implicit none
@@ -18,5 +18,5 @@ subroutine MPI_Session_finalize_f08(session,ierror)
    call ompi_session_finalize_f(session%MPI_VAL,c_ierror)
    if (present(ierror)) ierror = c_ierror
 
-end subroutine MPI_Session_finalize_f08
+end subroutine PMPI_Session_finalize_f08
 

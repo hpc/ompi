@@ -7,16 +7,16 @@
 !                         and Technology (RIST).  All rights reserved.
 ! $COPYRIGHT$
 
-subroutine MPI_Session_finalize_f08(session,ierror)
+subroutine MPI_Session_get_num_psets_f08(session, npset_names, ierror)
    use :: mpi_f08_types, only : MPI_Session
-   use :: ompi_mpifh_bindings, only : ompi_session_finalize_f
+   use :: ompi_mpifh_bindings, only : ompi_session_get_num_psets_f
    implicit none
-   TYPE(MPI_Session), INTENT(OUT) :: session
+   TYPE(MPI_Session), INTENT(IN) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: npset_names
    INTEGER, OPTIONAL, INTENT(OUT) :: ierror
    integer :: c_ierror
 
-   call ompi_session_finalize_f(session%MPI_VAL,c_ierror)
+   call ompi_session_get_num_psets_f(session%MPI_VAL, npset_names, c_ierror)
    if (present(ierror)) ierror = c_ierror
 
-end subroutine MPI_Session_finalize_f08
-
+end subroutine MPI_Session_get_num_psets_f08

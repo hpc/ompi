@@ -1259,6 +1259,17 @@ end subroutine PMPI_Request_get_status
 
 end interface
 
+interface PMPI_Session_get_num_psets
+
+subroutine PMPI_Session_get_num_psets(session, npset_names, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   INTEGER, INTENT(OUT) :: npset_names
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_num_psets
+
+end interface  PMPI_Session_get_num_psets
+
 
 interface  PMPI_Session_init
 
