@@ -378,6 +378,17 @@ subroutine MPI_Send_init_f08(buf,count,datatype,dest,tag,comm,request,ierror)
 end subroutine MPI_Send_init_f08
 end interface  MPI_Send_init
 
+interface MPI_Session_get_nth_psetlen
+subroutine MPI_Session_get_nth_psetlen_f08(session, n, pset_len, ierror)
+   use :: mpi_f08_types, only : MPI_Session
+   implicit none
+   TYPE(MPI_Session), INTENT(IN) :: session
+   INTEGER, OPTIONAL, INTENT(IN) :: n
+   INTEGER, OPTIONAL, INTENT(OUT) :: pset_len
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Session_get_nth_psetlen_f08
+end interface MPI_Session_get_nth_psetlen
+
 interface MPI_Session_get_num_psets
 subroutine MPI_Session_get_num_psets_f08(session, npset_names, ierror)
    use :: mpi_f08_types, only : MPI_Session

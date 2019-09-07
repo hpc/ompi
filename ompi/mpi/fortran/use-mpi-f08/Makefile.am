@@ -352,6 +352,7 @@ mpi_api_files = \
         send_init_f08.F90 \
         sendrecv_f08.F90 \
         sendrecv_replace_f08.F90 \
+	session_get_nth_psetlen_f08.F90 \
 	session_get_num_psets_f08.F90 \
 	session_init_f08.F90 \
 	session_finalize_f08.F90 \
@@ -710,6 +711,7 @@ pmpi_api_files = \
         profile/psend_init_f08.F90 \
         profile/psendrecv_f08.F90 \
         profile/psendrecv_replace_f08.F90 \
+	profile/psession_get_nth_psetlen_f08.F90 \
 	profile/psession_get_num_psets_f08.F90 \
 	profile/psession_init_f08.F90 \
 	profile/psession_finalize_f08.F90 \

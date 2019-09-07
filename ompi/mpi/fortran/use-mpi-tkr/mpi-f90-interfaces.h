@@ -1259,6 +1259,17 @@ end subroutine MPI_Request_get_status
 
 end interface
 
+interface MPI_Session_get_nth_psetlen
+subroutine MPI_Session_get_nth_psetlen(session, n, pset_len, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   INTEGER, OPTIONAL, INTENT(IN) :: n
+   INTEGER, OPTIONAL, INTENT(OUT) :: pset_len
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Session_get_nth_psetlen
+end interface MPI_Session_get_nth_psetlen
+
+
 interface MPI_Session_get_num_psets
 
 subroutine MPI_Session_get_num_psets(session, npset_names, ierror)

@@ -378,6 +378,47 @@ subroutine PMPI_Send_init_f08(buf,count,datatype,dest,tag,comm,request,ierror)
 end subroutine PMPI_Send_init_f08
 end interface  PMPI_Send_init
 
+interface PMPI_Session_get_nth_psetlen
+subroutine PMPI_Session_get_nth_psetlen_f08(session, n, pset_len, ierror)
+   use :: mpi_f08_types, only : MPI_Session
+   implicit none
+   TYPE(MPI_Session), INTENT(IN) :: session
+   INTEGER, OPTIONAL, INTENT(IN) :: n
+   INTEGER, OPTIONAL, INTENT(OUT) :: pset_len
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_nth_psetlen_f08
+end interface PMPI_Session_get_nth_psetlen
+
+interface PMPI_Session_get_num_psets
+subroutine PMPI_Session_get_num_psets_f08(session, npset_names, ierror)
+   use :: mpi_f08_types, only : MPI_Session
+   implicit none
+   TYPE(MPI_Session), INTENT(IN) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: npset_names
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_num_psets_f08
+end interface  PMPI_Session_get_num_psets
+
+interface  PMPI_Session_init
+subroutine PMPI_Session_init_f08(info,errhandler,session,ierror)
+   use :: mpi_f08_types, only : MPI_Session, MPI_Info, MPI_Errhandler
+   implicit none
+   TYPE(MPI_Info), INTENT(IN) :: info
+   TYPE(MPI_Errhandler), INTENT(OUT) :: errhandler
+   TYPE(MPI_Session), INTENT(OUT) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_init_f08
+end interface  PMPI_Session_init
+
+interface  PMPI_Session_finalize
+subroutine PMPI_Session_finalize_f08(session,ierror)
+   use :: mpi_f08_types, only : MPI_Session
+   implicit none
+   TYPE(MPI_Session), INTENT(INOUT) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_finalize_f08
+end interface  PMPI_Session_finalize
+
 interface  PMPI_Ssend
 subroutine PMPI_Ssend_f08(buf,count,datatype,dest,tag,comm,ierror)
    use :: mpi_f08_types, only : MPI_Datatype, MPI_Comm
