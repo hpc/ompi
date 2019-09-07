@@ -3496,6 +3496,17 @@ subroutine ompi_ineighbor_alltoallw_f(sendbuf,sendcounts,sdispls,sendtypes,recvb
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_ineighbor_alltoallw_f
 
+subroutine ompi_session_get_nth_pset_f(session, n, pset_len, pset_name, ierror) &
+   BIND(C, name="ompi_session_get_nth_pset_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
+   implicit none
+   integer, intent(in) :: session
+   integer, intent(in) :: n
+   integer, intent(in) :: pset_len
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(OUT) :: pset_name
+   integer, intent(out) :: ierror
+end subroutine ompi_session_get_nth_pset_f
+
 subroutine ompi_session_get_nth_psetlen_f(session, n, pset_len, ierror) &
    BIND(C, name="ompi_session_get_nth_psetlen_f")
   implicit none
