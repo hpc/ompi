@@ -18,14 +18,14 @@
 
 #if OMPI_BUILD_MPI_PROFILING
 #if OPAL_HAVE_WEAK_SYMBOLS
-#pragma weak MPI_Session_get_psetlen = PMPI_Session_get_psetlen
+#pragma weak MPI_Session_get_nth_psetlen = PMPI_Session_get_nth_psetlen
 #endif
-#define MPI_Session_get_psetlen PMPI_Session_get_psetlen
+#define MPI_Session_get_nth_psetlen PMPI_Session_get_nth_psetlen
 #endif
 
-static const char FUNC_NAME[] = "MPI_Session_get_psetlen";
+static const char FUNC_NAME[] = "MPI_Session_get_nth_psetlen";
 
-int MPI_Session_get_psetlen (MPI_Session session, int n, int *pset_name_len)
+int MPI_Session_get_nth_psetlen (MPI_Session session, int n, int *pset_name_len)
 {
     int rc;
 
