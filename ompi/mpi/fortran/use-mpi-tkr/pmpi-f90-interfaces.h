@@ -1260,6 +1260,28 @@ end subroutine PMPI_Request_get_status
 end interface
 
 
+interface  PMPI_Session_init
+
+subroutine PMPI_Session_init(info,errhandler,session,ierror)
+   implicit none
+   integer, intent(in) :: info
+   integer, intent(OUT) :: errhandler
+   integer, intent(OUT) :: session
+   integer, intent(OUT) :: ierror
+end subroutine PMPI_Session_init
+
+end interface  PMPI_Session_init
+
+interface  PMPI_Session_finalize
+
+subroutine PMPI_Session_finalize(session,ierror)
+   implicit none
+   integer, intent(inout) :: session
+   integer, intent(OUT) :: ierror
+end subroutine PMPI_Session_finalize
+
+end interface  PMPI_Session_finalize
+
 interface PMPI_Start
 
 subroutine PMPI_Start(request, ierror)

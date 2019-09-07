@@ -1260,6 +1260,28 @@ end subroutine MPI_Request_get_status
 end interface
 
 
+interface  MPI_Session_init
+
+subroutine MPI_Session_init(info,errhandler,session,ierror)
+   implicit none
+   integer, intent(in) :: info
+   integer, intent(OUT) :: errhandler
+   integer, intent(OUT) :: session
+   integer, intent(OUT) :: ierror
+end subroutine MPI_Session_init
+
+end interface  MPI_Session_init
+
+interface  MPI_Session_finalize
+
+subroutine MPI_Session_finalize(session,ierror)
+   implicit none
+   integer, intent(inout) :: session
+   integer, intent(OUT) :: ierror
+end subroutine MPI_Session_finalize
+
+end interface  MPI_Session_finalize
+
 interface MPI_Start
 
 subroutine MPI_Start(request, ierror)

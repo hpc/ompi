@@ -294,6 +294,8 @@ linked_files = \
         psend_init_f.c \
         psendrecv_f.c \
         psendrecv_replace_f.c \
+        psession_init_f.c \
+        psession_finalize_f.c \
         pssend_f.c \
         pssend_init_f.c \
         pstartall_f.c \

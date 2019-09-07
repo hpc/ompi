@@ -378,6 +378,26 @@ subroutine MPI_Send_init_f08(buf,count,datatype,dest,tag,comm,request,ierror)
 end subroutine MPI_Send_init_f08
 end interface  MPI_Send_init
 
+interface  MPI_Session_init
+subroutine MPI_Session_init_f08(info,errhandler,session,ierror)
+   use :: mpi_f08_types, only : MPI_Session, MPI_Info, MPI_Errhandler
+   implicit none
+   TYPE(MPI_Info), INTENT(IN) :: info
+   TYPE(MPI_Errhandler), INTENT(OUT) :: errhandler
+   TYPE(MPI_Session), INTENT(OUT) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Session_init_f08
+end interface  MPI_Session_init
+
+interface  MPI_Session_finalize
+subroutine MPI_Session_finalize_f08(session,ierror)
+   use :: mpi_f08_types, only : MPI_Session
+   implicit none
+   TYPE(MPI_Session), INTENT(INOUT) :: session
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Session_finalize_f08
+end interface  MPI_Session_finalize
+
 interface  MPI_Ssend
 subroutine MPI_Ssend_f08(buf,count,datatype,dest,tag,comm,ierror)
    use :: mpi_f08_types, only : MPI_Datatype, MPI_Comm

@@ -66,6 +66,10 @@ module mpi_f08_types
       integer :: MPI_VAL
    end type MPI_Win
 
+   type, BIND(C) :: MPI_Session
+      integer :: MPI_VAL
+   end type MPI_Session
+
    type, BIND(C) :: MPI_Status
       integer :: MPI_SOURCE
       integer :: MPI_TAG

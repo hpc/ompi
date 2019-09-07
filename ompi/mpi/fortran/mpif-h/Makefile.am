@@ -381,6 +381,8 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         send_init_f.c \
         sendrecv_f.c \
         sendrecv_replace_f.c \
+        session_init_f.c \
+        session_finalize_f.c \
         ssend_f.c \
         ssend_init_f.c \
         startall_f.c \
