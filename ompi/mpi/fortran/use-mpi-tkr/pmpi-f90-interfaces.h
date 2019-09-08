@@ -1259,27 +1259,35 @@ end subroutine PMPI_Request_get_status
 
 end interface
 
+nterface PMPI_Session_get_info
+subroutine PMPI_Session_get_info(session, info, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   integer, INTENT(OUT) :: info_used
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_info
+end interface
+
 interface PMPI_Session_get_nth_pset
-subroutine MPI_Session_get_nth_pset(session, n, pset_len, pset_name, ierror)
+subroutine PMPI_Session_get_nth_pset(session, n, pset_len, pset_name, ierror)
    implicit none
    INTEGER, INTENT(IN) :: session
-   INTEGER, OPTIONAL, INTENT(IN) :: n
-   INTEGER, OPTIONAL, INTENT(IN) :: pset_len
+   INTEGER, INTENT(IN) :: n
+   INTEGER, INTENT(IN) :: pset_len
    CHARACTER(LEN=*), INTENT(OUT) :: pset_name
-   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
-
-end subroutine MPI_Session_get_nth_pset
-end interface PMPI_Session_get_nth_pset
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_nth_pset
+end interface 
 
 interface PMPI_Session_get_nth_psetlen
 subroutine PMPI_Session_get_nth_psetlen(session, n, pset_len, ierror)
    implicit none
    integer, INTENT(IN) :: session
-   INTEGER, OPTIONAL, INTENT(IN) :: n
-   INTEGER, OPTIONAL, INTENT(OUT) :: pset_len
-   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+   INTEGER, INTENT(IN) :: n
+   INTEGER, INTENT(OUT) :: pset_len
+   INTEGER, INTENT(OUT) :: ierror
 end subroutine PMPI_Session_get_nth_psetlen
-end interface PMPI_Session_get_nth_psetlen
+end interface
 
 
 interface PMPI_Session_get_num_psets
@@ -1291,7 +1299,7 @@ subroutine PMPI_Session_get_num_psets(session, npset_names, ierror)
    INTEGER, INTENT(OUT) :: ierror
 end subroutine PMPI_Session_get_num_psets
 
-end interface  PMPI_Session_get_num_psets
+end interface
 
 
 interface  PMPI_Session_init
@@ -1304,7 +1312,7 @@ subroutine PMPI_Session_init(info,errhandler,session,ierror)
    integer, intent(OUT) :: ierror
 end subroutine PMPI_Session_init
 
-end interface  PMPI_Session_init
+end interface
 
 interface  PMPI_Session_finalize
 
@@ -1314,7 +1322,7 @@ subroutine PMPI_Session_finalize(session,ierror)
    integer, intent(OUT) :: ierror
 end subroutine PMPI_Session_finalize
 
-end interface  PMPI_Session_finalize
+end interface
 
 interface PMPI_Start
 
