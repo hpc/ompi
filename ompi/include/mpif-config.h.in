@@ -68,6 +68,7 @@
       parameter (MPI_MAX_INFO_VAL=@OPAL_MAX_INFO_VAL@-1)
       parameter (MPI_MAX_PORT_NAME=@OPAL_MAX_PORT_NAME@-1)
       parameter (MPI_MAX_DATAREP_STRING=@OPAL_MAX_DATAREP_STRING@-1)
+      parameter (MPI_MAX_FROM_GROUP_TAG=@OPAL_MAX_FROM_GROUP_TAG@-1)
 
 !
 ! MPI F08 conformance

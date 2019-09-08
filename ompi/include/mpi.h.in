@@ -99,6 +99,9 @@
 /* Maximum length of processor names (default is 256) */
 #undef OPAL_MAX_PROCESSOR_NAME
 
+/* Maximum length of from group tag (default is 256) */
+#undef OPAL_MAX_FROM_GROUP_TAG
+
 /* Whether we have FORTRAN LOGICAL*1 or not */
 #undef OMPI_HAVE_FORTRAN_LOGICAL1
 
@@ -449,6 +452,7 @@ typedef MPI_Win_errhandler_function MPI_Win_errhandler_fn
 #define MPI_DISTRIBUTE_CYCLIC    1                     /* cyclic distribution */
 #define MPI_DISTRIBUTE_NONE      2                     /* not distributed */
 #define MPI_DISTRIBUTE_DFLT_DARG (-1)                  /* default distribution arg */
+#define MPI_MAX_FROM_GROUP_TAG   OPAL_MAX_FROM_GROUP_TAG /* max length of string arg to comm from group funcs*/
 
 /*
  * Since these values are arbitrary to Open MPI, we might as well make

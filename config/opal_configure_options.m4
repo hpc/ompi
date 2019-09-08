@@ -512,6 +512,9 @@ OPAL_WITH_OPTION_MIN_MAX_VALUE(port_name,      1024, 255, 2048)
 # Min length accroding to MPI-2.1, p. 418
 OPAL_WITH_OPTION_MIN_MAX_VALUE(datarep_string,  128,  64,  256)
 
+# Min length according to _POSIX_HOST_NAME_MAX=255 (4*HOST_NAME_MAX)
+OPAL_WITH_OPTION_MIN_MAX_VALUE(from_group_tag,     1024, 256, 2048)
+
 AC_DEFINE_UNQUOTED([OPAL_ENABLE_CRDEBUG], [0],
     [Whether we want checkpoint/restart enabled debugging functionality or not])
 
