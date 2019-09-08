@@ -83,6 +83,6 @@ void ompi_session_get_info_f(MPI_Fint *session, MPI_Fint *info, MPI_Fint *ierr)
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
 
     if (MPI_SUCCESS == c_ierr) {
-        *info - PMPI_Info_c2f(c_info);
+        *info = PMPI_Info_c2f(c_info);
     }
 }

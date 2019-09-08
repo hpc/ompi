@@ -356,6 +356,7 @@ mpi_api_files = \
 	session_get_nth_pset_f08.F90 \
 	session_get_nth_psetlen_f08.F90 \
 	session_get_num_psets_f08.F90 \
+	session_get_pset_info_f08.F90 \
 	session_init_f08.F90 \
 	session_finalize_f08.F90 \
         ssend_f08.F90 \
@@ -717,6 +718,7 @@ pmpi_api_files = \
 	profile/psession_get_nth_pset_f08.F90 \
 	profile/psession_get_nth_psetlen_f08.F90 \
 	profile/psession_get_num_psets_f08.F90 \
+	profile/psession_get_pset_info_f08.F90 \
 	profile/psession_init_f08.F90 \
 	profile/psession_finalize_f08.F90 \
         profile/pssend_f08.F90 \

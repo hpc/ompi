@@ -354,6 +354,7 @@ PN2(void, MPI_Session_get_info, mpi_session_get_info, MPI_SESSION_GET_INFO, (MPI
 PN2(void, MPI_Session_get_nth_pset, mpi_session_get_nth_pset, MPI_SESSION_GET_NTH_PSET, (MPI_Fint *session, MPI_Fint *n, MPI_Fint *pset_len, char *pset_name, MPI_Fint *ierr));
 PN2(void, MPI_Session_get_nth_psetlen, mpi_session_get_nth_psetlen, MPI_SESSION_GET_NTH_PSETLEN, (MPI_Fint *session, MPI_Fint *n, MPI_Fint *pset_len, MPI_Fint *ierr));
 PN2(void, MPI_Session_get_num_psets, mpi_session_get_num_psets, MPI_SESSION_GET_NUM_PSETS, (MPI_Fint *session, MPI_Fint *npset_names, MPI_Fint *ierr));
+PN2(void, MPI_Session_get_pset_info, mpi_session_get_pset_info, MPI_SESSION_GET_PSET_INFO, (MPI_Fint *session, char *pset_name, MPI_Fint *info, MPI_Fint *ierr, int name_len));
 PN2(void, MPI_Session_init, mpi_session_init, MPI_SESSION_INIT, (MPI_Fint *info, MPI_Fint *errhandler, MPI_Fint *session, MPI_Fint *ierr));
 PN2(void, MPI_Session_finalize, mpi_session_finalize, MPI_SESSION_FINALIZE, (MPI_Fint *session, MPI_Fint *ierr));
 PN2(void, MPI_Ssend_init, mpi_ssend_init, MPI_SSEND_INIT, (char *buf, MPI_Fint *count, MPI_Fint *datatype, MPI_Fint *dest, MPI_Fint *tag, MPI_Fint *comm, MPI_Fint *request, MPI_Fint *ierr));

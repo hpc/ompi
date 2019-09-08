@@ -421,6 +421,17 @@ subroutine MPI_Session_get_num_psets_f08(session, npset_names, ierror)
 end subroutine MPI_Session_get_num_psets_f08
 end interface  MPI_Session_get_num_psets
 
+interface MPI_Session_get_pset_info
+subroutine MPI_Session_get_pset_info_f08(session, pset_name, info, ierror)
+   use :: mpi_f08_types, only : MPI_Session, MPI_Info
+   implicit none
+   TYPE(MPI_Session), INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   TYPE(MPI_Info), INTENT(OUT) :: info
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Session_get_pset_info_f08
+end interface MPI_Session_get_pset_info
+
 interface  MPI_Session_init
 subroutine MPI_Session_init_f08(info,errhandler,session,ierror)
    use :: mpi_f08_types, only : MPI_Session, MPI_Info, MPI_Errhandler

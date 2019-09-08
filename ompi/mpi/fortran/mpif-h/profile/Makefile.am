@@ -298,6 +298,7 @@ linked_files = \
         psession_get_nth_pset_f.c \
         psession_get_nth_psetlen_f.c \
         psession_get_num_psets_f.c \
+        psession_get_pset_info_f.c \
         psession_init_f.c \
         psession_finalize_f.c \
         pssend_f.c \

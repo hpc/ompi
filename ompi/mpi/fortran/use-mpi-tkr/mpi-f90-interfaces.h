@@ -1301,6 +1301,16 @@ end subroutine MPI_Session_get_num_psets
 
 end interface  MPI_Session_get_num_psets
 
+interface MPI_Session_get_pset_info
+subroutine MPI_Session_get_pset_info(session, pset_name, info, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   integer, INTENT(OUT) :: info
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine MPI_Session_get_pset_info
+end interface
+
 
 interface  MPI_Session_init
 

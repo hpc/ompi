@@ -3532,6 +3532,17 @@ subroutine ompi_session_get_num_psets_f(session, npset_names, ierror) &
   integer, intent(out) :: ierror
 end subroutine ompi_session_get_num_psets_f
 
+subroutine ompi_session_get_pset_info_f(session, pset_name, info, ierror, name_len) &
+   BIND(C, name="ompi_session_get_pset_info_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
+   implicit none
+   integer, intent(in) :: session
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: pset_name
+   INTEGER, VALUE, INTENT(IN) :: name_len
+   integer, intent(out) :: info
+   integer, intent(out) :: ierror
+end subroutine ompi_session_get_pset_info_f
+
 subroutine ompi_session_init_f(info, errhandler, session, ierror) &
    BIND(C, name="ompi_session_init_f")
   implicit none

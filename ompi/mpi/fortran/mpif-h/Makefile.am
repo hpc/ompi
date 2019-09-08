@@ -385,6 +385,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         session_get_nth_pset_f.c \
         session_get_nth_psetlen_f.c \
         session_get_num_psets_f.c \
+        session_get_pset_info_f.c \
         session_init_f.c \
         session_finalize_f.c \
         ssend_f.c \

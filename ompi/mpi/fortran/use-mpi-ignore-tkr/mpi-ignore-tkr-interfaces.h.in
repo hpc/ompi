@@ -5854,8 +5854,27 @@ subroutine PMPI_Session_get_nth_psetlen(session, n, pset_len, ierror)
 end subroutine PMPI_Session_get_nth_psetlen
 end interface
 
-interface  MPI_Session_init
+interface MPI_Session_get_pset_info
+subroutine MPI_Session_get_pset_info(session, pset_name, info, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   integer, INTENT(OUT) :: info
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine MPI_Session_get_pset_info
+end interface
 
+interface PMPI_Session_get_pset_info
+subroutine PMPI_Session_get_pset_info(session, pset_name, info, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   integer, INTENT(OUT) :: info
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine PMPI_Session_get_pset_info
+end interface
+
+interface  MPI_Session_init
 subroutine MPI_Session_init(info,errhandler,session,ierror)
    implicit none
    integer, intent(in) :: info
@@ -5863,11 +5882,9 @@ subroutine MPI_Session_init(info,errhandler,session,ierror)
    integer, intent(OUT) :: session
    integer, intent(OUT) :: ierror
 end subroutine MPI_Session_init
-
-end interface  MPI_Session_init
+end interface
 
 interface  PMPI_Session_init
-
 subroutine PMPI_Session_init(info,errhandler,session,ierror)
    implicit none
    integer, intent(in) :: info
@@ -5875,8 +5892,7 @@ subroutine PMPI_Session_init(info,errhandler,session,ierror)
    integer, intent(OUT) :: session
    integer, intent(OUT) :: ierror
 end subroutine PMPI_Session_init
-
-end interface  PMPI_Session_init
+end interface
 
 interface  MPI_Session_finalize
 
