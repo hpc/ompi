@@ -287,6 +287,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         group_compare_f.c \
         group_difference_f.c \
         group_excl_f.c \
+        group_from_session_pset_f.c \
         group_free_f.c \
         group_incl_f.c \
         group_intersection_f.c \

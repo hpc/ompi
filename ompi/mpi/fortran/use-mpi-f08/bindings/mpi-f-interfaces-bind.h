@@ -1471,6 +1471,16 @@ subroutine ompi_group_free_f(group,ierror) &
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_group_free_f
 
+soubroutine ompi_group_from_seession_pset_f(session, pset_name, newgroup, ierror, name_len) &
+   BIND(C, name="ompi_group_from_session_pset_f")
+   implicit none
+   INTEGER, INTENT(IN) :: session
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: pset_name
+   INTEGER, INTENT(OUT) :: newgroup
+   integer, intent(out) :: ierror
+   INTEGER, VALUE, INTENT(IN) :: name_len
+end subroutine ompi_group_from_seession_pset_f
+
 subroutine ompi_group_incl_f(group,n,ranks,newgroup,ierror) &
    BIND(C, name="ompi_group_incl_f")
    implicit none

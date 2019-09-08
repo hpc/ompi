@@ -256,6 +256,7 @@ mpi_api_files = \
         group_difference_f08.F90 \
         group_excl_f08.F90 \
         group_free_f08.F90 \
+        group_from_session_pset_f08.F90 \
         group_incl_f08.F90 \
         group_intersection_f08.F90 \
         group_range_excl_f08.F90 \
@@ -618,6 +619,7 @@ pmpi_api_files = \
         profile/pgroup_difference_f08.F90 \
         profile/pgroup_excl_f08.F90 \
         profile/pgroup_free_f08.F90 \
+        profile/pgroup_from_session_pset_f08.F90 \
         profile/pgroup_incl_f08.F90 \
         profile/pgroup_intersection_f08.F90 \
         profile/pgroup_range_excl_f08.F90 \

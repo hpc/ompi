@@ -252,6 +252,7 @@ PN2(void, MPI_Group_compare, mpi_group_compare, MPI_GROUP_COMPARE, (MPI_Fint *gr
 PN2(void, MPI_Group_difference, mpi_group_difference, MPI_GROUP_DIFFERENCE, (MPI_Fint *group1, MPI_Fint *group2, MPI_Fint *newgroup, MPI_Fint *ierr));
 PN2(void, MPI_Group_excl, mpi_group_excl, MPI_GROUP_EXCL, (MPI_Fint *group, MPI_Fint *n, MPI_Fint *ranks, MPI_Fint *newgroup, MPI_Fint *ierr));
 PN2(void, MPI_Group_free, mpi_group_free, MPI_GROUP_FREE, (MPI_Fint *group, MPI_Fint *ierr));
+PN2(void, MPI_Group_from_session_pset, mpi_group_from_session_pset, MPI_GROUP_FROM_SESSION_PSET, (MPI_Fint *group, char *pset_name, MPI_Fint *newgroup, MPI_Fint *ierr, int name_len));
 PN2(void, MPI_Group_incl, mpi_group_incl, MPI_GROUP_INCL, (MPI_Fint *group, MPI_Fint *n, MPI_Fint *ranks, MPI_Fint *newgroup, MPI_Fint *ierr));
 PN2(void, MPI_Group_intersection, mpi_group_intersection, MPI_GROUP_INTERSECTION, (MPI_Fint *group1, MPI_Fint *group2, MPI_Fint *newgroup, MPI_Fint *ierr));
 PN2(void, MPI_Group_range_excl, mpi_group_range_excl, MPI_GROUP_RANGE_EXCL, (MPI_Fint *group, MPI_Fint *n, MPI_Fint ranges[][3], MPI_Fint *newgroup, MPI_Fint *ierr));

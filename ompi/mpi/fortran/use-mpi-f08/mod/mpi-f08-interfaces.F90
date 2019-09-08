@@ -1991,6 +1991,17 @@ subroutine MPI_Group_free_f08(group,ierror)
 end subroutine MPI_Group_free_f08
 end interface  MPI_Group_free
 
+interface MPI_Group_from_session_pset
+subroutine MPI_Group_from_session_pset_f08(session, pset_name, newgroup, ierror)
+   use :: mpi_f08_types, only : MPI_Session, MPI_Group
+   implicit none
+   TYPE(MPI_Session), INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   TYPE(MPI_Group), INTENT(OUT) :: newgroup
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Group_from_session_pset_f08
+end interface MPI_Group_from_session_pset
+
 interface  MPI_Group_incl
 subroutine MPI_Group_incl_f08(group,n,ranks,newgroup,ierror)
    use :: mpi_f08_types, only : MPI_Group

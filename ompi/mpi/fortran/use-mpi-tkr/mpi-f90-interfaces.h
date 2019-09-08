@@ -837,6 +837,16 @@ end subroutine MPI_Group_free
 
 end interface
 
+interface MPI_Group_from_session_pset
+subroutine MPI_Group_from_session_pset(session, pset_name, newgroup, ierror)
+   implicit none
+   integer, INTENT(IN) :: session
+   CHARACTER(LEN=*), INTENT(IN) :: pset_name
+   integer, INTENT(OUT) :: newgroup
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine MPI_Group_from_session_pset
+end interface
+
 
 interface MPI_Group_incl
 

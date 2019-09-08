@@ -202,6 +202,7 @@ linked_files = \
         pgroup_difference_f.c \
         pgroup_excl_f.c \
         pgroup_free_f.c \
+        pgroup_from_session_pset_f.c \
         pgroup_incl_f.c \
         pgroup_intersection_f.c \
         pgroup_range_excl_f.c \
