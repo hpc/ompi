@@ -244,6 +244,7 @@ linked_files = \
         pinitialized_f.c \
         pinit_thread_f.c \
         pintercomm_create_f.c \
+        pintercomm_create_from_groupsf.c \
         pintercomm_merge_f.c \
         piprobe_f.c \
         pirecv_f.c \

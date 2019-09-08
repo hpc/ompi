@@ -330,6 +330,7 @@ lib@OMPI_LIBMPI_NAME@_mpifh_la_SOURCES += \
         initialized_f.c \
         init_thread_f.c \
         intercomm_create_f.c \
+        intercomm_from_groups_f.c \
         intercomm_merge_f.c \
         iprobe_f.c \
         irecv_f.c \

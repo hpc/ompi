@@ -298,6 +298,7 @@ mpi_api_files = \
         initialized_f08.F90 \
         init_thread_f08.F90 \
         intercomm_create_f08.F90 \
+        intercomm_create_from_groups_f08.F90 \
         intercomm_merge_f08.F90 \
         iprobe_f08.F90 \
         irecv_f08.F90 \
@@ -662,6 +663,7 @@ pmpi_api_files = \
         profile/pinitialized_f08.F90 \
         profile/pinit_thread_f08.F90 \
         profile/pintercomm_create_f08.F90 \
+        profile/pintercomm_create_from_groups_f08.F90 \
         profile/pintercomm_merge_f08.F90 \
         profile/piprobe_f08.F90 \
         profile/pirecv_f08.F90 \

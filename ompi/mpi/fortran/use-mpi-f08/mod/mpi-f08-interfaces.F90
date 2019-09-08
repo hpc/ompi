@@ -2112,6 +2112,21 @@ subroutine MPI_Intercomm_create_f08(local_comm,local_leader,peer_comm,remote_lea
 end subroutine MPI_Intercomm_create_f08
 end interface  MPI_Intercomm_create
 
+interface MPI_Intercomm_create_from_groups
+subroutine MPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, remote_leader,
+                                          stringtag, info, errhandler, newintercomm, ierror)
+   use :: mpi_f08_types, only : MPI_Comm, MPI_Group, MPI_Errhandler, MPI_Info
+   implicit none
+   TYPE(MPI_Group), INTENT(IN) :: local_group, remote_group
+   INTEGER, INTENT(IN):: local_leader, remote_leader
+   CHARACTER(LEN=*), INTENT(IN) :: stringtag
+   TYPE(MPI_Info), INTENT(IN) :: info
+   TYPE(MPI_Errhandler), INTENT(IN) :: errhandler
+   TYPE(MPI_Comm), INTENT(OUT) :: newintercomm
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+end subroutine MPI_Intercomm_create_from_groups_f08
+end interface MPI_Intercomm_create_from_groups
+
 interface  MPI_Intercomm_merge
 subroutine MPI_Intercomm_merge_f08(intercomm,high,newintracomm,ierror)
    use :: mpi_f08_types, only : MPI_Comm

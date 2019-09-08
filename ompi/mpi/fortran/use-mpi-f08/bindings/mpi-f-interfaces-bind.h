@@ -1354,7 +1354,7 @@ subroutine ompi_comm_from_group_f(group, stringtag, info, errhandler, newcomm, i
    use, intrinsic :: ISO_C_BINDING, only : C_CHAR
    implicit none
    INTEGER, INTENT(IN) :: group
-   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(OUT) :: stringtag
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: stringtag
    INTEGER, INTENT(IN) :: info
    INTEGER, INTENT(IN) :: errhandler
    INTEGER, INTENT(OUT) :: newcomm
@@ -1575,6 +1575,20 @@ subroutine ompi_intercomm_create_f(local_comm,local_leader,peer_comm, &
    INTEGER, INTENT(OUT) :: newintercomm
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_intercomm_create_f
+
+subroutine ompi_intercomm_create_from_groups_f(local_group, local_leader, remote_group, 
+                                               remote_leader, stringtag, info, errhandler, 
+                                               newintercomm, ierror, name_len) &
+   BIND(C, name="ompi_intercomm_create_from_groups_f")
+   implicit none
+   INTEGER, INTENT(IN) :: local_group, remote_group
+   INTEGER, INTENT(IN) :: local_leader, remote_leader
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: stringtag
+   INTEGER, INTENT(IN) :: info, errhandler
+   INTEGER, INTENT(OUT) :: newintercomm
+   INTEGER, INTENT(OUT) :: ierror
+   INTEGER, VALUE, INTENT(IN) :: name_len
+end subroutine ompi_intercomm_create_from_groups_f
 
 subroutine ompi_type_create_keyval_f(type_copy_attr_fn,type_delete_attr_fn, &
                                      type_keyval,extra_state,ierror) &

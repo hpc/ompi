@@ -300,6 +300,7 @@ PN2(void, MPI_Init, mpi_init, MPI_INIT, (MPI_Fint *ierr));
 PN2(void, MPI_Initialized, mpi_initialized, MPI_INITIALIZED, (ompi_fortran_logical_t *flag, MPI_Fint *ierr));
 PN2(void, MPI_Init_thread, mpi_init_thread, MPI_INIT_THREAD, (MPI_Fint *required, MPI_Fint *provided, MPI_Fint *ierr));
 PN2(void, MPI_Intercomm_create, mpi_intercomm_create, MPI_INTERCOMM_CREATE, (MPI_Fint *local_comm, MPI_Fint *local_leader, MPI_Fint *bridge_comm, MPI_Fint *remote_leader, MPI_Fint *tag, MPI_Fint *newintercomm, MPI_Fint *ierr));
+PN2(void, MPI_Intercomm_create_from_groups, mpi_intercomm_create_from_groups, MPI_INTERCOMM_CREATE_FROM_GROUPS, (MPI_Fint *local_group, MPI_Fint *local_leader, MPI_Fint *remote_group,  MPI_Fint *remote_leader, char *stringtag, MPI_Fint *info, MPI_Fint *errhandler, MPI_Fint *newintercomm, MPI_Fint *ierr, int name_len));
 PN2(void, MPI_Intercomm_merge, mpi_intercomm_merge, MPI_INTERCOMM_MERGE, (MPI_Fint *intercomm, ompi_fortran_logical_t *high, MPI_Fint *newintercomm, MPI_Fint *ierr));
 PN2(void, MPI_Iprobe, mpi_iprobe, MPI_IPROBE, (MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm, ompi_fortran_logical_t *flag, MPI_Fint *status, MPI_Fint *ierr));
 PN2(void, MPI_Irecv, mpi_irecv, MPI_IRECV, (char *buf, MPI_Fint *count, MPI_Fint *datatype, MPI_Fint *source, MPI_Fint *tag, MPI_Fint *comm, MPI_Fint *request, MPI_Fint *ierr));

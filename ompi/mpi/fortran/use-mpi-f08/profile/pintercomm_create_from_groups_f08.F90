@@ -9,20 +9,24 @@
 !                         reserved.
 ! $COPYRIGHT$
 
-subroutine MPI_Comm_create_from_group_f08(group, stringtag, info, errhandler, newcomm, ierror)
+subroutine PMPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, remote_leader,
+                                          stringtag, info, errhandler, newintercomm, ierror)
    use :: mpi_f08_types, only : MPI_Comm, MPI_Group, MPI_Errhandler, MPI_Info
-   use :: ompi_mpifh_bindings, only : ompi_comm_create_from_group_f
+   use :: ompi_mpifh_bindings, only : ompi_intercomm_create_from_groups_f
    implicit none
-   TYPE(MPI_Group), INTENT(IN) :: group
+   TYPE(MPI_Group), INTENT(IN) :: local_group, remote_group
+   INTEGER, INTENT(IN):: local_leader, remote_leader
    CHARACTER(LEN=*), INTENT(IN) :: stringtag
    TYPE(MPI_Info), INTENT(IN) :: info
    TYPE(MPI_Errhandler), INTENT(IN) :: errhandler
-   TYPE(MPI_Comm), INTENT(OUT) :: newcomm
+   TYPE(MPI_Comm), INTENT(OUT) :: newintercomm
    INTEGER, OPTIONAL, INTENT(OUT) :: ierror
    integer :: c_ierror
 
-   call ompi_create_comm_from_group_f(group%MPI_VAL, stringtag, info%MPI_VAL, errhandler%MPI_VAL, newcomm%MPI_VAL, c_ierror, len(stringtag))
+   call ompi_create_intercomm_from_groups_f(local_group%MPI_VAL, local_leader, remote_group%MPI_VAL,  &
+                                            remote_leader, stringtag, info%MPI_VAL, errhandler%MPI_VAL, &
+                                            newintercomm%MPI_VAL, c_ierror, len(stringtag))
    if (present(ierror)) ierror = c_ierror
 
-end subroutine MPI_Comm_create_from_group_f08
+end subroutine PMPI_Intercomm_create_from_groups_f08
 
