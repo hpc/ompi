@@ -80,6 +80,7 @@ linked_files = \
         pcomm_connect_f.c \
         pcomm_create_errhandler_f.c \
         pcomm_create_f.c \
+        pcomm_create_from_group_f.c \
         pcomm_create_group_f.c \
         pcomm_create_keyval_f.c \
         pcomm_delete_attr_f.c \

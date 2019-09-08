@@ -277,6 +277,19 @@ end subroutine MPI_Comm_create
 
 end interface
 
+interface  MPI_Comm_create_from_group
+
+subroutine MPI_Comm_create_from_group(group, stringtag, info, errhandler, newcomm, ierror)
+   implicit none
+   integer, INTENT(IN) :: group
+   CHARACTER(LEN=*), INTENT(IN) :: stringtag
+   integer, INTENT(IN) :: info
+   integer, INTENT(IN) :: errhandler
+   integer, INTENT(OUT) :: newcomm
+   INTEGER, INTENT(OUT) :: ierror
+end subroutine MPI_Comm_create_from_group
+
+end interface
 
 interface MPI_Comm_create_group
 

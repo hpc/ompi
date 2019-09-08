@@ -1269,6 +1269,16 @@ subroutine ompi_comm_create_f(comm,group,newcomm,ierror) &
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_comm_create_f
 
+subroutine ompi_comm_create_from_group_f(group, stringtag, info, errhandler, newcomm, ierror, name_len) &
+   BIND(C, name="ompi_comm_create_from_group_f")
+   implicit none
+  integer, intent(in) :: group
+  integer, intent(in) :: group
+  integer, intent(in) :: tag
+  integer, intent(out) :: newcomm
+  integer, intent(out) :: ierror
+end subroutine ompi_comm_create_from_group_f
+
 subroutine ompi_comm_create_group_f(comm, group, tag, newcomm, ierror) &
    BIND(C, name="ompi_comm_create_group_f")
    implicit none
@@ -1339,16 +1349,18 @@ subroutine ompi_comm_get_info_f(comm,info_used,ierror) &
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_comm_get_info_f
 
-subroutine ompi_comm_get_name_f(comm,comm_name,resultlen,ierror,comm_name_len) &
-   BIND(C, name="ompi_comm_get_name_f")
+subroutine ompi_comm_from_group_f(group, stringtag, info, errhandler, newcomm, ierror, name_len) &
+   BIND(C, name="ompi_comm_from_group_f")
    use, intrinsic :: ISO_C_BINDING, only : C_CHAR
    implicit none
-   INTEGER, INTENT(IN) :: comm
-   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(OUT) :: comm_name
-   INTEGER, INTENT(OUT) :: resultlen
+   INTEGER, INTENT(IN) :: group
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(OUT) :: stringtag
+   INTEGER, INTENT(IN) :: info
+   INTEGER, INTENT(IN) :: errhandler
+   INTEGER, INTENT(OUT) :: newcomm
    INTEGER, INTENT(OUT) :: ierror
-   INTEGER, VALUE, INTENT(IN) :: comm_name_len
-end subroutine ompi_comm_get_name_f
+   INTEGER, VALUE, INTENT(IN) :: name_len
+end subroutine ompi_comm_from_group_f
 
 subroutine ompi_comm_group_f(comm,group,ierror) &
    BIND(C, name="ompi_comm_group_f")

@@ -1730,6 +1730,19 @@ subroutine MPI_Comm_create_f08(comm,group,newcomm,ierror)
 end subroutine MPI_Comm_create_f08
 end interface  MPI_Comm_create
 
+interface  MPI_Comm_create_from_group
+subroutine MPI_Comm_create_from_group_f08(group, stringtag, info, errhandler, newcomm, ierror)
+   implicit none
+   TYPE(MPI_Group), INTENT(IN) :: group
+   CHARACTER(LEN=*), INTENT(IN) :: stringtag
+   TYPE(MPI_Info), INTENT(IN) :: info
+   TYPE(MPI_Errhandler), INTENT(IN) :: errhandler
+   TYPE(MPI_Comm), INTENT(OUT) :: newcomm
+   INTEGER, OPTIONAL, INTENT(OUT) :: ierror
+
+end subroutine MPI_Comm_create_from_group_f08
+end interface  MPI_Comm_create_from_group
+
 interface  MPI_Comm_create_group
 subroutine MPI_Comm_create_group_f08(comm,group,tag,newcomm,ierror)
    use :: mpi_f08_types, only : MPI_Comm, MPI_Group
