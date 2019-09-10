@@ -1732,6 +1732,7 @@ end interface  MPI_Comm_create
 
 interface  MPI_Comm_create_from_group
 subroutine MPI_Comm_create_from_group_f08(group, stringtag, info, errhandler, newcomm, ierror)
+   use :: mpi_f08_types, only : MPI_Comm, MPI_Group, MPI_Info, MPI_Errhandler
    implicit none
    TYPE(MPI_Group), INTENT(IN) :: group
    CHARACTER(LEN=*), INTENT(IN) :: stringtag
@@ -2113,7 +2114,7 @@ end subroutine MPI_Intercomm_create_f08
 end interface  MPI_Intercomm_create
 
 interface MPI_Intercomm_create_from_groups
-subroutine MPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, remote_leader,
+subroutine MPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, remote_leader, &
                                           stringtag, info, errhandler, newintercomm, ierror)
    use :: mpi_f08_types, only : MPI_Comm, MPI_Group, MPI_Errhandler, MPI_Info
    implicit none

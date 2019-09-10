@@ -97,7 +97,7 @@ void ompi_group_from_session_pset_f(MPI_Fint *session,char *pset_name, MPI_Fint 
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
 
     if (MPI_SUCCESS == c_ierr) {
-        *newgroup = PMPI_Group_c2f (c_group);
+        *newgroup = PMPI_Group_c2f (c_newgroup);
     }
 
     /* Free the C name */

@@ -9,8 +9,8 @@
 !                         reserved.
 ! $COPYRIGHT$
 
-subroutine PMPI_Comm_create_from_group(group, stringtag, info, errhandler, newcomm, ierror)
-   use :: mpi_f08_types, only : MPI_Session, MPI_Group, MPI_Errhandler, MPI_Info
+subroutine PMPI_Comm_create_from_group_f08(group, stringtag, info, errhandler, newcomm, ierror)
+   use :: mpi_f08_types, only : MPI_Session, MPI_Group, MPI_Errhandler, MPI_Info, MPI_Comm
    use :: ompi_mpifh_bindings, only : ompi_comm_create_from_group_f
    implicit none
    TYPE(MPI_Group), INTENT(IN) :: group
@@ -21,8 +21,9 @@ subroutine PMPI_Comm_create_from_group(group, stringtag, info, errhandler, newco
    INTEGER, OPTIONAL, INTENT(OUT) :: ierror
    integer :: c_ierror
 
-   call ompi_create_comm_from_group_f(group%MPI_VAL, stringtag, info%MPI_VAL, errhandler%MPI_VAL, newcomm%MPI_VAL, c_ierror, len(stringtag))
+   call ompi_create_comm_from_group_f(group%MPI_VAL, stringtag, info%MPI_VAL, errhandler%MPI_VAL, &
+                                      newcomm%MPI_VAL, c_ierror, len(stringtag))
    if (present(ierror)) ierror = c_ierror
 
-end subroutine PMPI_Group_from_session_pset_f08
+end subroutine PMPI_Comm_create_from_group_f08
 

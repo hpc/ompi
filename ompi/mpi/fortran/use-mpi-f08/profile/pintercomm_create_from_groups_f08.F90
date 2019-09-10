@@ -9,8 +9,9 @@
 !                         reserved.
 ! $COPYRIGHT$
 
-subroutine PMPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, remote_leader,
-                                          stringtag, info, errhandler, newintercomm, ierror)
+subroutine PMPI_Intercomm_create_from_groups_f08(local_group, local_leader, remote_group, &
+                                                 remote_leader, stringtag, info, errhandler, &
+                                                 newintercomm, ierror)
    use :: mpi_f08_types, only : MPI_Comm, MPI_Group, MPI_Errhandler, MPI_Info
    use :: ompi_mpifh_bindings, only : ompi_intercomm_create_from_groups_f
    implicit none
@@ -23,8 +24,10 @@ subroutine PMPI_Intercomm_create_from_groups_f08(local_group, local_leader, remo
    INTEGER, OPTIONAL, INTENT(OUT) :: ierror
    integer :: c_ierror
 
-   call ompi_create_intercomm_from_groups_f(local_group%MPI_VAL, local_leader, remote_group%MPI_VAL,  &
-                                            remote_leader, stringtag, info%MPI_VAL, errhandler%MPI_VAL, &
+   call ompi_create_intercomm_from_groups_f(local_group%MPI_VAL, local_leader, &
+                                            remote_group%MPI_VAL,  &
+                                            remote_leader, stringtag, info%MPI_VAL, &
+                                            errhandler%MPI_VAL, &
                                             newintercomm%MPI_VAL, c_ierror, len(stringtag))
    if (present(ierror)) ierror = c_ierror
 

@@ -1271,12 +1271,15 @@ end subroutine ompi_comm_create_f
 
 subroutine ompi_comm_create_from_group_f(group, stringtag, info, errhandler, newcomm, ierror, name_len) &
    BIND(C, name="ompi_comm_create_from_group_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
    implicit none
-  integer, intent(in) :: group
-  integer, intent(in) :: group
-  integer, intent(in) :: tag
-  integer, intent(out) :: newcomm
-  integer, intent(out) :: ierror
+   integer, intent(in) :: group
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: stringtag
+   integer, intent(in) :: info
+   integer, intent(in) :: errhandler
+   integer, intent(out) :: newcomm
+   integer, intent(out) :: ierror
+   INTEGER, VALUE, INTENT(IN) :: name_len
 end subroutine ompi_comm_create_from_group_f
 
 subroutine ompi_comm_create_group_f(comm, group, tag, newcomm, ierror) &
@@ -1348,6 +1351,17 @@ subroutine ompi_comm_get_info_f(comm,info_used,ierror) &
    INTEGER, INTENT(OUT) :: info_used
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_comm_get_info_f
+
+subroutine ompi_comm_get_name_f(comm,comm_name,resultlen,ierror,comm_name_len) &
+   BIND(C, name="ompi_comm_get_name_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
+   implicit none
+   INTEGER, INTENT(IN) :: comm
+   CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(OUT) :: comm_name
+   INTEGER, INTENT(OUT) :: resultlen
+   INTEGER, INTENT(OUT) :: ierror
+   INTEGER, VALUE, INTENT(IN) :: comm_name_len
+end subroutine ompi_comm_get_name_f
 
 subroutine ompi_comm_from_group_f(group, stringtag, info, errhandler, newcomm, ierror, name_len) &
    BIND(C, name="ompi_comm_from_group_f")
@@ -1483,15 +1497,16 @@ subroutine ompi_group_free_f(group,ierror) &
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_group_free_f
 
-soubroutine ompi_group_from_seession_pset_f(session, pset_name, newgroup, ierror, name_len) &
+subroutine ompi_group_from_session_pset_f(session, pset_name, newgroup, ierror, name_len) &
    BIND(C, name="ompi_group_from_session_pset_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
    implicit none
    INTEGER, INTENT(IN) :: session
    CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: pset_name
    INTEGER, INTENT(OUT) :: newgroup
    integer, intent(out) :: ierror
    INTEGER, VALUE, INTENT(IN) :: name_len
-end subroutine ompi_group_from_seession_pset_f
+end subroutine ompi_group_from_session_pset_f
 
 subroutine ompi_group_incl_f(group,n,ranks,newgroup,ierror) &
    BIND(C, name="ompi_group_incl_f")
@@ -1576,10 +1591,11 @@ subroutine ompi_intercomm_create_f(local_comm,local_leader,peer_comm, &
    INTEGER, INTENT(OUT) :: ierror
 end subroutine ompi_intercomm_create_f
 
-subroutine ompi_intercomm_create_from_groups_f(local_group, local_leader, remote_group, 
-                                               remote_leader, stringtag, info, errhandler, 
+subroutine ompi_intercomm_create_from_groups_f(local_group, local_leader, remote_group,  &
+                                               remote_leader, stringtag, info, errhandler, &
                                                newintercomm, ierror, name_len) &
    BIND(C, name="ompi_intercomm_create_from_groups_f")
+   use, intrinsic :: ISO_C_BINDING, only : C_CHAR
    implicit none
    INTEGER, INTENT(IN) :: local_group, remote_group
    INTEGER, INTENT(IN) :: local_leader, remote_leader

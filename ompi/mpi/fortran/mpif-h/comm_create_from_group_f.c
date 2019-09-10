@@ -89,13 +89,18 @@ void ompi_comm_create_from_group_f(MPI_Fint *group, char *stringtag, MPI_Fint *i
 
     /* Convert the fortran string */
 
-    if (OMPI_SUCCESS != (ret = ompi_fortran_string_f2c(stringtag, name_len,
+    c_ierr = ompi_fortran_string_f2c(stringtag, name_len, &c_tag);
+    if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
+#if 0
+    if (OMPI_SUCCESS != (c = ompi_fortran_string_f2c(stringtag, name_len,
                                                        &c_tag))) {
-        c_ierr = OMPI_ERRHANDLER_INVOKE((ompi_instance_t *)c_session, ret,
+/* TODO - what error handler do we invoke here */
+        c_ierr = OMPI_ERRHANDLER_INVOKE(((ompi_instance_t *)c_group, ret,
                                         "MPI_COMM_CREATE_FROM_GROUP");
         if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
         return;
     }
+#endif
 
     c_ierr = PMPI_Comm_create_from_group(c_group, c_tag, c_info, c_err, &c_comm);
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);

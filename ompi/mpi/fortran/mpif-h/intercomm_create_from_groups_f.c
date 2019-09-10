@@ -99,6 +99,8 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
 
     /* Convert the fortran string */
 
+    c_ierr = ompi_fortran_string_f2c(stringtag, name_len, &c_tag);
+#if 0
     if (OMPI_SUCCESS != (ret = ompi_fortran_string_f2c(stringtag, name_len,
                                                        &c_tag))) {
         c_ierr = OMPI_ERRHANDLER_INVOKE((ompi_instance_t *)c_session, ret,
@@ -106,6 +108,7 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
         if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
         return;
     }
+#endif
 
     c_ierr = PMPI_Intercomm_create_from_groups(c_lgroup,  OMPI_FINT_2_INT(*local_leader), 
                                                c_rgroup,  OMPI_FINT_2_INT(*remote_leader), 
@@ -113,7 +116,7 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
     if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
 
     if (MPI_SUCCESS == c_ierr) {
-        *newcomm = PMPI_Comm_c2f (c_intercomm);
+        *internewcomm = PMPI_Comm_c2f (c_intercomm);
     }
 
     /* Free the C tag */

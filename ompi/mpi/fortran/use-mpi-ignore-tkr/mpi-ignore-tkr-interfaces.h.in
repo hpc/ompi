@@ -2751,7 +2751,7 @@ subroutine MPI_Group_from_session_pset(session, pset_name, newgroup, ierror)
    integer, INTENT(OUT) :: newgroup
    INTEGER, INTENT(OUT) :: ierror
    integer :: c_ierror
-end subroutine MPI_Session_from_session_pset
+end subroutine MPI_Group_from_session_pset
 
 end interface
 
@@ -2764,7 +2764,7 @@ subroutine PMPI_Group_from_session_pset(session, pset_name, newgroup, ierror)
    integer, INTENT(OUT) :: newgroup
    INTEGER, INTENT(OUT) :: ierror
    integer :: c_ierror
-end subroutine PMPI_Session_from_session_pset
+end subroutine PMPI_Group_from_session_pset
 
 end interface
 
@@ -3969,8 +3969,9 @@ end interface
 
 interface MPI_Intercomm_create_from_groups
 
-subroutine MPI_Intercomm_create_from_groups(local_group, local_leader, remote_group, remote_leader,
-                                          stringtag, info, errhandler, newintercomm, ierror)
+subroutine MPI_Intercomm_create_from_groups(local_group, local_leader, remote_group, &
+                                            remote_leader, stringtag, info, errhandler, &
+                                            newintercomm, ierror)
    implicit none
    integer, INTENT(IN) :: local_group, remote_group
    integer, INTENT(IN):: local_leader, remote_leader
@@ -3979,14 +3980,15 @@ subroutine MPI_Intercomm_create_from_groups(local_group, local_leader, remote_gr
    integer, INTENT(IN) :: errhandler
    integer, INTENT(OUT) :: newintercomm
    INTEGER, INTENT(OUT) :: ierror
-end subroutine MPI_Intercomm_create_from_groups_f08
+end subroutine MPI_Intercomm_create_from_groups
 
 end interface
 
 interface PMPI_Intercomm_create_from_groups
 
-subroutine PMPI_Intercomm_create_from_groups(local_group, local_leader, remote_group, remote_leader,
-                                          stringtag, info, errhandler, newintercomm, ierror)
+subroutine PMPI_Intercomm_create_from_groups(local_group, local_leader, remote_group, &
+                                            remote_leader, stringtag, info, errhandler, &
+                                            newintercomm, ierror)
    implicit none
    integer, INTENT(IN) :: local_group, remote_group
    integer, INTENT(IN):: local_leader, remote_leader
@@ -3995,7 +3997,7 @@ subroutine PMPI_Intercomm_create_from_groups(local_group, local_leader, remote_g
    integer, INTENT(IN) :: errhandler
    integer, INTENT(OUT) :: newintercomm
    INTEGER, INTENT(OUT) :: ierror
-end subroutine PMPI_Intercomm_create_from_groups_f08
+end subroutine PMPI_Intercomm_create_from_groups
 
 end interface
 

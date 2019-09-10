@@ -21,7 +21,8 @@ subroutine MPI_Comm_create_from_group_f08(group, stringtag, info, errhandler, ne
    INTEGER, OPTIONAL, INTENT(OUT) :: ierror
    integer :: c_ierror
 
-   call ompi_create_comm_from_group_f(group%MPI_VAL, stringtag, info%MPI_VAL, errhandler%MPI_VAL, newcomm%MPI_VAL, c_ierror, len(stringtag))
+   call ompi_create_comm_from_group_f(group%MPI_VAL, stringtag, info%MPI_VAL, errhandler%MPI_VAL, &
+                                      newcomm%MPI_VAL, c_ierror, len(stringtag))
    if (present(ierror)) ierror = c_ierror
 
 end subroutine MPI_Comm_create_from_group_f08
