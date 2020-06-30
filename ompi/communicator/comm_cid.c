@@ -311,8 +311,8 @@ static int ompi_comm_ext_cid_new_block (ompi_communicator_t *newcomm, ompi_commu
     opal_list_t info, results;
     opal_value_t *value;
     opal_process_name_t *name_array;
-    char *tag = NULL;
-    size_t proc_count, cid_base = 0UL;
+    char *tag;
+    size_t proc_count, cid_base;
     int rc, leader_rank;
 
     rc = ompi_group_to_proc_name_array (newcomm->c_local_group, &name_array, &proc_count);
@@ -429,7 +429,6 @@ int ompi_comm_nextcid_nb (ompi_communicator_t *newcomm, ompi_communicator_t *com
 {
     ompi_comm_cid_context_t *context;
     ompi_comm_request_t *request;
-
     if (mca_pml_base_supports_extended_cid() && OMPI_COMM_CID_INTER != mode &&
         OMPI_COMM_CID_INTRA_BRIDGE != mode && OMPI_COMM_CID_INTRA_PMIX != mode) {
         return ompi_comm_nextcid_ext_nb (newcomm, comm, bridgecomm, arg0, arg1, send_first, mode, req);
@@ -653,11 +652,14 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
         }
 
         /* set the according values to the newcomm */
-        context->newcomm->c_contextid = context->nextcid;
 #if OPAL_ENABLE_FT_MPI
         context->newcomm->c_epoch = INT_MAX - context->rflag; /* reorder for simpler debugging */
         ompi_comm_cid_epoch -= 1; /* protected by the cid_lock */
 #endif /* OPAL_ENABLE_FT_MPI */
+        context->newcomm->c_index = context->nextcid;
+        if (OMPI_COMM_IS_INTRA(context->newcomm)) {
+            context->newcomm->c_index_vec[context->newcomm->c_my_rank] = context->newcomm->c_index;
+        }
         /* to simplify coding always set the global CID even if it isn't used by the
          * active PML */
         context->newcomm->c_contextid.cid_base = 0;

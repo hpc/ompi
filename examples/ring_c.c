@@ -12,13 +12,16 @@
 
 int main(int argc, char *argv[])
 {
-    int rank, size, next, prev, message, tag = 201;
+    int rank, color, size, next, prev, message, tag = 201;
+    MPI_Comm comm;
 
     /* Start up MPI */
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    color = (rank % 2) ? 0 : 1;
+    MPI_Comm_split(MPI_COMM_WORLD, color, rank, &comm);
 
     /* Calculate the rank of the next process in the ring.  Use the
        modulus operator so that the last process "wraps around" to

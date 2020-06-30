@@ -255,6 +255,7 @@ struct ompi_communicator_t {
     ompi_comm_extended_cid_t      c_contextid;
     ompi_comm_extended_cid_block_t c_contextidb;
     int                           c_index;
+    int                           *c_index_vec;
     int                           c_my_rank;
     uint32_t                      c_flags; /* flags, e.g. intercomm,
                                               topology, etc. */
