@@ -584,6 +584,10 @@ static void attr_subsys_construct(attr_subsys_t *subsys)
     ret = opal_bitmap_init(subsys->key_bitmap, 32);
     assert(OPAL_SUCCESS == ret);
 
+    for (int i = 0; i <= MPI_WIN_MODEL; i++) {
+        opal_bitmap_set_bit(subsys->key_bitmap, i);
+    }
+
     for (int_pos = 0; int_pos < (sizeof(void*) / sizeof(int));
          ++int_pos) {
         if (p[int_pos] == 1) {
@@ -647,7 +651,11 @@ static int ompi_attr_create_keyval_impl(ompi_attribute_type_t type,
 
     /* Create a new unique key and fill the hash */
     opal_mutex_lock(&attribute_lock);
-    ret = CREATE_KEY(key);
+    ret = MPI_SUCCESS;
+    if (!(flags & OMPI_KEYVAL_PREDEFINED)) {
+        ret = CREATE_KEY(key);
+    }
+    
     if (OMPI_SUCCESS == ret) {
         keyval->key = *key;
         ret = opal_hash_table_set_value_uint32(attr_subsys->keyval_hash,

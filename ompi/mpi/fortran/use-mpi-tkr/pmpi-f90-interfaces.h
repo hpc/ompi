@@ -102,6 +102,7 @@
 #define MPI_Init_thread PMPI_Init_thread
 #define MPI_Initialized PMPI_Initialized
 #define MPI_Intercomm_create PMPI_Intercomm_create
+#define MPI_Intercomm_create_from_groups PMPI_Intercomm_create_from_groups
 #define MPI_Intercomm_merge PMPI_Intercomm_merge
 #define MPI_Iprobe PMPI_Iprobe
 #define MPI_Is_thread_main PMPI_Is_thread_main

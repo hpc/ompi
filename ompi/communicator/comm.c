@@ -209,7 +209,11 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         newcomm->c_flags |= OMPI_COMM_INTER;
         newcomm->c_index_vec = malloc(remote_size * sizeof(int));
         for (int i = 0; i < remote_size; i++) {
-            newcomm->c_index_vec[i] = -2;
+            if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
+                newcomm->c_index_vec[i] = newcomm->c_index;
+            } else {
+                newcomm->c_index_vec[i] = -2;
+            }
         }
 
         if (dup_comm) {
@@ -228,7 +232,11 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         OBJ_RETAIN(newcomm->c_remote_group);
         newcomm->c_index_vec = malloc(local_size * sizeof(int));
         for (int i = 0; i < local_size; i++) {
-            newcomm->c_index_vec[i] = -2;
+            if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
+                newcomm->c_index_vec[i] = newcomm->c_index;
+            } else {
+                newcomm->c_index_vec[i] = -2;
+            }
         }
     }
 

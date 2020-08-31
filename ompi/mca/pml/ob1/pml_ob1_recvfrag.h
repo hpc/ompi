@@ -163,9 +163,7 @@ extern void mca_pml_ob1_recv_frag_callback_fin (mca_btl_base_module_t *btl,
  * Callback from BTL on receipt of an extended CID header
  */
 extern void mca_pml_ob1_recv_frag_callback_cid( mca_btl_base_module_t *btl,
-                                                mca_btl_base_tag_t tag,
-                                                mca_btl_base_descriptor_t* descriptor,
-                                                void* cbdata );
+                                                const mca_btl_base_receive_descriptor_t* descriptor);
 
 /**
  * Extract the next fragment from the cant_match ordered list. This fragment

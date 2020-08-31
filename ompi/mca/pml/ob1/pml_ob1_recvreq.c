@@ -250,18 +250,8 @@ static inline int mca_pml_ob1_recv_request_ack_send (ompi_proc_t* proc, uint64_t
                                  hdr_src_req, hdr_dst_req, hdr_send_offset, size);
     ob1_hdr_hton(&ack, MCA_PML_OB1_HDR_TYPE_ACK, proc);
 
-    ob1_hdr_hton(ack, MCA_PML_OB1_HDR_TYPE_ACK, proc);
-
-    /* initialize descriptor */
-    des->des_cbfunc = mca_pml_ob1_recv_ctl_completion;
-
-    rc = mca_bml_base_send(bml_btl, des, MCA_PML_OB1_HDR_TYPE_ACK);
-    SPC_RECORD(OMPI_SPC_BYTES_SENT_MPI, (ompi_spc_value_t)sizeof(mca_pml_ob1_ack_hdr_t));
-    if( OPAL_LIKELY( rc >= 0 ) ) {
-        return OMPI_SUCCESS;
-    }
-    mca_bml_base_free(bml_btl, des);
-    return OMPI_ERR_OUT_OF_RESOURCE;
+    return mca_pml_ob1_send_control_any (proc, MCA_BTL_NO_ORDER, (mca_pml_ob1_hdr_t *) &ack,
+                                         sizeof (ack), true);
 }
 
 /*

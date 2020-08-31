@@ -12,7 +12,7 @@
  *                         All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -55,7 +55,6 @@ int MPI_Info_create(MPI_Info *info)
     OPAL_CR_NOOP_PROGRESS();
 
     if (MPI_PARAM_CHECK) {
-        OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
         if (NULL == info) {
             return OMPI_ERRHANDLER_NOHANDLE_INVOKE(MPI_ERR_INFO,
                                           FUNC_NAME);

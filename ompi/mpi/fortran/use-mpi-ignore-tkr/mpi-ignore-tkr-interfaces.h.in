@@ -540,7 +540,6 @@ end interface
 interface  MPI_Comm_create_from_group
 
 subroutine MPI_Comm_create_from_group(group, stringtag, info, errhandler, newcomm, ierror)
-   implicit none
    integer, INTENT(IN) :: group
    CHARACTER(LEN=*), INTENT(IN) :: stringtag
    integer, INTENT(IN) :: info
@@ -3135,7 +3134,6 @@ end interface
 
 interface MPI_Session_get_info
 subroutine MPI_Session_get_info(session, info, ierror)
-   implicit none
    integer, INTENT(IN) :: session
    integer, INTENT(OUT) :: info
    INTEGER, INTENT(OUT) :: ierror
@@ -3144,7 +3142,6 @@ end interface
 
 interface MPI_Session_get_nth_pset
 subroutine MPI_Session_get_nth_pset(session, info, n, pset_len, pset_name, ierror)
-   implicit none
    integer, INTENT(IN) :: session
    integer, INTENT(IN) :: info
    INTEGER, INTENT(IN) :: n
@@ -3152,7 +3149,7 @@ subroutine MPI_Session_get_nth_pset(session, info, n, pset_len, pset_name, ierro
    CHARACTER(LEN=*), INTENT(OUT) :: pset_name
    INTEGER, INTENT(OUT) :: ierror
 end subroutine MPI_Session_get_nth_pset
-end interface MPI_Session_get_nth_pset
+end interface
 
 interface MPI_Session_get_nth_psetlen
 subroutine MPI_Session_get_nth_psetlen(session, n, pset_len, ierror)
@@ -3164,21 +3161,8 @@ subroutine MPI_Session_get_nth_psetlen(session, n, pset_len, ierror)
 end subroutine MPI_Session_get_nth_psetlen
 end interface 
 
-interface PMPI_Session_get_nth_pset
-subroutine PMPI_Session_get_nth_pset(session, info, n, pset_len, pset_name, ierror)
-   implicit none
-   integer, INTENT(IN) :: session
-   integer, INTENT(IN) :: info
-   INTEGER, INTENT(IN) :: n
-   INTEGER, INTENT(INOUT) :: pset_len
-   CHARACTER(LEN=*), INTENT(OUT) :: pset_name
-   INTEGER, INTENT(OUT) :: ierror
-end subroutine PMPI_Session_get_nth_pset
-end interface PMPI_Session_get_nth_pset
-
 interface MPI_Session_get_pset_info
 subroutine MPI_Session_get_pset_info(session, pset_name, info, ierror)
-   implicit none
    integer, INTENT(IN) :: session
    CHARACTER(LEN=*), INTENT(IN) :: pset_name
    integer, INTENT(OUT) :: info
@@ -3188,7 +3172,6 @@ end interface
 
 interface  MPI_Session_init
 subroutine MPI_Session_init(info,errhandler,session,ierror)
-   implicit none
    integer, intent(IN) :: info
    integer, intent(IN) :: errhandler
    integer, intent(OUT) :: session
@@ -3196,15 +3179,14 @@ subroutine MPI_Session_init(info,errhandler,session,ierror)
 end subroutine MPI_Session_init
 end interface
 
-interface  MPI_Session_finalize
+interface
 
 subroutine MPI_Session_finalize(session,ierror)
-   implicit none
    integer, intent(inout) :: session
    integer, intent(OUT) :: ierror
 end subroutine MPI_Session_finalize
 
-end interface  MPI_Session_finalize
+end interface
 
 interface MPI_Ssend
 

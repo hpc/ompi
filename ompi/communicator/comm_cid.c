@@ -311,8 +311,8 @@ static int ompi_comm_ext_cid_new_block (ompi_communicator_t *newcomm, ompi_commu
     opal_list_t info, results;
     opal_value_t *value;
     opal_process_name_t *name_array;
-    char *tag;
-    size_t proc_count, cid_base;
+    char *tag = NULL;
+    size_t proc_count, cid_base = 0UL;
     int rc, leader_rank;
 
     rc = ompi_group_to_proc_name_array (newcomm->c_local_group, &name_array, &proc_count);
@@ -338,7 +338,7 @@ static int ompi_comm_ext_cid_new_block (ompi_communicator_t *newcomm, ompi_commu
     OBJ_CONSTRUCT(&info, opal_list_t);
     OBJ_CONSTRUCT(&results, opal_list_t);
 
-   value = OBJ_NEW(opal_value_t);
+    value = OBJ_NEW(opal_value_t);
     value->key = strdup (PMIX_GROUP_ASSIGN_CONTEXT_ID);
     value->data.flag = true;
     opal_list_append (&info, &value->super);

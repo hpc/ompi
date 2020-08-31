@@ -17,7 +17,7 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016      Los Alamos National Security, LLC.  All rights
  *                         reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -65,19 +65,19 @@ int MPI_Intercomm_create_from_groups (MPI_Group local_group, int local_leader, M
         }
 
         if (NULL == local_group || NULL == remote_group) {
-            return ompi_errhandler_invoke (errhandler, MPI_COMM_SELF, errhandler->eh_mpi_object_type,
+            return ompi_errhandler_invoke (errhandler, MPI_COMM_NULL, errhandler->eh_mpi_object_type,
                                            MPI_ERR_GROUP, FUNC_NAME);
         }
         if (NULL == info || ompi_info_is_freed(info)) {
-            return ompi_errhandler_invoke (errhandler, MPI_COMM_SELF, errhandler->eh_mpi_object_type,
+            return ompi_errhandler_invoke (errhandler, MPI_COMM_NULL, errhandler->eh_mpi_object_type,
                                            MPI_ERR_INFO, FUNC_NAME);
         }
         if (NULL == tag) {
-            return ompi_errhandler_invoke (errhandler, MPI_COMM_SELF, errhandler->eh_mpi_object_type,
+            return ompi_errhandler_invoke (errhandler, MPI_COMM_NULL, errhandler->eh_mpi_object_type,
                                            MPI_ERR_TAG, FUNC_NAME);
         }
         if (NULL == newintercomm) {
-            return ompi_errhandler_invoke (errhandler, MPI_COMM_SELF, errhandler->eh_mpi_object_type,
+            return ompi_errhandler_invoke (errhandler, MPI_COMM_NULL, errhandler->eh_mpi_object_type,
                                            MPI_ERR_ARG, FUNC_NAME);
         }
     }

@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -66,9 +66,9 @@ enum {
 opal_atomic_int32_t ompi_instance_count = 0;
 
 static const char *ompi_instance_builtin_psets[] = {
-    "mpi://world",
-    "mpi://self",
-    "mpi://shared",
+    "mpi://WORLD",
+    "mpi://SELF",
+    "mpix://SHARED",
 };
 
 static const int32_t ompi_instance_builtin_count = 3;
@@ -545,6 +545,8 @@ static int ompi_mpi_instance_init_common (void)
         return ompi_instance_print_error ("ompi_group_init() failed", ret);
     }
 
+    ompi_mpi_instance_append_finalize (ompi_mpi_instance_cleanup_pml);
+
     /* initialize communicator subsystem */
     if (OMPI_SUCCESS != (ret = ompi_comm_init ())) {
         opal_mutex_unlock (&instance_lock);
@@ -602,8 +604,6 @@ static int ompi_mpi_instance_init_common (void)
             return ompi_instance_print_error ("ompi_proc_get_allocated () failed", ret);
         }
     }
-
-    ompi_mpi_instance_append_finalize (ompi_mpi_instance_cleanup_pml);
 
     ret = MCA_PML_CALL(add_procs(procs, nprocs));
     free(procs);
@@ -1206,13 +1206,13 @@ int ompi_group_from_pset (ompi_instance_t *instance, const char *pset_name, ompi
 {
     if (0 == strncmp (pset_name, "mpi://", 6)) {
         pset_name += 6;
-        if (0 == strcmp (pset_name, "world")) {
+        if (0 == strcmp (pset_name, "WORLD")) {
         return ompi_instance_group_world (instance, group_out);
         }
-        if (0 == strcmp (pset_name, "self")) {
+        if (0 == strcmp (pset_name, "SELF")) {
             return ompi_instance_group_self (instance, group_out);
         }
-        if (0 == strcmp (pset_name, "shared")) {
+        if (0 == strcmp (pset_name, "SHARED")) {
             return ompi_instance_group_shared (instance, group_out);
         }
     }

@@ -37,7 +37,6 @@
 #include "opal/class/opal_list.h"
 #include "opal/class/opal_hash_table.h"
 #include "opal/mca/threads/mutex.h"
-#include "ompi/instance/instance.h"
 
 BEGIN_C_DECLS
 

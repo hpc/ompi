@@ -1224,9 +1224,7 @@ void mca_pml_ob1_handle_cid (ompi_communicator_t *comm, int src, mca_pml_ob1_cid
 }
 
 void mca_pml_ob1_recv_frag_callback_cid (mca_btl_base_module_t* btl,
-                                         mca_btl_base_tag_t tag,
-                                         mca_btl_base_descriptor_t* des,
-                                         void* cbdata)
+                                         const mca_btl_base_receive_descriptor_t* des)
 {
     mca_btl_base_segment_t segments[MCA_BTL_DES_MAX_SEGMENTS];
     mca_pml_ob1_hdr_t *hdr = (mca_pml_ob1_hdr_t *) des->des_segments[0].seg_addr.pval;
