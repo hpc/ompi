@@ -13,7 +13,7 @@
  * Copyright (c) 2008-2009 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -43,17 +43,18 @@ static const char FUNC_NAME[] = "MPI_Comm_create_errhandler";
 int MPI_Comm_create_errhandler(MPI_Comm_errhandler_function *function,
                                MPI_Errhandler *errhandler)
 {
-    int err;
+    int err = MPI_SUCCESS;
 
     /* Error checking */
 
     if (MPI_PARAM_CHECK) {
         OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
 
-    if (NULL == function ||
-        NULL == errhandler) {
-      return OMPI_ERRHANDLER_NOHANDLE_INVOKE(MPI_ERR_ARG,
-                                    FUNC_NAME);
+        if (NULL == function ||
+            NULL == errhandler) {
+          return OMPI_ERRHANDLER_NOHANDLE_INVOKE(MPI_ERR_ARG,
+                                                 FUNC_NAME);
+        }
     }
 
     /* Create and cache the errhandler.  Sets a refcount of 1. */

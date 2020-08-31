@@ -28,6 +28,7 @@
 
 #include "ompi/runtime/params.h"
 #include "ompi/runtime/mpiruntime.h"
+#include "ompi/instance/instance.h"
 
 static char *ompi_mpi_dynamics_disabled_msg = "Enabled";
 

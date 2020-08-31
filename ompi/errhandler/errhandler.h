@@ -379,10 +379,9 @@ extern opal_atomic_int32_t ompi_instance_count;
    * @param[in]  object_type    Enum of the type of MPI object
    * @param[in]  func           Function pointer of the error handler
    * @param[in]  language       Calling language
-   * @param[out] errhandler_out New errhandler object
    *
-   * @returns OMPI_SUCCESS on succes
-   * @returns OMPI error code on failure
+   * @returns errhandler Pointer to the ompi_errorhandler_t that will be
+   *   created and returned
    *
    * This function is called as the back-end of all the
    * MPI_*_CREATE_ERRHANDLER functions.  It creates a new
@@ -397,10 +396,9 @@ extern opal_atomic_int32_t ompi_instance_count;
    * least theoretically, a sizeof(void*) may not necessarily be the
    * same as sizeof(void(*)).
    */
-  OMPI_DECLSPEC int ompi_errhandler_create (ompi_errhandler_type_t object_type,
+  OMPI_DECLSPEC ompi_errhandler_t *ompi_errhandler_create(ompi_errhandler_type_t object_type,
                                             ompi_errhandler_generic_handler_fn_t *func,
-                                            ompi_errhandler_lang_t language,
-                                            ompi_errhandler_t **errhandler_out);
+                                            ompi_errhandler_lang_t language);
 
   OMPI_DECLSPEC void ompi_errhandler_free (ompi_errhandler_t *errhandler);
 

@@ -192,7 +192,7 @@ void ompi_mpi_errors_are_fatal_instance_handler (struct ompi_instance_t **instan
       name = NULL;
   }
   /* NTH: for now we still call these "sessions" */
-  backend_fatal("session", abort_comm, name, error_code, arglist);
+  backend_abort(true, "session", abort_comm, name, error_code, arglist);
   va_end(arglist);
 }
 

@@ -109,6 +109,7 @@ int ompi_mpi_finalize(void)
 {
     int ret = MPI_SUCCESS;
     pmix_status_t rc;
+    volatile bool active;
 
     ompi_hook_base_mpi_finalize_top();
 

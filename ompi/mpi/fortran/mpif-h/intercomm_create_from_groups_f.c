@@ -85,7 +85,7 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
                                          MPI_Fint *remote_leader, char *stringtag, MPI_Fint *info, MPI_Fint *errhandler, 
                                          MPI_Fint *internewcomm, MPI_Fint *ierr, int name_len)
 {
-    int c_ierr, ret;
+    int c_ierr;
     MPI_Group c_lgroup, c_rgroup;
     char *c_tag;
     MPI_Comm c_intercomm;
@@ -100,6 +100,7 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
     /* Convert the fortran string */
 
     c_ierr = ompi_fortran_string_f2c(stringtag, name_len, &c_tag);
+/* TODO HPP */
 #if 0
     if (OMPI_SUCCESS != (ret = ompi_fortran_string_f2c(stringtag, name_len,
                                                        &c_tag))) {

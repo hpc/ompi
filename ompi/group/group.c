@@ -606,6 +606,7 @@ int ompi_group_count_local_peers (ompi_group_t *group)
     }
 
     return local_peers;
+}
 
 int ompi_group_to_proc_name_array (ompi_group_t *group, opal_process_name_t **name_array, size_t *name_array_size)
 {
