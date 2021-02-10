@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -545,6 +545,8 @@ static int ompi_mpi_instance_init_common (void)
         return ompi_instance_print_error ("ompi_group_init() failed", ret);
     }
 
+    ompi_mpi_instance_append_finalize (ompi_mpi_instance_cleanup_pml);
+
     /* initialize communicator subsystem */
     if (OMPI_SUCCESS != (ret = ompi_comm_init ())) {
         opal_mutex_unlock (&instance_lock);
@@ -602,8 +604,6 @@ static int ompi_mpi_instance_init_common (void)
             return ompi_instance_print_error ("ompi_proc_get_allocated () failed", ret);
         }
     }
-
-    ompi_mpi_instance_append_finalize (ompi_mpi_instance_cleanup_pml);
 
     ret = MCA_PML_CALL(add_procs(procs, nprocs));
     free(procs);
