@@ -66,9 +66,9 @@ enum {
 opal_atomic_int32_t ompi_instance_count = 0;
 
 static const char *ompi_instance_builtin_psets[] = {
-    "mpi://world",
-    "mpi://self",
-    "mpi://shared",
+    "mpi://WORLD",
+    "mpi://SELF",
+    "mpix://SHARED",
 };
 
 static const int32_t ompi_instance_builtin_count = 3;

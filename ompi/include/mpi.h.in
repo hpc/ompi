@@ -20,7 +20,7 @@
  * Copyright (c) 2015-2020 Research Organization for Information Science
  *                         and Technology (RIST).  All rights reserved.
  * Copyright (c) 2017-2019 IBM Corporation.  All rights reserved.
- * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -103,7 +103,7 @@
 #undef OPAL_MAX_PSET_NAME_LEN
 
 /* Maximum length of from group tag (default is 256) */
-#undef OPAL_MAX_FROM_GROUP_TAG
+#undef OPAL_MAX_STRINGTAG_LEN
 
 /* The number or Fortran INTEGER in MPI Status */
 #undef OMPI_FORTRAN_STATUS_SIZE
@@ -540,7 +540,7 @@ typedef MPI_Win_errhandler_function MPI_Win_errhandler_fn
 #define MPI_DISTRIBUTE_NONE      2                     /* not distributed */
 #define MPI_DISTRIBUTE_DFLT_DARG (-1)                  /* default distribution arg */
 #define MPI_MAX_PSET_NAME_LEN    OPAL_MAX_PSET_NAME_LEN /* max pset name len */
-#define MPI_MAX_FROM_GROUP_TAG   OPAL_MAX_FROM_GROUP_TAG /* max length of string arg to comm from group funcs*/
+#define MPI_MAX_STRINGTAG_LEN    OPAL_MAX_STRINGTAG_LEN /* max length of string arg to comm from group funcs*/
 
 /*
  * Since these values are arbitrary to Open MPI, we might as well make

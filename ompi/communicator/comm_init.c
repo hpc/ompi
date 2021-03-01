@@ -189,7 +189,7 @@ int ompi_comm_init_mpi3 (void)
     OBJ_CONSTRUCT(&ompi_mpi_comm_world, ompi_communicator_t);
     assert(ompi_mpi_comm_world.comm.c_f_to_c_index == 0);
 
-    ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://world", &group);
+    ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://WORLD", &group);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
         return ret;
     }
@@ -247,7 +247,7 @@ int ompi_comm_init_mpi3 (void)
     OBJ_CONSTRUCT(&ompi_mpi_comm_self, ompi_communicator_t);
     assert(ompi_mpi_comm_self.comm.c_f_to_c_index == 1);
 
-    ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://self", &group);
+    ret = ompi_group_from_pset (ompi_mpi_instance_default, "mpi://SELF", &group);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
         return ret;
     }
