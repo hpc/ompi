@@ -30,7 +30,7 @@ static const char FUNC_NAME[] = "MPI_Session_create_errhandler";
 
 int MPI_Session_create_errhandler (MPI_Session_errhandler_function *session_errhandler_fn, MPI_Errhandler *errhandler)
 {
-    int err;
+    int err = MPI_SUCCESS;
 
     if ( MPI_PARAM_CHECK ) {
         if (NULL == errhandler || NULL == session_errhandler_fn) {
@@ -46,4 +46,6 @@ int MPI_Session_create_errhandler (MPI_Session_errhandler_function *session_errh
     if (NULL == *errhandler) {
         err = MPI_ERR_INTERN;
     }
+
+    return err;
 }

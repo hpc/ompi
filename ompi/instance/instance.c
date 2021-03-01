@@ -1206,13 +1206,13 @@ int ompi_group_from_pset (ompi_instance_t *instance, const char *pset_name, ompi
 {
     if (0 == strncmp (pset_name, "mpi://", 6)) {
         pset_name += 6;
-        if (0 == strcmp (pset_name, "world")) {
+        if (0 == strcmp (pset_name, "WORLD")) {
         return ompi_instance_group_world (instance, group_out);
         }
-        if (0 == strcmp (pset_name, "self")) {
+        if (0 == strcmp (pset_name, "SELF")) {
             return ompi_instance_group_self (instance, group_out);
         }
-        if (0 == strcmp (pset_name, "shared")) {
+        if (0 == strcmp (pset_name, "SHARED")) {
             return ompi_instance_group_shared (instance, group_out);
         }
     }
