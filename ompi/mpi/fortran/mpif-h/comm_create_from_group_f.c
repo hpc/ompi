@@ -15,7 +15,7 @@
  *                         reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2019      Triad National Security, LLC.  All rights reserved.
+ * Copyright (c) 2019-2021 Triad National Security, LLC.  All rights reserved.
  *
  * $COPYRIGHT$
  *
@@ -76,7 +76,7 @@ OMPI_GENERATE_F77_BINDINGS (MPI_COMM_CREATE_FROM_GROUP,
 
 void ompi_comm_create_from_group_f(MPI_Fint *group, char *stringtag, MPI_Fint *info, MPI_Fint *errhandler, MPI_Fint *newcomm, MPI_Fint *ierr, int name_len)
 {
-    int c_ierr, ret;
+    int c_ierr;
     MPI_Group c_group;
     char *c_tag;
     MPI_Comm c_comm;
