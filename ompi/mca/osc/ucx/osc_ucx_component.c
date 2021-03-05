@@ -392,7 +392,7 @@ select_unlock:
     }
 
     *model = MPI_WIN_UNIFIED;
-    opal_asprintf(&name, "ucx window %d", ompi_comm_get_cid(module->comm));
+    opal_asprintf(&name, "ucx window %d", ompi_comm_print_cid(module->comm));
     ompi_win_set_name(win, name);
     free(name);
 
