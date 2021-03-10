@@ -17,7 +17,7 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016      Los Alamos National Security, LLC. All rights
  *                         reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -49,10 +49,13 @@ static const char FUNC_NAME[] = "MPI_Intercomm_merge";
 int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
                         MPI_Comm *newcomm)
 {
+    ompi_communicator_t *newcomp = MPI_COMM_NULL;
+    ompi_proc_t **procs=NULL;
+    int first, thigh = high;
+    int local_size, remote_size;
+    int total_size;
+    int rc=MPI_SUCCESS;
     ompi_group_t *new_group_pointer;
-    ompi_communicator_t *newcomp;
-    int first, rc, thigh = high;
-    char tag[128];
 
     MEMCHECKER(
         memchecker_comm(intercomm);
@@ -73,6 +76,15 @@ int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
 
     OPAL_CR_ENTER_LIBRARY();
 
+    local_size  = ompi_comm_size ( intercomm );
+    remote_size = ompi_comm_remote_size ( intercomm );
+    total_size  = local_size + remote_size;
+    procs = (ompi_proc_t **) malloc ( total_size * sizeof(ompi_proc_t *));
+    if ( NULL == procs ) {
+        rc = MPI_ERR_INTERN;
+        goto exit;
+    }
+
     first = ompi_comm_determine_first ( intercomm, thigh );
     if ( MPI_UNDEFINED == first ) {
         return OMPI_ERRHANDLER_INVOKE(intercomm, MPI_ERR_INTERN, FUNC_NAME);
@@ -84,6 +96,57 @@ int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
     else {
         ompi_group_union ( intercomm->c_remote_group, intercomm->c_local_group, &new_group_pointer );
     }
+
+    rc = ompi_comm_set ( &newcomp,                 /* new comm */
+                         intercomm,                /* old comm */
+                         total_size,               /* local_size */
+                         NULL,                     /* local_procs*/
+                         0,                        /* remote_size */
+                         NULL,                     /* remote_procs */
+                         NULL,                     /* attrs */
+                         intercomm->error_handler, /* error handler*/
+                         new_group_pointer,        /* local group */
+                         NULL,                     /* remote group */
+                         0);
+    if ( MPI_SUCCESS != rc ) {
+        goto exit;
+    }
+
+    OBJ_RELEASE(new_group_pointer);
+    new_group_pointer = MPI_GROUP_NULL;
+
+    /* Determine context id */
+    rc = ompi_comm_nextcid (newcomp, intercomm, NULL, NULL, NULL, false,
+                            OMPI_COMM_CID_INTER);
+    if ( OMPI_SUCCESS != rc ) {
+        goto exit;
+    }
+
+    /* activate communicator and init coll-module */
+    rc = ompi_comm_activate (&newcomp, intercomm, NULL, NULL, NULL, false,
+                             OMPI_COMM_CID_INTER);
+    if ( OMPI_SUCCESS != rc ) {
+        goto exit;
+    }
+
+ exit:
+    OPAL_CR_EXIT_LIBRARY();
+
+    if ( NULL != procs ) {
+        free ( procs );
+    }
+    if ( MPI_SUCCESS != rc ) {
+        if ( MPI_COMM_NULL != newcomp && NULL != newcomp ) {
+            OBJ_RELEASE(newcomp);
+        }
+        *newcomm = MPI_COMM_NULL;
+        return OMPI_ERRHANDLER_INVOKE(intercomm, rc,  FUNC_NAME);
+    }
+
+    *newcomm = newcomp;
+    return MPI_SUCCESS;
+}
+#if 0
 
     /* NTH: the merge can easily be done with create_from_group. no reason not to unless we want
      * to try and optimize the extended CID space (there are 2^128 possible extended CIDs) */
@@ -104,3 +167,4 @@ int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
     return MPI_SUCCESS;
 }
 
+#endif
