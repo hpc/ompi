@@ -107,8 +107,6 @@ int MPI_File_open_from_group (MPI_Group group, const char *tag, MPI_Errhandler e
                                        rc, FUNC_NAME);
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     /* Create an empty MPI_File handle */
 
     *fh = MPI_FILE_NULL;

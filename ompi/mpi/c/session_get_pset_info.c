@@ -37,8 +37,6 @@ int MPI_Session_get_pset_info (MPI_Session session, const char *pset_name, MPI_I
 {
     int ret;
 
-    OPAL_CR_NOOP_PROGRESS();
-
     if (MPI_PARAM_CHECK) {
         OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
         if (NULL == session || MPI_SESSION_NULL == session) {

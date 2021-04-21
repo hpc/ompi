@@ -480,7 +480,7 @@ void mca_pml_ob1_recv_frag_callback_match (mca_btl_base_module_t *btl,
          * moved to the right communicator.
          */
         append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending, btl,
-                             (mca_pml_ob1_hdr_t *) hdr, segments, num_segments, NULL );
+                             hdr, segments, num_segments, NULL );
         return;
     }
     comm = (mca_pml_ob1_comm_t *)comm_ptr->c_pml_comm;
@@ -974,7 +974,7 @@ static mca_pml_ob1_recv_request_t *match_one (mca_btl_base_module_t *btl,
         append_frag_to_umq(comm->umq, btl, hdr, segments,
                             num_segments, frag);
 #else
-        append_frag_to_list(&proc->unexpected_frags, btl, (mca_pml_ob1_hdr_t *)hdr, segments,
+        append_frag_to_list(&proc->unexpected_frags, btl, hdr, segments,
                             num_segments, frag);
 #endif
         SPC_RECORD(OMPI_SPC_UNEXPECTED, 1);
@@ -1041,7 +1041,7 @@ static int mca_pml_ob1_recv_frag_match (mca_btl_base_module_t *btl,
          * moved to the right communicator.
          */
         append_frag_to_list( &mca_pml_ob1.non_existing_communicator_pending, btl,
-                             (mca_pml_ob1_hdr_t *)hdr, segments, num_segments, NULL );
+                             hdr, segments, num_segments, NULL );
         return OMPI_SUCCESS;
     }
     comm = (mca_pml_ob1_comm_t *)comm_ptr->c_pml_comm;
@@ -1253,7 +1253,8 @@ void mca_pml_ob1_recv_frag_callback_cid (mca_btl_base_module_t* btl,
              * moved to the right communicator.
              */
             append_frag_to_list (&mca_pml_ob1.non_existing_communicator_pending,
-                                 btl, hdr, des->des_segments, num_segments, NULL);
+                                 btl, (const mca_pml_ob1_match_hdr_t *)hdr, des->des_segments, 
+                                 num_segments, NULL);
         }
 
         /* nothing more to do */

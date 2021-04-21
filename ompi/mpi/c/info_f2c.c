@@ -13,7 +13,7 @@
  * Copyright (c) 2006-2012 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -37,7 +37,7 @@
 #define MPI_Info_f2c PMPI_Info_f2c
 #endif
 
-/* static const char FUNC_NAME[] = "MPI_Info_f2c"; */
+static const char FUNC_NAME[] = "MPI_Info_f2c";
 
 
 /**

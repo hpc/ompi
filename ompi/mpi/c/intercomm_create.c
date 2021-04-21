@@ -84,10 +84,8 @@ int MPI_Intercomm_create(MPI_Comm local_comm, int local_leader,
      */
 #endif
 
-    OPAL_CR_ENTER_LIBRARY();
     rc = ompi_intercomm_create (local_comm, local_leader, bridge_comm, remote_leader, tag,
                                 newintercomm);
-    OPAL_CR_EXIT_LIBRARY();
 
     OMPI_ERRHANDLER_RETURN (rc, local_comm, rc, FUNC_NAME);
 }

@@ -82,10 +82,8 @@ int MPI_Intercomm_create_from_groups (MPI_Group local_group, int local_leader, M
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
     rc = ompi_intercomm_create_from_groups (local_group, local_leader, remote_group, remote_leader, tag,
                                             &info->super, errhandler, newintercomm);
-    OPAL_CR_EXIT_LIBRARY();
 
     OMPI_ERRHANDLER_RETURN (rc, MPI_COMM_SELF, rc, FUNC_NAME);
 }

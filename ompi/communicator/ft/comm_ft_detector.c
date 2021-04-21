@@ -380,7 +380,7 @@ static int fd_heartbeat_request(comm_detector_t* detector) {
         detector->hb_observing = rank;
 
         ompi_comm_heartbeat_req_t* msg = calloc(sizeof(*msg)+regsize, 1);
-        msg->super.cid = comm->c_contextid;
+        msg->super.cid = comm->c_index;
         msg->super.epoch = comm->c_epoch;
         msg->super.type = comm_heartbeat_request_cb_type;
         msg->from = comm->c_my_rank;
@@ -674,7 +674,7 @@ static int fd_heartbeat_send(comm_detector_t* detector) {
 
     /* send the heartbeat with eager send */
     ompi_comm_heartbeat_message_t msg;
-    msg.super.cid = comm->c_contextid;
+    msg.super.cid = comm->c_index;
     msg.super.epoch = comm->c_epoch;
     msg.super.type = comm_heartbeat_recv_cb_type;
     msg.from = detector->hb_rdma_rank; /* comm->c_my_rank; except during finalize when it is equal to detector->hb_observer */

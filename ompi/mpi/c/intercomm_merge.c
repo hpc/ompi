@@ -140,7 +140,6 @@ int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
     }
 
  exit:
-    OPAL_CR_EXIT_LIBRARY();
 
     if ( NULL != procs ) {
         free ( procs );
@@ -156,25 +155,3 @@ int MPI_Intercomm_merge(MPI_Comm intercomm, int high,
     *newcomm = newcomp;
     return MPI_SUCCESS;
 }
-#if 0
-
-    /* NTH: the merge can easily be done with create_from_group. no reason not to unless we want
-     * to try and optimize the extended CID space (there are 2^128 possible extended CIDs) */
-    snprintf (tag, sizeof (tag), "OMPIi_ICM_%s::%s", ompi_comm_print_cid (intercomm),
-              OPAL_NAME_PRINT(ompi_group_get_proc_name (new_group_pointer, 0)));
-
-    rc = ompi_comm_create_from_group (new_group_pointer, tag, &ompi_mpi_info_null.info.super,
-                                      intercomm->error_handler, &newcomp);
-
-    ompi_group_free (&new_group_pointer);
-
-    if (MPI_SUCCESS != rc) {
-        *newcomm = MPI_COMM_NULL;
-        return OMPI_ERRHANDLER_INVOKE(intercomm, rc,  FUNC_NAME);
-    }
-
-    *newcomm = newcomp;
-    return MPI_SUCCESS;
-}
-
-#endif

@@ -217,7 +217,7 @@ alloc_ft_req:
                                   count,
                                   datatype,
                                   dst, tag,
-                                  comm, sendmode, false);
+                                  comm, sendmode, false, ob1_proc);
 
     PERUSE_TRACE_COMM_EVENT (PERUSE_COMM_REQ_ACTIVATE,
                              &(sendreq)->req_send.req_base,

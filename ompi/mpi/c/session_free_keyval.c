@@ -52,8 +52,6 @@ int MPI_Session_free_keyval (int *session_keyval)
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     ret = ompi_attr_free_keyval (INSTANCE_ATTR, session_keyval, 0);
     return ompi_errcode_get_mpi_code (ret);
 }

@@ -73,7 +73,7 @@ int ompi_comm_failure_propagate(ompi_communicator_t* comm, ompi_proc_t* proc, in
 
     ompi_comm_failure_propagator_message_t msg;
     /* Broadcast the 'failure_propagator' signal to all other processes. */
-    msg.rbcast_msg.cid   = comm->c_contextid;
+    msg.rbcast_msg.cid   = comm->c_index;
     msg.rbcast_msg.epoch = comm->c_epoch;
     msg.rbcast_msg.type  = comm_failure_propagator_cb_type;
     msg.proc_name        = proc->super.proc_name;

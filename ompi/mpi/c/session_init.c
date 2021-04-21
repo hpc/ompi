@@ -31,7 +31,7 @@ int MPI_Session_init (MPI_Info info, MPI_Errhandler errhandler, MPI_Session *ses
 {
     int rc, flag;
     int ts_level = MPI_THREAD_SINGLE;  /* for now we default to thread single for OMPI sessions */
-    char info_value[MPI_MAX_INFO_VAL + 1];
+    opal_cstring_t *info_value;
     const char ts_level_multi[] = "MPI_THREAD_MULTIPLE";
 
     if ( MPI_PARAM_CHECK ) {
@@ -45,11 +45,12 @@ int MPI_Session_init (MPI_Info info, MPI_Errhandler errhandler, MPI_Session *ses
     }
 
     if (MPI_INFO_NULL != info) {
-        (void) ompi_info_get (info, "thread_level", MPI_MAX_INFO_VAL, info_value, &flag);
+        (void) ompi_info_get (info, "thread_level", &info_value, &flag);
         if (flag) {
-            if(strncmp(info_value, ts_level_multi, strlen(ts_level_multi)) == 0) {
+            if(strncmp(info_value->string, ts_level_multi, strlen(ts_level_multi)) == 0) {
                 ts_level = MPI_THREAD_MULTIPLE;
             }
+            OBJ_RELEASE(info_value);
         }
     }
 

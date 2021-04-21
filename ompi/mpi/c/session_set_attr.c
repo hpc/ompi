@@ -50,8 +50,6 @@ int MPI_Session_set_attr (MPI_Session session, int session_keyval, void *attribu
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     ret = ompi_attr_set_c (INSTANCE_ATTR, session, &session->i_keyhash,
                            session_keyval, attribute_val, false);
     OMPI_ERRHANDLER_RETURN(ret, session, MPI_ERR_OTHER, FUNC_NAME);

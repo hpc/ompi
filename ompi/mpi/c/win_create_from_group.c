@@ -68,17 +68,13 @@ int MPI_Win_create_from_group (void *base, MPI_Aint size,  int disp_unit, MPI_In
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     /* create window and return */
     ret = ompi_win_create_from_group (base, (size_t)size, disp_unit, group, tag,
                                       &info->super, win);
     if (OMPI_SUCCESS != ret) {
         *win = MPI_WIN_NULL;
-        OPAL_CR_EXIT_LIBRARY();
         return ompi_errcode_get_mpi_code (ret);
     }
 
-    OPAL_CR_EXIT_LIBRARY();
     return MPI_SUCCESS;
 }

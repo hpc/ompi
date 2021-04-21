@@ -52,8 +52,6 @@ int MPI_Session_create_keyval (MPI_Session_delete_attr_function *session_delete_
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     del_fn.attr_instance_delete_fn = session_delete_attr_fn;
 
     ret = ompi_attr_create_keyval (INSTANCE_ATTR, (ompi_attribute_fn_ptr_union_t){.attr_communicator_copy_fn = NULL},

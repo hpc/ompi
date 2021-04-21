@@ -52,8 +52,6 @@ static const char FUNC_NAME[] = "MPI_Info_create";
  */
 int MPI_Info_create(MPI_Info *info)
 {
-    OPAL_CR_NOOP_PROGRESS();
-
     if (MPI_PARAM_CHECK) {
         if (NULL == info) {
             return OMPI_ERRHANDLER_NOHANDLE_INVOKE(MPI_ERR_INFO,

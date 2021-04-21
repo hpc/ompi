@@ -81,7 +81,6 @@ int MPI_Graph_create_from_group (MPI_Group group, const char *tag, MPI_Info info
         return MPI_SUCCESS;
     }
 
-    OPAL_CR_ENTER_LIBRARY();
     /*
      * everything seems to be alright with the communicator, we can go
      * ahead and select a topology module for this purpose and create
@@ -94,7 +93,6 @@ int MPI_Graph_create_from_group (MPI_Group group, const char *tag, MPI_Info info
     /* Now let that topology module rearrange procs/ranks if it wants to */
     err = topo->topo.graph.graph_create_from_group (topo, group, tag, &info->super, errhandler,
                                                     nnodes, indx, edges, !reorder, comm_graph);
-    OPAL_CR_EXIT_LIBRARY();
 
     if (MPI_SUCCESS != err) {
         OBJ_RELEASE(topo);
