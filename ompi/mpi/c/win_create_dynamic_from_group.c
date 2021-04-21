@@ -65,16 +65,12 @@ int MPI_Win_create_dynamic_from_group (MPI_Info info, MPI_Group group, const cha
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     /* create_dynamic_from_group window and return */
     ret = ompi_win_create_dynamic_from_group (&(info->super), group, tag, win);
     if (OMPI_SUCCESS != ret) {
         *win = MPI_WIN_NULL;
-        OPAL_CR_EXIT_LIBRARY();
         return ompi_errcode_get_mpi_code (ret);
     }
 
-    OPAL_CR_EXIT_LIBRARY();
     return MPI_SUCCESS;
 }

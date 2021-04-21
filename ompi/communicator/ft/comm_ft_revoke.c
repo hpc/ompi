@@ -56,7 +56,7 @@ int ompi_comm_revoke_internal(ompi_communicator_t* comm)
     if( ompi_comm_revoke_local(comm, NULL) ) {
         /* Broadcast the 'revoke' signal to all other processes. */
         ompi_comm_rbcast_message_t msg;
-        msg.cid   = comm->c_contextid;
+        msg.cid   = comm->c_index;
         msg.epoch = comm->c_epoch;
         msg.type  = comm_revoke_cb_type;
         ret = ompi_comm_rbcast(comm, &msg, sizeof(msg));

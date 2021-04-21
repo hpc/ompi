@@ -24,7 +24,7 @@
  * Copyright (c) 2017      Mellanox Technologies. All rights reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
- * Copyright (c) 2020      Triad National Security, LLC. All rights
+ * Copyright (c) 2020-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -32,6 +32,7 @@
  *
  * $HEADER$
  */
+
 
 #include "ompi_config.h"
 
@@ -51,11 +52,8 @@
 #include "ompi/request/request.h"
 #include "ompi/runtime/mpiruntime.h"
 #include "ompi/runtime/ompi_rte.h"
-#if 0
-#include "pmix.h"
-#endif
 
-/* TODO: need to refactor OMPI to get rid of opal_pmix_t */
+#include "pmix.h"
 
 /* for use when we don't have a PMIx that supports CID generation */
 opal_atomic_int64_t ompi_comm_next_base_cid = 1;
@@ -308,12 +306,13 @@ static int ompi_comm_ext_cid_new_block (ompi_communicator_t *newcomm, ompi_commu
                                         const void *arg0, const void *arg1, bool send_first, int mode,
                                         ompi_request_t **req)
 {
-    opal_list_t info, results;
-    opal_value_t *value;
+    pmix_info_t pinfo, *results = NULL;
+    size_t nresults;
     opal_process_name_t *name_array;
     char *tag = NULL;
     size_t proc_count, cid_base = 0UL;
     int rc, leader_rank;
+    pmix_proc_t *procs;
 
     rc = ompi_group_to_proc_name_array (newcomm->c_local_group, &name_array, &proc_count);
     if (OPAL_UNLIKELY(OMPI_SUCCESS != rc)) {
@@ -335,34 +334,25 @@ static int ompi_comm_ext_cid_new_block (ompi_communicator_t *newcomm, ompi_commu
         break;
     }
 
-    OBJ_CONSTRUCT(&info, opal_list_t);
-    OBJ_CONSTRUCT(&results, opal_list_t);
+    PMIX_INFO_LOAD(&pinfo, PMIX_GROUP_ASSIGN_CONTEXT_ID, NULL, PMIX_BOOL);
 
-    value = OBJ_NEW(opal_value_t);
-    value->key = strdup (PMIX_GROUP_ASSIGN_CONTEXT_ID);
-    value->data.flag = true;
-    opal_list_append (&info, &value->super);
+    PMIX_PROC_CREATE(procs, proc_count);
+    for (size_t i = 0 ; i < proc_count; ++i) {
+        OPAL_PMIX_CONVERT_NAME(&procs[i],&name_array[i]);
+    }
 
-    rc = opal_pmix_group_construct (tag, name_array, proc_count, &info, &results);
+    rc = PMIx_Group_construct(tag, procs, proc_count, &pinfo, 1, &results, &nresults);
+    PMIX_INFO_DESTRUCT(&pinfo);
+
+    if (NULL != results) {
+        PMIX_VALUE_GET_NUMBER(rc, &results[0].value, cid_base, size_t);
+        PMIX_INFO_FREE(results, nresults);
+    }
+
+    PMIX_PROC_FREE(procs, proc_count);
     free (name_array);
-    OPAL_LIST_DESTRUCT(&info);
-    if (OPAL_SUCCESS != rc) {
-        return OMPI_ERROR;
-    }
 
-    opal_pmix_group_destruct (tag, NULL);
-
-    if (0 == opal_list_get_size (&results)) {
-        return OMPI_ERROR;
-    }
-
-    OPAL_LIST_FOREACH(value, &results, opal_value_t) {
-        if (0 == strcmp (value->key, PMIX_GROUP_CONTEXT_ID)) {
-            cid_base = value->data.size;
-        }
-    }
-
-    OPAL_LIST_DESTRUCT(&results);
+    rc = PMIx_Group_destruct (tag, NULL, 0);
 
     ompi_comm_extended_cid_block_initialize (new_block, cid_base, 0, 0);
 

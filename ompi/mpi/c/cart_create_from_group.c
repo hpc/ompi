@@ -105,7 +105,6 @@ int MPI_Cart_create_from_group (MPI_Group group, const char *tag, MPI_Info info,
     err = topo->topo.cart.cart_create_from_group (topo, group, tag, &info->super, errhandler,
                                                   ndims, dims, periods, !!reorder,
                                                   comm_cart);
-    OPAL_CR_EXIT_LIBRARY();
 
     if (MPI_SUCCESS != err) {
         OBJ_RELEASE(topo);

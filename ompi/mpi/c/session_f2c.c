@@ -43,8 +43,6 @@ MPI_Session MPI_Session_f2c(MPI_Fint session)
 {
     int o_index= OMPI_FINT_2_INT(session);
 
-    OPAL_CR_NOOP_PROGRESS();
-
     if (MPI_PARAM_CHECK) {
         OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
     }

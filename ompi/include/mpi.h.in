@@ -615,6 +615,7 @@ enum {
 
     /* MPI-4 */
     MPI_FT, /* used by OPAL_ENABLE_FT_MPI */
+    MPI_ATTR_KEY_LAST,
 };
 
 /*

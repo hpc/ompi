@@ -311,7 +311,6 @@ static int ompi_mpi_instance_init_common (void)
     opal_pmix_lock_t mylock;
     OMPI_TIMING_INIT(64);
 
-
     ret = ompi_mpi_instance_retain ();
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
         return ret;
@@ -351,6 +350,13 @@ static int ompi_mpi_instance_init_common (void)
         mca_base_var_set_value(ret, allvalue, 4, MCA_BASE_VAR_SOURCE_DEFAULT, NULL);
     }
 
+    OMPI_TIMING_NEXT("initialization");
+
+    /* Setup RTE */
+    if (OMPI_SUCCESS != (ret = ompi_rte_init (NULL, NULL))) {
+        return ompi_instance_print_error ("ompi_mpi_init: ompi_rte_init failed", ret);
+    }
+
     /* open the ompi hook framework */
     for (int i = 0 ; ompi_framework_dependencies[i] ; ++i) {
         ret = mca_base_framework_open (ompi_framework_dependencies[i], 0);
@@ -361,13 +367,6 @@ static int ompi_mpi_instance_init_common (void)
                       ompi_framework_dependencies[i]->framework_name);
             return ompi_instance_print_error (error_msg, ret);
         }
-    }
-
-    OMPI_TIMING_NEXT("initialization");
-
-    /* Setup RTE */
-    if (OMPI_SUCCESS != (ret = ompi_rte_init (NULL, NULL))) {
-        return ompi_instance_print_error ("ompi_mpi_init: ompi_rte_init failed", ret);
     }
 
     OMPI_TIMING_NEXT("rte_init");

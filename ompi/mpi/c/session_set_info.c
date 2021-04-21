@@ -35,8 +35,6 @@ static const char FUNC_NAME[] = "MPI_Session_set_info";
 
 int MPI_Session_set_info (MPI_Session session, MPI_Info info)
 {
-    OPAL_CR_NOOP_PROGRESS();
-
     if (MPI_PARAM_CHECK) {
         OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
         if (NULL == session || MPI_SESSION_NULL == session) {
@@ -47,8 +45,6 @@ int MPI_Session_set_info (MPI_Session session, MPI_Info info)
             return OMPI_ERRHANDLER_INVOKE (session, MPI_ERR_INFO, FUNC_NAME);
         }
     }
-
-    OPAL_CR_ENTER_LIBRARY();
 
     opal_infosubscribe_change_info (&session->super, &info->super);
 

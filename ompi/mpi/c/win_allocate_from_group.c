@@ -70,17 +70,13 @@ int MPI_Win_allocate_from_group (MPI_Aint size, int disp_unit, MPI_Info info,
     }
 
 
-    OPAL_CR_ENTER_LIBRARY();
-
     /* create window and return */
     ret = ompi_win_allocate_from_group ((size_t)size, disp_unit, &(info->super),
                                         group, tag, baseptr, win);
     if (OMPI_SUCCESS != ret) {
         *win = MPI_WIN_NULL;
-        OPAL_CR_EXIT_LIBRARY();
         return ompi_errcode_get_mpi_code (ret);
     }
 
-    OPAL_CR_EXIT_LIBRARY();
     return MPI_SUCCESS;
 }

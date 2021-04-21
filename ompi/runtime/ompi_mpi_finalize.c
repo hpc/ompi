@@ -303,6 +303,7 @@ int ompi_mpi_finalize(void)
 
     /* All done */
 
+   done:
     opal_atomic_wmb();
     opal_atomic_swap_32(&ompi_mpi_state, OMPI_MPI_STATE_FINALIZE_COMPLETED);
 

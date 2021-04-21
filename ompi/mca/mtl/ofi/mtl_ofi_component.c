@@ -910,10 +910,6 @@ select_prov:
         goto error;
     }
 
-    if (!strcmp(prov->fabric_attr->prov_name,"gni")) {
-         prov->domain_attr->mr_mode = FI_MR_BASIC;
-    }
-
     /**
      * Unfortunately the attempt to implement FI_MR_SCALABLE in the GNI provider
      * doesn't work, at least not well.  Since we're asking for the 1.5 libfabric

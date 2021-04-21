@@ -584,7 +584,7 @@ static void attr_subsys_construct(attr_subsys_t *subsys)
     ret = opal_bitmap_init(subsys->key_bitmap, 32);
     assert(OPAL_SUCCESS == ret);
 
-    for (int i = 0; i <= MPI_WIN_MODEL; i++) {
+    for (int i = 0; i < MPI_ATTR_KEY_LAST; i++) {
         opal_bitmap_set_bit(subsys->key_bitmap, i);
     }
 
@@ -793,7 +793,7 @@ int ompi_attr_set_c(ompi_attribute_type_t type, void *object,
                     opal_hash_table_t **attr_hash,
                     int key, void *attribute, bool predefined)
 {
-    int ret;
+    int ret = MPI_SUCCESS;
     attribute_value_t *new_attr = OBJ_NEW(attribute_value_t);
     if (NULL == new_attr) {
         return OMPI_ERR_OUT_OF_RESOURCE;

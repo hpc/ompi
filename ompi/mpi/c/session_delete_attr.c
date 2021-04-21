@@ -51,8 +51,6 @@ int MPI_Session_delete_attr(MPI_Session session, int session_keyval)
         }
     }
 
-    OPAL_CR_ENTER_LIBRARY();
-
     ret = ompi_attr_delete (INSTANCE_ATTR, session, session->i_keyhash, session_keyval,
                             false);
 

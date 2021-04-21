@@ -128,6 +128,16 @@ OMPI_DECLSPEC OBJ_CLASS_DECLARATION(ompi_communicator_t);
 #define OMPI_COMM_CID_INTRA_PMIX_FT   0x00002000
 #endif /* OPAL_ENABLE_FT_MPI */
 
+/**
+ * The block of CIDs allocated for MPI_COMM_WORLD
+ * and other communicators
+ */
+#define OMPI_COMM_BLOCK_WORLD      16
+#define OMPI_COMM_BLOCK_OTHERS     8
+
+/* A macro comparing two CIDs */
+#define OMPI_COMM_CID_IS_LOWER(comm1,comm2) ( ((comm1)->c_index < (comm2)->c_index)? 1:0)
+
 OMPI_DECLSPEC extern opal_hash_table_t ompi_comm_hash;
 OMPI_DECLSPEC extern opal_pointer_array_t ompi_comm_array;
 OMPI_DECLSPEC extern opal_pointer_array_t ompi_comm_f_to_c_table;
@@ -181,7 +191,6 @@ static inline char *ompi_comm_extended_cid_get_unique_tag (ompi_comm_extended_ci
 
     return id;
 }
->>>>>>> WIP: sessions -- will split later
 
 /**
  * Create a new sub-block from an existing block
@@ -246,6 +255,7 @@ OMPI_DECLSPEC extern opal_pointer_array_t ompi_mpi_comm_epoch;
 typedef void (ompi_comm_rank_failure_callback_t)(struct ompi_communicator_t *comm, int rank, bool remote);
 
 OMPI_DECLSPEC extern ompi_comm_rank_failure_callback_t *ompi_rank_failure_cbfunc;
+#endif  /* OPAL_ENABLE_FT_MPI */
 
 struct ompi_communicator_t {
     opal_infosubscriber_t      super;
@@ -422,7 +432,7 @@ typedef struct ompi_communicator_t ompi_communicator_t;
  * the PREDEFINED_COMMUNICATOR_PAD macro?
  * A: Most likely not, but it would be good to check.
  */
-#define PREDEFINED_COMMUNICATOR_PAD 512
+#define PREDEFINED_COMMUNICATOR_PAD 1024
 
 struct ompi_predefined_communicator_t {
     struct ompi_communicator_t comm;

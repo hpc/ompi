@@ -80,7 +80,6 @@ int MPI_Comm_create_from_group (MPI_Group group, const char *tag, MPI_Info info,
         return MPI_SUCCESS;
     }
 
-    OPAL_CR_ENTER_LIBRARY();
 
     rc = ompi_comm_create_from_group ((ompi_group_t *) group, tag, &info->super, errhandler,
                                       (ompi_communicator_t **) newcomm);
