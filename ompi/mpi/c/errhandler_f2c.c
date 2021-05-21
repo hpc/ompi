@@ -13,7 +13,8 @@
  * Copyright (c) 2006-2012 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2020      Triad National Security, LLC.  All rights reserved.
+ * Copyright (c) 2020-2021 Triad National Security, LLC.  
+ *                         All rights reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -43,12 +44,6 @@ MPI_Errhandler MPI_Errhandler_f2c(MPI_Fint errhandler_f)
     int eh_index = OMPI_FINT_2_INT(errhandler_f);
     MPI_Errhandler c_err_handler;
 
-    /* Error checking */
-
-    if (MPI_PARAM_CHECK) {
-        OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
-    }
-
     /* Per MPI-2:4.12.4, do not invoke an error handler if we get an
        invalid fortran handle.  If we get an invalid fortran handle,
        return an invalid C handle. */
@@ -69,6 +64,9 @@ MPI_Errhandler MPI_Errhandler_f2c(MPI_Fint errhandler_f)
         c_err_handler = MPI_ERRORS_RETURN;
         break;
     default:
+        if (MPI_PARAM_CHECK) {
+            OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
+        }
         if (eh_index < 0 ||
             eh_index >=
                  opal_pointer_array_get_size(&ompi_errhandler_f_to_c_table)) {

@@ -50,12 +50,6 @@ MPI_Info MPI_Info_f2c(MPI_Fint info)
 {
     int info_index = OMPI_FINT_2_INT(info);
 
-    /* check the arguments */
-
-    if (MPI_PARAM_CHECK) {
-        OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
-    }
-
     /* Per MPI-2:4.12.4, do not invoke an error handler if we get an
        invalid fortran handle.  If we get an invalid fortran handle,
        return an invalid C handle. */
@@ -69,6 +63,10 @@ MPI_Info MPI_Info_f2c(MPI_Fint info)
 
     if (info_index == 1) {
         return MPI_INFO_ENV;
+    }
+
+    if (MPI_PARAM_CHECK) {
+        OMPI_ERR_INIT_FINALIZE(FUNC_NAME);
     }
 
     if (info_index < 0 ||
