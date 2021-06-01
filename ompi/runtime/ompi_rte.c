@@ -97,6 +97,7 @@ buffer_cleanup(void *value)
         }
         free (ptr);
     }
+    fns_init = false;
 }
 
 static opal_print_args_buffers_t*
