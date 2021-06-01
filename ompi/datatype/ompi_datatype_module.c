@@ -18,7 +18,7 @@
  * Copyright (c) 2015-2018 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2018 FUJITSU LIMITED.  All rights reserved.
- * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -702,7 +702,7 @@ static int ompi_datatype_finalize (void)
      */
     for( int i = 0; i < ompi_datatype_number_of_predefined_data; i++ ) {
         opal_datatype_t* datatype = (opal_datatype_t*)opal_pointer_array_get_item(&ompi_datatype_f_to_c_table, i );
-        OBJ_DESTRUCT(datatype);
+        OBJ_DESTRUCT_NDBG(datatype);
     }
 
     /* Get rid of the Fortran2C translation table */
