@@ -232,8 +232,6 @@ int mca_pml_ob1_add_comm(ompi_communicator_t* comm)
                 continue;
             }
 
-            fprintf (stderr, "MATCHED necp header\n");
-
             /* handle this CID*/
             mca_pml_ob1_handle_cid (comm, frag->hdr.hdr_ext_match.hdr_match.hdr_src, &frag->hdr.hdr_cid);
 
