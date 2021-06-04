@@ -187,8 +187,14 @@ void ompi_mpi_instance_release (void)
 
     if (0 != --ompi_mpi_instance_init_basic_count) {
         opal_mutex_unlock (&instance_lock);
+#if 0
+        fprintf(stderr,"inside ompi_mpi_instance_release %d\n", ompi_mpi_instance_init_basic_count);
+#endif
         return;
     }
+#if 0
+    fprintf(stderr,"inside ompi_mpi_instance_release %d\n", ompi_mpi_instance_init_basic_count);
+#endif
 
     opal_argv_free (ompi_mpi_instance_pmix_psets);
     ompi_mpi_instance_pmix_psets = NULL;
@@ -207,6 +213,9 @@ int ompi_mpi_instance_retain (void)
 
     opal_mutex_lock (&instance_lock);
 
+#if 0
+    fprintf(stderr,"inside ompi_mpi_instance_retain %d\n", ompi_mpi_instance_init_basic_count);
+#endif
     if (0 < ompi_mpi_instance_init_basic_count++) {
         opal_mutex_unlock (&instance_lock);
         return OMPI_SUCCESS;
@@ -315,6 +324,9 @@ static int ompi_mpi_instance_init_common (void)
     if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
         return ret;
     }
+#if 0
+    fprintf(stderr, "inside ompi_mpi_instance_init_common\n");
+#endif
 
     OBJ_CONSTRUCT(&ompi_instance_common_domain, opal_finalize_domain_t);
     opal_finalize_domain_init (&ompi_instance_common_domain, "ompi_mpi_instance_init_common");
@@ -768,6 +780,13 @@ static int ompi_mpi_instance_finalize_common (void)
     uint32_t key;
     ompi_datatype_t *datatype;
     int ret;
+
+#if 0
+    fprintf(stderr, "inside ompi_mpi_instance_finalize_common %d\n", ompi_mpi_instance_init_basic_count);
+#endif
+    if (1 < ompi_mpi_instance_init_basic_count) {
+        return OMPI_SUCCESS;
+    }
 
     /* As finalize is the last legal MPI call, we are allowed to force the release
      * of the user buffer used for bsend, before going anywhere further.
