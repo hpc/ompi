@@ -15,8 +15,6 @@
  *                         and Technology (RIST).  All rights reserved.
  * Copyright (c) 2015      Los Alamos National Security, LLC. All rights
  *                         reserved.
- * Copyright (c) 2021      Triad National Security, LLC. All rights
- *                         reserved.
  *
  * $COPYRIGHT$
  * Additional copyrights may follow
@@ -405,13 +403,6 @@ static inline opal_object_t *opal_obj_new_debug(opal_class_t *type, const char *
             OBJ_REMEMBER_FILE_AND_LINENO(object, __FILE__, __LINE__); \
         } while (0)
 #endif
-
-#    define OBJ_DESTRUCT_NDBG(object)                                 \
-        do {                                                          \
-            opal_obj_run_destructors((opal_object_t *) (object));     \
-            OBJ_REMEMBER_FILE_AND_LINENO(object, __FILE__, __LINE__); \
-        } while (0)
-
 
 OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_object_t);
 

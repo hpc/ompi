@@ -697,13 +697,6 @@ static int ompi_datatype_finalize (void)
      * Anyway they are over the limit of OMPI_DATATYPE_MPI_MAX_PREDEFINED so they will never get freed.
      */
 
-    /* As they are statically allocated they cannot be released.
-     * But we can call OBJ_DESTRUCT, just to free all internally allocated ressources.
-     */
-    for( int i = 0; i < ompi_datatype_number_of_predefined_data; i++ ) {
-        opal_datatype_t* datatype = (opal_datatype_t*)opal_pointer_array_get_item(&ompi_datatype_f_to_c_table, i );
-        OBJ_DESTRUCT_NDBG(datatype);
-    }
 
     /* Get rid of the Fortran2C translation table */
     OBJ_DESTRUCT(&ompi_datatype_f_to_c_table);
