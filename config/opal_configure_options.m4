@@ -20,7 +20,7 @@ dnl Copyright (c) 2011-2013 NVIDIA Corporation.  All rights reserved.
 dnl Copyright (c) 2013-2017 Intel, Inc.  All rights reserved.
 dnl Copyright (c) 2015      Research Organization for Information Science
 dnl                         and Technology (RIST). All rights reserved.
-dnl Copyright (c) 2019      Triad National Security, LLC. All rights
+dnl Copyright (c) 2019-2021 Triad National Security, LLC. All rights
 dnl                         reserved.
 dnl
 dnl $COPYRIGHT$
@@ -521,7 +521,7 @@ OPAL_WITH_OPTION_MIN_MAX_VALUE(datarep_string,  128,  64,  256)
 
 OPAL_WITH_OPTION_MIN_MAX_VALUE(pset_name_len,  512,  512, 4096)
 
-OPAL_WITH_OPTION_MIN_MAX_VALUE(from_group_tag,     1024, 256, 2048)
+OPAL_WITH_OPTION_MIN_MAX_VALUE(stringtag_len,     1024, 256, 2048)
 
 AC_DEFINE_UNQUOTED([OPAL_ENABLE_CRDEBUG], [0],
     [Whether we want checkpoint/restart enabled debugging functionality or not])
