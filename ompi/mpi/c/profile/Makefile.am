@@ -162,7 +162,6 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pfile_iwrite_all.c \
         pfile_iwrite_shared.c \
         pfile_open.c \
-        pfile_open_from_group.c \
         pfile_preallocate.c \
         pfile_read_all_begin.c \
         pfile_read_all.c \
