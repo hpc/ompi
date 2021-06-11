@@ -1498,8 +1498,6 @@ OMPI_DECLSPEC  int MPI_File_set_errhandler( MPI_File file, MPI_Errhandler errhan
 OMPI_DECLSPEC  int MPI_File_get_errhandler( MPI_File file, MPI_Errhandler *errhandler);
 OMPI_DECLSPEC  int MPI_File_open(MPI_Comm comm, const char *filename, int amode,
                                  MPI_Info info, MPI_File *fh);
-OMPI_DECLSPEC  int MPI_File_open_from_group (MPI_Group group, const char *tag, MPI_Errhandler errhandler,
-                                             const char *filename, int amode, MPI_Info info, MPI_File *fh);
 OMPI_DECLSPEC  int MPI_File_close(MPI_File *fh);
 OMPI_DECLSPEC  int MPI_File_delete(const char *filename, MPI_Info info);
 OMPI_DECLSPEC  int MPI_File_set_size(MPI_File fh, MPI_Offset size);
@@ -2223,8 +2221,6 @@ OMPI_DECLSPEC  int PMPI_File_set_errhandler( MPI_File file, MPI_Errhandler errha
 OMPI_DECLSPEC  int PMPI_File_get_errhandler( MPI_File file, MPI_Errhandler *errhandler);
 OMPI_DECLSPEC  int PMPI_File_open(MPI_Comm comm, const char *filename, int amode,
                                   MPI_Info info, MPI_File *fh);
-OMPI_DECLSPEC  int PMPI_File_open_from_group (MPI_Group group, const char *tag, MPI_Errhandler errhandler,
-                                              const char *filename, int amode, MPI_Info info, MPI_File *fh);
 OMPI_DECLSPEC  int PMPI_File_close(MPI_File *fh);
 OMPI_DECLSPEC  int PMPI_File_delete(const char *filename, MPI_Info info);
 OMPI_DECLSPEC  int PMPI_File_set_size(MPI_File fh, MPI_Offset size);
