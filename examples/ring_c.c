@@ -7,21 +7,18 @@
  * Simple ring test program in C.
  */
 
-#include "mpi.h"
 #include <stdio.h>
+#include "mpi.h"
 
 int main(int argc, char *argv[])
 {
-    int rank, color, size, next, prev, message, tag = 201;
-    MPI_Comm comm;
+    int rank, size, next, prev, message, tag = 201;
 
     /* Start up MPI */
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    color = (rank % 2) ? 0 : 1;
-    MPI_Comm_split(MPI_COMM_WORLD, color, rank, &comm);
 
     /* Calculate the rank of the next process in the ring.  Use the
        modulus operator so that the last process "wraps around" to
@@ -37,8 +34,8 @@ int main(int argc, char *argv[])
     if (0 == rank) {
         message = 10;
 
-        printf("Process 0 sending %d to %d, tag %d (%d processes in ring)\n", message, next, tag,
-               size);
+        printf("Process 0 sending %d to %d, tag %d (%d processes in ring)\n",
+               message, next, tag, size);
         MPI_Send(&message, 1, MPI_INT, next, tag, MPI_COMM_WORLD);
         printf("Process 0 sent to %d\n", next);
     }
@@ -52,7 +49,8 @@ int main(int argc, char *argv[])
        and can quit normally. */
 
     while (1) {
-        MPI_Recv(&message, 1, MPI_INT, prev, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&message, 1, MPI_INT, prev, tag, MPI_COMM_WORLD,
+                 MPI_STATUS_IGNORE);
 
         if (0 == rank) {
             --message;
@@ -70,7 +68,8 @@ int main(int argc, char *argv[])
        to be received before the program can exit */
 
     if (0 == rank) {
-        MPI_Recv(&message, 1, MPI_INT, prev, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&message, 1, MPI_INT, prev, tag, MPI_COMM_WORLD,
+                 MPI_STATUS_IGNORE);
     }
 
     /* All done */
