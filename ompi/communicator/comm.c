@@ -1323,23 +1323,6 @@ int ompi_comm_create_from_group (ompi_group_t *group, const char *tag, opal_info
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-#if 0
-    /* NTH: HACK IN SLEEPY STUFF */
-    /* HPP: this is unreliable at the moment since we aren't reliably tracking group instance */
-    {
-        opal_info_entry_t *info_entry;
-        OPAL_LIST_FOREACH(info_entry, &group->grp_instance->super.s_info->super, opal_info_entry_t) {
-            opal_info_set (newcomp->super.s_info, info_entry->ie_key, info_entry->ie_value);
-        }
-
-        ompi_comm_assert_subscribe (newcomp, OMPI_COMM_ASSERT_LAZY_BARRIER);
-        ompi_comm_assert_subscribe (newcomp, OMPI_COMM_ASSERT_ACTIVE_POLL);
-        if (info) {
-            opal_infosubscribe_change_info(&newcomp->super, info);
-        }
-    }
-#endif
-
     /* activate communicator and init coll-module. use the group allreduce implementation as
      * no collective module has yet been selected. the tag does not matter as any tag will
      * be unique on the new communicator. */
