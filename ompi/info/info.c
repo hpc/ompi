@@ -84,8 +84,10 @@ opal_pointer_array_t ompi_info_f_to_c_table = {{0}};
 
 /*
  * This function is called during ompi_init and initializes the
- * fortran to C translation table. 
+ * fortran to C translation table. It also fills in the values
+ * for the MPI_INFO_GET_ENV object
  */
+
 int ompi_mpiinfo_init(void)
 {
 
