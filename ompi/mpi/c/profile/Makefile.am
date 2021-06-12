@@ -329,9 +329,6 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         psendrecv_replace.c \
         psession_c2f.c \
         psession_create_errhandler.c \
-        psession_create_keyval.c \
-        psession_delete_attr.c \
-        psession_get_attr.c \
         psession_get_info.c \
         psession_get_num_psets.c \
         psession_get_nth_pset.c \
@@ -339,8 +336,6 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         psession_init.c \
         psession_f2c.c \
         psession_finalize.c \
-        psession_free_keyval.c \
-        psession_set_attr.c \
         psession_set_info.c \
         pssend_init.c \
         pssend.c \
