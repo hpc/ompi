@@ -358,26 +358,6 @@ ompi_win_allocate_shared(size_t size, int disp_unit, opal_info_t *info,
     return OMPI_SUCCESS;
 }
 
-int ompi_win_allocate_shared_from_group (size_t size, int disp_unit, opal_info_t *info, ompi_group_t *group,
-                                         const char *tag, void *baseptr, ompi_win_t** newwin)
-{
-    /* NTH: dummy implementation until the osc modules are updated for group communicator
-    * creation. This implemention will probably continue to exist for modules that do
-    * not provide group-based window creation. */
-    ompi_communicator_t *comm;
-    int rc;
-
-    rc = ompi_comm_create_from_group (group, tag, info, MPI_ERRHANDLER_NULL, &comm);
-    if (OPAL_UNLIKELY(OMPI_SUCCESS == rc)) {
-        return rc;
-    }
-
-    rc = ompi_win_allocate_shared (size, disp_unit, info, comm, baseptr, newwin);
-    ompi_comm_free (&comm);
-    return rc;
-}
-
-
 int
 ompi_win_create_dynamic(opal_info_t *info, ompi_communicator_t *comm, ompi_win_t **newwin)
 {
