@@ -444,6 +444,7 @@ static void ompi_comm_construct(ompi_communicator_t* comm)
     comm->c_topo         = NULL;
     comm->c_coll         = NULL;
     comm->c_nbc_tag      = MCA_COLL_BASE_TAG_NONBLOCKING_BASE;
+    comm->instance       = NULL;
 
     /*
      * magic numerology - see TOPDIR/ompi/include/mpif-values.pl

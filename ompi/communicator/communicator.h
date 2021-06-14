@@ -325,6 +325,9 @@ struct ompi_communicator_t {
      */
     opal_atomic_int32_t c_nbc_tag;
 
+    /* instance that this comm belongs to */
+    ompi_instance_t* instance;
+
 #if OPAL_ENABLE_FT_MPI
     /** MPI_ANY_SOURCE Failed Group Offset - OMPI_Comm_failure_get_acked */
     int                      any_source_offset;
