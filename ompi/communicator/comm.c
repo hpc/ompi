@@ -276,6 +276,8 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         }
     }
 
+    newcomm->instance = oldcomm->instance;
+
     *ncomm = newcomm;
     return (OMPI_SUCCESS);
 }
@@ -1332,6 +1334,8 @@ int ompi_comm_create_from_group (ompi_group_t *group, const char *tag, opal_info
         return rc;
     }
 
+    newcomp->instance = group->grp_instance;
+
     *newcomm = newcomp;
     return MPI_SUCCESS;
 }
@@ -1632,6 +1636,11 @@ int ompi_comm_compare(ompi_communicator_t *comm1, ompi_communicator_t *comm2, in
     int size1, size2, rsize1, rsize2;
     int lresult, rresult=MPI_CONGRUENT;
     int cmp_result;
+
+    if (comm1->instance != comm2->instance) {
+        printf("Tried to compare two comms from different sessions\n");
+        return OMPI_ERR_BAD_PARAM;
+    }
 
     comp1 = (ompi_communicator_t *) comm1;
     comp2 = (ompi_communicator_t *) comm2;
