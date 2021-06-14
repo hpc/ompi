@@ -142,9 +142,6 @@ int ompi_win_create_from_group (void *base, size_t size, int disp_unit,
                                 ompi_win_t **newwin);
 int ompi_win_allocate(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
-int ompi_win_allocate_from_group (size_t size, int disp_unit, opal_info_t *info,
-                                  ompi_group_t *group, const char *tag, void *baseptr,
-                                  ompi_win_t **newwin);
 int ompi_win_allocate_shared(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
 int ompi_win_allocate_shared_from_group (size_t size, int disp_unit, opal_info_t *info,
