@@ -208,6 +208,10 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
 
         newcomm->c_flags |= OMPI_COMM_INTER;
         newcomm->c_index_vec = malloc(remote_size * sizeof(int));
+        if (NULL == newcomm->c_index_vec) {
+            OBJ_RELEASE(newcomm);
+            return OMPI_ERR_OUT_OF_RESOURCE;
+        }
         for (int i = 0; i < remote_size; i++) {
             if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
                 newcomm->c_index_vec[i] = newcomm->c_index;
@@ -231,6 +235,10 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         newcomm->c_remote_group = newcomm->c_local_group;
         OBJ_RETAIN(newcomm->c_remote_group);
         newcomm->c_index_vec = malloc(local_size * sizeof(int));
+        if (NULL == newcomm->c_index_vec) {
+            OBJ_RELEASE(newcomm);
+            return OMPI_ERR_OUT_OF_RESOURCE;
+        }
         for (int i = 0; i < local_size; i++) {
             if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
                 newcomm->c_index_vec[i] = newcomm->c_index;
