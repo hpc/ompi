@@ -59,7 +59,6 @@ enum ompi_attribute_type_t {
                       * using memset in the constructor */
     TYPE_ATTR,       /**< The attribute belongs to datatype object */
     WIN_ATTR,        /**< The attribute belongs to a win object */
-    INSTANCE_ATTR,   /**< The attribute belongs to a session object */
 };
 typedef enum ompi_attribute_type_t ompi_attribute_type_t;
 
