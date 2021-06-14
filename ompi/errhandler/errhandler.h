@@ -17,7 +17,7 @@
  *                         reserved.
  * Copyright (c) 2016      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -211,11 +211,13 @@ extern opal_atomic_int32_t ompi_instance_count;
  * potentially-performance-critical code paths) before reading the
  * variable.
  */
-#define OMPI_ERR_INIT_FINALIZE(name)                                    \
-    {                                                                   \
-        if (OPAL_UNLIKELY(0 == ompi_instance_count)) {                  \
-            ompi_mpi_errors_are_fatal_comm_handler(NULL, NULL, name);   \
-        }                                                               \
+#define OMPI_ERR_INIT_FINALIZE(name)                                       \
+    {                                                                      \
+        if (OPAL_UNLIKELY(0 == ompi_instance_count)) {                     \
+            ompi_errhandler_invoke(NULL, NULL, -1,                         \
+                                   ompi_errcode_get_mpi_code(MPI_ERR_ARG), \
+                                   name);                                  \
+        }                                                                  \
     }
 
 /**
