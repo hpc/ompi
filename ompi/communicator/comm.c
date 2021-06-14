@@ -284,7 +284,9 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         }
     }
 
-    newcomm->instance = oldcomm->instance;
+    if (NULL != oldcomm) {
+        newcomm->instance = oldcomm->instance;
+    }
 
     *ncomm = newcomm;
     return (OMPI_SUCCESS);
