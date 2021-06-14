@@ -424,7 +424,6 @@ libmpi_c_mpi_la_SOURCES = \
         get.c \
         put.c \
 	win_allocate.c \
-	win_allocate_from_group.c \
 	win_allocate_shared.c \
 	win_allocate_shared_from_group.c \
 	win_attach.c \
