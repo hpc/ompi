@@ -90,13 +90,6 @@ mca_topo_base_cart_create(mca_topo_base_module_t *topo_module,
                           ompi_communicator_t** comm_topo);
 
 OMPI_DECLSPEC int
-mca_topo_base_cart_create_from_group (mca_topo_base_module_t *topo_module, ompi_group_t *group,
-                                      const char *tag, opal_info_t *info,
-                                      ompi_errhandler_t *errhandler, int ndims, const int *dims,
-                                      const int *periods, bool reorder,
-                                      ompi_communicator_t **comm_topo);
-
-OMPI_DECLSPEC int
 mca_topo_base_cart_coords(ompi_communicator_t *comm,
                           int rank,
                           int maxdims,
@@ -150,12 +143,6 @@ mca_topo_base_graph_create(mca_topo_base_module_t *topo_module,
                            ompi_communicator_t** new_comm);
 
 OMPI_DECLSPEC int
-mca_topo_base_graph_create_from_group (mca_topo_base_module_t *topo_module, ompi_group_t *group,
-                                       const char *tag, opal_info_t *info,
-                                       ompi_errhandler_t *errhandler, int nnodes, const int *index,
-                                       const int *edges, bool reorder, ompi_communicator_t **new_comm);
-
-OMPI_DECLSPEC int
 mca_topo_base_graph_get(ompi_communicator_t *comm,
                         int maxindex,
                         int maxedges,
@@ -199,13 +186,6 @@ mca_topo_base_dist_graph_create(mca_topo_base_module_t* module,
                                 ompi_communicator_t **new_comm);
 
 OMPI_DECLSPEC int
-mca_topo_base_dist_graph_create_from_group (mca_topo_base_module_t *module, ompi_group_t *group,
-                                            const char *tag, ompi_errhandler_t *errhandler, int n,
-                                            const int nodes[], const int degrees[], const int targets[],
-                                            const int weights[], opal_info_t *info, int reorder,
-                                            ompi_communicator_t **new_comm);
-
-OMPI_DECLSPEC int
 mca_topo_base_dist_graph_create_adjacent(mca_topo_base_module_t* module,
                                          ompi_communicator_t *old_comm,
                                          int indegree, const int sources[],
@@ -213,14 +193,6 @@ mca_topo_base_dist_graph_create_adjacent(mca_topo_base_module_t* module,
                                          const int destinations[], const int destweights[],
                                          opal_info_t *info, int reorder,
                                          ompi_communicator_t **comm_dist_graph);
-
-OMPI_DECLSPEC int
-mca_topo_base_dist_graph_create_adjacent_from_group (mca_topo_base_module_t* module, ompi_group_t *group,
-                                                     const char *tag, ompi_errhandler_t *errhandler,
-                                                     int indegree, const int sources[], const int sourceweights[],
-                                                     int outdegree, const int destinations[],
-                                                     const int destweights[], opal_info_t *info, int reorder,
-                                                     ompi_communicator_t **comm_dist_graph);
 
 OMPI_DECLSPEC int
 mca_topo_base_dist_graph_neighbors(ompi_communicator_t *comm,

@@ -162,19 +162,6 @@ typedef int (*mca_topo_base_module_cart_create_fn_t)
                      bool reorder,
                      ompi_communicator_t** comm_topo);
 
-/* Back end for MPI_Cart_create_from_group */
-typedef int (*mca_topo_base_module_cart_create_from_group_fn_t)
-                    (mca_topo_base_module_t *topo_module,
-                     ompi_group_t *group,
-                     const char *tag,
-                     opal_info_t *info,
-                     ompi_errhandler_t *errhandler,
-                     int ndims,
-                     const int *dims,
-                     const int *periods,
-                     bool reorder,
-                     ompi_communicator_t** comm_topo);
-
 /* Back end for MPI_CART_GET */
 typedef int (*mca_topo_base_module_cart_get_fn_t)
                     (struct ompi_communicator_t *comm,
@@ -226,19 +213,6 @@ typedef int (*mca_topo_base_module_graph_create_fn_t)
                      bool reorder,
                      ompi_communicator_t** new_comm);
 
-/* Back end for MPI_Graph_create_from_group */
-typedef int (*mca_topo_base_module_graph_create_from_group_fn_t)
-                    (mca_topo_base_module_t *topo_module,
-                     ompi_group_t *group,
-                     const char *tag,
-                     opal_info_t *info,
-                     ompi_errhandler_t *errhandler,
-                     int nnodes,
-                     const int *index,
-                     const int *edges,
-                     bool reorder,
-                     ompi_communicator_t** new_comm);
-
 /* Back end for MPI_GRAPH_GET */
 typedef int (*mca_topo_base_module_graph_get_fn_t)
                     (struct ompi_communicator_t *comm,
@@ -283,15 +257,6 @@ typedef int (*mca_topo_base_module_dist_graph_create_fn_t)
                      struct opal_info_t *info, int reorder,
                      struct ompi_communicator_t **new_comm);
 
-/* Back end for MPI_Dist_graph_create_from_group */
-typedef int (*mca_topo_base_module_dist_graph_create_from_group_fn_t)
-                    (struct mca_topo_base_module_t* module,
-                     ompi_group_t *group, const char *tag,
-                     ompi_errhandler_t *errhandler, int n, const int nodes[],
-                     const int degrees[], const int targets[], const int weights[],
-                     struct opal_info_t *info, int reorder,
-                     struct ompi_communicator_t **new_comm);
-
 /* Back end for MPI_DIST_GRAPH_CREATE_ADJACENT */
 typedef int (*mca_topo_base_module_dist_graph_create_adjacent_fn_t)
                     (struct mca_topo_base_module_t* module,
@@ -301,16 +266,6 @@ typedef int (*mca_topo_base_module_dist_graph_create_adjacent_fn_t)
                      int outdegree,
                      const int destinations[],
                      const int destweights[],
-                     struct opal_info_t *info, int reorder,
-                     ompi_communicator_t **comm_dist_graph);
-
-/* Back end for MPI_Dist_graph_create_adjacent_from_group */
-typedef int (*mca_topo_base_module_dist_graph_create_adjacent_from_group_fn_t)
-                    (struct mca_topo_base_module_t* module,
-                     ompi_group_t *group, const char *tag,
-                     ompi_errhandler_t *errhandler, int indegree, const int sources[],
-                     const int sourceweights[], int outdegree,
-                     const int destinations[], const int destweights[],
                      struct opal_info_t *info, int reorder,
                      ompi_communicator_t **comm_dist_graph);
 
@@ -340,7 +295,6 @@ typedef int (*mca_topo_base_module_dist_graph_neighbors_count_fn_t)
 typedef struct mca_topo_base_cart_module_2_3_0_t {
     mca_topo_base_module_cart_coords_fn_t cart_coords;
     mca_topo_base_module_cart_create_fn_t cart_create;
-    mca_topo_base_module_cart_create_from_group_fn_t cart_create_from_group;
     mca_topo_base_module_cart_get_fn_t    cart_get;
     mca_topo_base_module_cartdim_get_fn_t cartdim_get;
     mca_topo_base_module_cart_map_fn_t    cart_map;
@@ -351,7 +305,6 @@ typedef struct mca_topo_base_cart_module_2_3_0_t {
 
 typedef struct mca_topo_base_graph_module_2_3_0_t {
     mca_topo_base_module_graph_create_fn_t          graph_create;
-    mca_topo_base_module_graph_create_from_group_fn_t graph_create_from_group;
     mca_topo_base_module_graph_get_fn_t             graph_get;
     mca_topo_base_module_graph_map_fn_t             graph_map;
     mca_topo_base_module_graphdims_get_fn_t         graphdims_get;
@@ -361,9 +314,7 @@ typedef struct mca_topo_base_graph_module_2_3_0_t {
 
 typedef struct mca_topo_base_dist_graph_module_2_3_0_t {
     mca_topo_base_module_dist_graph_create_fn_t          dist_graph_create;
-    mca_topo_base_module_dist_graph_create_from_group_fn_t dist_graph_create_from_group;
     mca_topo_base_module_dist_graph_create_adjacent_fn_t dist_graph_create_adjacent;
-    mca_topo_base_module_dist_graph_create_adjacent_from_group_fn_t dist_graph_create_adjacent_from_group;
     mca_topo_base_module_dist_graph_neighbors_fn_t       dist_graph_neighbors;
     mca_topo_base_module_dist_graph_neighbors_count_fn_t dist_graph_neighbors_count;
 } mca_topo_base_dist_graph_module_2_3_0_t;

@@ -314,34 +314,6 @@ int mca_topo_base_dist_graph_create(mca_topo_base_module_t* module,
     return err;
 }
 
-int mca_topo_base_dist_graph_create_from_group (mca_topo_base_module_t* module, ompi_group_t *group,
-                                                const char *tag, ompi_errhandler_t *errhandler,
-                                                int n, const int nodes[], const int degrees[],
-                                                const int targets[], const int weights[],
-                                                opal_info_t *info, int reorder,
-                                                ompi_communicator_t **newcomm)
-{
-    int err;
-
-    if (OMPI_SUCCESS != (err = ompi_comm_create_from_group (group, tag, info, errhandler, newcomm))) {
-        OBJ_RELEASE(module);
-        return err;
-    }
-
-    assert(NULL == (*newcomm)->c_topo);
-    (*newcomm)->c_topo             = module;
-    (*newcomm)->c_topo->reorder    = reorder;
-    (*newcomm)->c_flags           |= OMPI_COMM_DIST_GRAPH;
-
-    err = mca_topo_base_dist_graph_distribute (module, *newcomm,  n, nodes, degrees, targets,
-                                               weights, &((*newcomm)->c_topo->mtc.dist_graph));
-    if( OMPI_SUCCESS != err ) {
-        ompi_comm_free(newcomm);
-    }
-
-    return err;
-}
-
 static void mca_topo_base_comm_dist_graph_2_2_0_construct(mca_topo_base_comm_dist_graph_2_2_0_t * dist_graph) {
     dist_graph->in = NULL;
     dist_graph->inw = NULL;

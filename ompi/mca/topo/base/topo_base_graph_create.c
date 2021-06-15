@@ -121,46 +121,6 @@ int mca_topo_base_graph_create (mca_topo_base_module_t *topo, ompi_communicator_
     return OMPI_SUCCESS;
 }
 
-int mca_topo_base_graph_create_from_group (mca_topo_base_module_t *topo, ompi_group_t *group,
-                                           const char *tag, opal_info_t *info, ompi_errhandler_t *errhandler,
-                                           int nnodes, const int *index, const int *edges, bool reorder,
-                                           ompi_communicator_t **comm_topo)
-{
-    int num_procs, ret, my_rank = group->grp_my_rank;
-    mca_topo_base_comm_graph_2_2_0_t *graph;
-    ompi_group_t *c_local_group;
-
-    assert(topo->type == OMPI_COMM_GRAPH);
-
-    *comm_topo = MPI_COMM_NULL;
-
-    ret = mca_topo_base_graph_allocate (group, nnodes, index, edges, &num_procs, &graph);
-    if (OPAL_UNLIKELY(OMPI_SUCCESS != ret || my_rank >= num_procs)) {
-        return ret;
-    }
-
-    c_local_group = ompi_group_flatten (group, nnodes);
-    if (OPAL_UNLIKELY(NULL == c_local_group)) {
-        OBJ_RELEASE(graph);
-        return OMPI_ERR_OUT_OF_RESOURCE;
-    }
-
-    ret = ompi_comm_create_from_group (c_local_group, tag, info, errhandler, comm_topo);
-    if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
-        OBJ_RELEASE(graph);
-        return ret;
-    }
-
-    if (MPI_COMM_NULL != *comm_topo) {
-        (*comm_topo)->c_topo            = topo;
-        (*comm_topo)->c_topo->mtc.graph = graph;
-        (*comm_topo)->c_flags          |= OMPI_COMM_GRAPH;
-        (*comm_topo)->c_topo->reorder   = reorder;
-    }
-
-    return OMPI_SUCCESS;
-}
-
 static void mca_topo_base_comm_graph_2_2_0_construct(mca_topo_base_comm_graph_2_2_0_t * graph) {
     graph->nnodes = 0;
     graph->index = NULL;

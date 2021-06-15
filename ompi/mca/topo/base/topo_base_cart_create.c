@@ -178,61 +178,6 @@ int mca_topo_base_cart_create(mca_topo_base_module_t *topo,
     return OMPI_SUCCESS;
 }
 
-int mca_topo_base_cart_create_from_group (mca_topo_base_module_t *topo, ompi_group_t *group, const char *tag,
-                                          opal_info_t *info, ompi_errhandler_t *errhandler, int ndims,
-                                          const int *dims, const int *periods, bool reorder,
-                                          ompi_communicator_t **comm_topo)
-{
-    int new_rank, num_procs, ret;
-    ompi_communicator_t *new_comm;
-    mca_topo_base_comm_cart_2_2_0_t* cart;
-    ompi_group_t *c_local_group;
-
-    *comm_topo = MPI_COMM_NULL;
-
-    assert(topo->type == OMPI_COMM_CART);
-
-    ret = mca_topo_base_cart_allocate (group, ndims, dims, periods, &new_rank, &num_procs, &cart);
-    if (OPAL_UNLIKELY(OPAL_SUCCESS != ret)) {
-        return ret;
-    }
-
-    if (MPI_UNDEFINED == new_rank) {
-        /* not part of this */
-        return OMPI_SUCCESS;
-    }
-
-    /* Copy the proc structure from the previous communicator over to
-       the new one.  The topology module is then able to work on this
-       copy and rearrange it as it deems fit. NTH: seems odd that this
-       function has always clipped the group size here. It might be
-       worthwhile to clip the group in the module (if reordering) */
-    c_local_group = ompi_group_flatten (group, num_procs);
-    if (OPAL_UNLIKELY(NULL == c_local_group)) {
-        OBJ_RELEASE(cart);
-        return OMPI_ERR_OUT_OF_RESOURCE;
-    }
-
-    ret = ompi_comm_create_from_group (c_local_group, tag, info, errhandler, &new_comm);
-
-    ompi_group_free (&c_local_group);
-
-    if (OPAL_UNLIKELY(OMPI_SUCCESS != ret)) {
-        OBJ_RELEASE(cart);
-        return ret;
-    }
-
-    new_comm->c_topo           = topo;
-    new_comm->c_topo->mtc.cart = cart;
-    new_comm->c_topo->reorder  = reorder;
-    new_comm->c_flags         |= OMPI_COMM_CART;
-
-    *comm_topo = new_comm;
-
-    /* end here */
-    return OMPI_SUCCESS;
-}
-
 static void mca_topo_base_comm_cart_2_2_0_construct(mca_topo_base_comm_cart_2_2_0_t * cart) {
     cart->ndims = 0;
     cart->dims = NULL;

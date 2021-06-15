@@ -115,21 +115,3 @@ int mca_topo_base_dist_graph_create_adjacent(mca_topo_base_module_t* module,
     return _mca_topo_base_dist_graph_create_adjacent (module, indegree, sources, sourceweights, outdegree,
                                                       destinations, destweights, reorder, newcomm);
 }
-
-int mca_topo_base_dist_graph_create_adjacent_from_group (mca_topo_base_module_t* module, ompi_group_t *group,
-                                                         const char *tag, ompi_errhandler_t *errhandler,
-                                                         int indegree, const int sources[],
-                                                         const int sourceweights[], int outdegree,
-                                                         const int destinations[], const int destweights[],
-                                                         opal_info_t *info, int reorder,
-                                                         ompi_communicator_t **newcomm)
-{
-    int err;
-
-    if (OMPI_SUCCESS != (err = ompi_comm_create_from_group (group, tag, info, errhandler, newcomm))) {
-        return err;
-    }
-
-    return _mca_topo_base_dist_graph_create_adjacent (module, indegree, sources, sourceweights, outdegree,
-                                                      destinations, destweights, reorder, newcomm);
-}
