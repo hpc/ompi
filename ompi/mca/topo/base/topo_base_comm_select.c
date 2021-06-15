@@ -288,9 +288,6 @@ static void fill_null_pointers(int type, mca_topo_base_module_t *module)
         if (NULL == module->topo.cart.cart_create) {
             module->topo.cart.cart_create = mca_topo_base_cart_create;
         }
-        if (NULL == module->topo.cart.cart_create_from_group) {
-            module->topo.cart.cart_create_from_group = mca_topo_base_cart_create_from_group;
-        }
         if (NULL == module->topo.cart.cart_get) {
             module->topo.cart.cart_get = mca_topo_base_cart_get;
         }
@@ -313,9 +310,6 @@ static void fill_null_pointers(int type, mca_topo_base_module_t *module)
         if (NULL == module->topo.graph.graph_create) {
             module->topo.graph.graph_create = mca_topo_base_graph_create;
         }
-        if (NULL == module->topo.graph.graph_create_from_group) {
-            module->topo.graph.graph_create_from_group = mca_topo_base_graph_create_from_group;
-        }
         if (NULL == module->topo.graph.graph_get) {
             module->topo.graph.graph_get = mca_topo_base_graph_get;
         }
@@ -335,14 +329,8 @@ static void fill_null_pointers(int type, mca_topo_base_module_t *module)
         if (NULL == module->topo.dist_graph.dist_graph_create) {
             module->topo.dist_graph.dist_graph_create = mca_topo_base_dist_graph_create;
         }
-        if (NULL == module->topo.dist_graph.dist_graph_create_from_group) {
-            module->topo.dist_graph.dist_graph_create_from_group = mca_topo_base_dist_graph_create_from_group;
-        }
         if (NULL == module->topo.dist_graph.dist_graph_create_adjacent) {
             module->topo.dist_graph.dist_graph_create_adjacent = mca_topo_base_dist_graph_create_adjacent;
-        }
-        if (NULL == module->topo.dist_graph.dist_graph_create_adjacent_from_group) {
-            module->topo.dist_graph.dist_graph_create_adjacent_from_group = mca_topo_base_dist_graph_create_adjacent_from_group;
         }
         if (NULL == module->topo.dist_graph.dist_graph_neighbors) {
             module->topo.dist_graph.dist_graph_neighbors = mca_topo_base_dist_graph_neighbors;
