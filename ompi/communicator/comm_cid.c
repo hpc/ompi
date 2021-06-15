@@ -420,7 +420,9 @@ int ompi_comm_nextcid_nb (ompi_communicator_t *newcomm, ompi_communicator_t *com
     ompi_comm_cid_context_t *context;
     ompi_comm_request_t *request;
     if (mca_pml_base_supports_extended_cid() && OMPI_COMM_CID_INTER != mode &&
-        OMPI_COMM_CID_INTRA_BRIDGE != mode && OMPI_COMM_CID_INTRA_PMIX != mode) {
+        OMPI_COMM_CID_INTRA_BRIDGE != mode && OMPI_COMM_CID_INTRA_PMIX != mode &&
+        OMPI_COMM_CID_INTRA_FT != mode && OMPI_COMM_CID_INTER_FT != mode &&
+         OMPI_COMM_CID_INTRA_PMIX_FT != mode) {
         return ompi_comm_nextcid_ext_nb (newcomm, comm, bridgecomm, arg0, arg1, send_first, mode, req);
     }
 
