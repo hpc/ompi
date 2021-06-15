@@ -30,6 +30,7 @@
 #include "ompi/mpi/fortran/base/fortran_base_strings.h"
 #include "ompi/constants.h"
 #include "ompi/instance/instance.h"
+#include "ompi/group/group.h"
 
 
 #if OMPI_BUILD_MPI_PROFILING
@@ -85,7 +86,7 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
                                          MPI_Fint *remote_leader, char *stringtag, MPI_Fint *info, MPI_Fint *errhandler, 
                                          MPI_Fint *internewcomm, MPI_Fint *ierr, int name_len)
 {
-    int c_ierr;
+    int c_ierr, ret;
     MPI_Group c_lgroup, c_rgroup;
     char *c_tag;
     MPI_Comm c_intercomm;
@@ -99,17 +100,13 @@ void ompi_intercomm_create_from_groups_f(MPI_Fint *local_group, MPI_Fint *local_
 
     /* Convert the fortran string */
 
-    c_ierr = ompi_fortran_string_f2c(stringtag, name_len, &c_tag);
-/* TODO HPP */
-#if 0
+    /* Convert the fortran string */
     if (OMPI_SUCCESS != (ret = ompi_fortran_string_f2c(stringtag, name_len,
                                                        &c_tag))) {
-        c_ierr = OMPI_ERRHANDLER_INVOKE((ompi_instance_t *)c_session, ret,
-                                        "MPI_INTERCOMM_CREATE_FROM_GROUPS");
+        c_ierr = OMPI_ERRHANDLER_INVOKE(ompi_group_get_instance(c_lgroup), ret, "MPI_INTERCOMM_CREATE_FROM_GROUPS");
         if (NULL != ierr) *ierr = OMPI_INT_2_FINT(c_ierr);
         return;
     }
-#endif
 
     c_ierr = PMPI_Intercomm_create_from_groups(c_lgroup,  OMPI_FINT_2_INT(*local_leader), 
                                                c_rgroup,  OMPI_FINT_2_INT(*remote_leader), 
