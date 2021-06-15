@@ -522,5 +522,14 @@ int ompi_group_div_ceil (int num, int den);
  */
 int ompi_group_to_proc_name_array (ompi_group_t *group, opal_process_name_t **name_array, size_t *name_array_size);
 
+/**
+ * Return instance from a group
+ */
+
+static inline ompi_instance_t *ompi_group_get_instance(ompi_group_t *group)
+{
+    return group->grp_instance;
+}
+
 END_C_DECLS
 #endif /* OMPI_GROUP_H */
