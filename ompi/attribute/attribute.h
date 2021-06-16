@@ -122,7 +122,6 @@ union ompi_attribute_fn_ptr_union_t {
     MPI_Comm_delete_attr_function          *attr_communicator_delete_fn;
     MPI_Type_delete_attr_function          *attr_datatype_delete_fn;
     MPI_Win_delete_attr_function           *attr_win_delete_fn;
-    MPI_Session_delete_attr_function       *attr_instance_delete_fn;
 
     MPI_Comm_internal_copy_attr_function   *attr_communicator_copy_fn;
     MPI_Type_internal_copy_attr_function   *attr_datatype_copy_fn;
@@ -159,7 +158,7 @@ typedef union ompi_attribute_fortran_ptr_t ompi_attribute_fortran_ptr_t;
 
 struct ompi_attribute_keyval_t {
     opal_object_t super;
-    ompi_attribute_type_t attr_type; /**< One of COMM/WIN/DTYPE/INSTANCE. This
+    ompi_attribute_type_t attr_type; /**< One of COMM/WIN/DTYPE. This
                                        will be used to cast the
                                        copy/delete attribute functions
                                        properly and error checking */
@@ -226,7 +225,7 @@ int ompi_attr_put_ref(void);
 /**
  * Create a new key for use by attribute of Comm/Win/Datatype/Instance
  *
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param copy_attr_fn   Union variable containing the function pointer
  *                       to be used in order to copy the attribute (IN)
  * @param delete_attr_fn Function pointer to be used for deleting the
@@ -285,7 +284,7 @@ OMPI_DECLSPEC int ompi_attr_create_keyval_aint(ompi_attribute_type_t type,
 
 /**
  * Free an attribute keyval
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param key            key, which is set to MPI_KEY_INVALID (IN/OUT)
  * @return OMPI error code
  */
@@ -294,9 +293,9 @@ int ompi_attr_free_keyval(ompi_attribute_type_t type, int *key,
                           bool predefined);
 
 /**
- * Set an attribute on the comm/win/datatype/instance in a form valid for C.
+ * Set an attribute on the comm/win/datatype in a form valid for C.
  *
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param object         The actual Comm/Win/Datatype/Instance object (IN)
  * @param attr_hash      The attribute hash table hanging on the object(IN/OUT)
  * @param key            Key val for the attribute (IN)
@@ -325,7 +324,7 @@ int ompi_attr_set_c(ompi_attribute_type_t type, void *object,
 /**
  * Set an int predefined attribute in a form valid for C.
  *
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param object         The actual Comm/Win/Datatype/Instance object (IN)
  * @param attr_hash      The attribute hash table hanging on the object(IN/OUT)
  * @param key            Key val for the attribute (IN)
@@ -352,10 +351,10 @@ int ompi_attr_set_int(ompi_attribute_type_t type, void *object,
                       int key, int attribute, bool predefined);
 
 /**
- * Set an attribute on the comm/win/datatype/instance in a form valid for
+ * Set an attribute on the comm/win/datatype in a form valid for
  * Fortran MPI-1.
  *
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param object         The actual Comm/Win/Datatype/Instance object (IN)
  * @param attr_hash      The attribute hash table hanging on the object(IN/OUT)
  * @param key            Key val for the attribute (IN)
@@ -383,10 +382,10 @@ OMPI_DECLSPEC int ompi_attr_set_fint(ompi_attribute_type_t type, void *object,
                                      bool predefined);
 
 /**
- * Set an attribute on the comm/win/datatype/instance in a form valid for
+ * Set an attribute on the comm/win/datatype in a form valid for
  * Fortran MPI-2.
  *
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param object         The actual Comm/Win/Datatype/Instance object (IN)
  * @param attr_hash      The attribute hash table hanging on the object(IN/OUT)
  * @param key            Key val for the attribute (IN)
@@ -414,7 +413,7 @@ OMPI_DECLSPEC int ompi_attr_set_aint(ompi_attribute_type_t type, void *object,
                                      bool predefined);
 
 /**
- * Get an attribute on the comm/win/datatype/instance in a form valid for C.
+ * Get an attribute on the comm/win/datatype in a form valid for C.
  *
  * @param attr_hash      The attribute hash table hanging on the object(IN)
  * @param key            Key val for the attribute (IN)
@@ -440,7 +439,7 @@ int ompi_attr_get_c(opal_hash_table_t *attr_hash, int key,
 
 
 /**
- * Get an attribute on the comm/win/datatype/instance in a form valid for
+ * Get an attribute on the comm/win/datatype in a form valid for
  * Fortran MPI-1.
  *
  * @param attr_hash      The attribute hash table hanging on the object(IN)
@@ -467,7 +466,7 @@ int ompi_attr_get_c(opal_hash_table_t *attr_hash, int key,
 
 
 /**
- * Get an attribute on the comm/win/datatype/instance in a form valid for
+ * Get an attribute on the comm/win/datatype in a form valid for
  * Fortran MPI-2.
  *
  * @param attr_hash      The attribute hash table hanging on the object(IN)
@@ -494,8 +493,8 @@ OMPI_DECLSPEC int ompi_attr_get_aint(opal_hash_table_t *attr_hash, int key,
 
 
 /**
- * Delete an attribute on the comm/win/datatype/instance
- * @param type           Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
+ * Delete an attribute on the comm/win/datatype
+ * @param type           Type of attribute (COMM/WIN/DTYPE) (IN)
  * @param object         The actual Comm/Win/Datatype/Instance object (IN)
  * @param attr_hash      The attribute hash table hanging on the object(IN)
  * @param key            Key val for the attribute (IN)
@@ -520,7 +519,6 @@ int ompi_attr_delete(ompi_attribute_type_t type, void *object,
  * @param newattr_hash The attribute hash table hanging on new object(IN)
  * @return OMPI error code
  *
- * Note: not valid for instance objects as they can not be copied
  */
 
 int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
@@ -531,8 +529,8 @@ int ompi_attr_copy_all(ompi_attribute_type_t type, void *old_object,
 /**
  * This to be used to delete all the attributes from the Comm/Win/Dtype/Instance
  * object in one shot
- * @param type         Type of attribute (COMM/WIN/DTYPE/INSTANCE) (IN)
- * @param object       The COMM/WIN/DTYPE/INSTANCE object (IN)
+ * @param type         Type of attribute (COMM/WIN/DTYPE) (IN)
+ * @param object       The COMM/WIN/DTYPE object (IN)
  * @param attr_hash    The attribute hash table hanging on the object(IN)
  * @return OMPI error code
  *

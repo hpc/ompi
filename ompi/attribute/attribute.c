@@ -260,7 +260,6 @@
 #define attr_communicator_f c_f_to_c_index
 #define attr_datatype_f d_f_to_c_index
 #define attr_win_f w_f_to_c_index
-#define attr_instance_f i_f_to_c_index
 
 #define CREATE_KEY(key) opal_bitmap_find_and_set_first_unset_bit(attr_subsys->key_bitmap, (key))
 
