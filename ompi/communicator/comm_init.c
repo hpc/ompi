@@ -316,7 +316,6 @@ ompi_communicator_t *ompi_comm_allocate ( int local_size, int remote_size )
     /* fill in the inscribing hyper-cube dimensions */
     new_comm->c_cube_dim = opal_cube_dim(local_size);
     new_comm->c_index_vec = malloc(new_comm->c_local_group->grp_proc_count * sizeof(int));
-    printf("proc_count: %d\n", new_comm->c_local_group->grp_proc_count);
     fflush(stdout);
 
     return new_comm;

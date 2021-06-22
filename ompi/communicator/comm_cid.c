@@ -428,8 +428,9 @@ int ompi_comm_nextcid_nb (ompi_communicator_t *newcomm, ompi_communicator_t *com
 
     /* old CID algorighm */
 
-    /* need to add support for MPI_Comm_create_from_group for these configurations */
-    assert (NULL != comm);
+    if (NULL == comm) {
+        return OMPI_ERR_BAD_PARAM;
+    }
 
     newcomm->c_flags |= OMPI_COMM_GLOBAL_INDEX;
 

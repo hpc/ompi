@@ -137,17 +137,11 @@ int ompi_win_init(void);
 int ompi_win_create(void *base, size_t size, int disp_unit,
                     ompi_communicator_t *comm, opal_info_t *info,
                     ompi_win_t **newwin);
-int ompi_win_create_from_group (void *base, size_t size, int disp_unit,
-                                ompi_group_t *group, const char *tag, opal_info_t *info,
-                                ompi_win_t **newwin);
 int ompi_win_allocate(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
 int ompi_win_allocate_shared(size_t size, int disp_unit, opal_info_t *info,
                       ompi_communicator_t *comm, void *baseptr, ompi_win_t **newwin);
 int ompi_win_create_dynamic(opal_info_t *info, ompi_communicator_t *comm, ompi_win_t **newwin);
-int ompi_win_create_dynamic_from_group (opal_info_t *info, ompi_group_t *group, const char *tag,
-                                        ompi_win_t **newwin);
-
 int ompi_win_free(ompi_win_t *win);
 
 OMPI_DECLSPEC int ompi_win_set_name(ompi_win_t *win, const char *win_name);

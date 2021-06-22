@@ -30,7 +30,6 @@
 #    include <unistd.h>
 #endif
 
-#include "opal/class/opal_list.h"
 #include "opal/class/opal_pointer_array.h"
 #include "opal/util/argv.h"
 #include "opal/util/output.h"

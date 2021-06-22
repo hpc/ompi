@@ -30,8 +30,6 @@
 #include "ompi/proc/proc.h"
 #include "ompi/op/op.h"
 
-#include "ompi/runtime/mpiruntime.h"
-
 BEGIN_C_DECLS
 
 /**

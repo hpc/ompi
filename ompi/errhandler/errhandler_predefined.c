@@ -18,7 +18,7 @@
  *                         All rights reserved.
  * Copyright (c) 2016-2019 Intel, Inc.  All rights reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -54,6 +54,14 @@
  */
 static void backend_abort(int fatal, char *type, struct ompi_communicator_t *comm,
                           char *name, int *error_code, va_list arglist);
+static void backend_abort_aggregate(int fatal, char *type,
+                                    struct ompi_communicator_t *comm,
+                                    char *name, int *error_code,
+                                    va_list arglist);
+static void backend_abort_no_aggregate(int fatal, char *type,
+                                       struct ompi_communicator_t *comm,
+                                       char *name, int *error_code,
+                                       va_list arglist);
 static void out(char *str, char *arg);
 
 
@@ -181,8 +189,8 @@ void ompi_mpi_errors_are_fatal_instance_handler (struct ompi_instance_t **instan
                                                  int *error_code, ...)
 {
   char *name;
-  struct ompi_communicator_t *abort_comm = NULL;
   va_list arglist;
+  int err = MPI_ERR_UNKNOWN;
 
   va_start(arglist, error_code);
 
@@ -191,9 +199,20 @@ void ompi_mpi_errors_are_fatal_instance_handler (struct ompi_instance_t **instan
   } else {
       name = NULL;
   }
-  /* NTH: for now we still call these "sessions" */
-  backend_abort(true, "session", abort_comm, name, error_code, arglist);
+
+  if (NULL != error_code) {
+     err = *error_code;
+  }
+
+  /* We only want aggregation while the rte is initialized */
+  if (ompi_rte_initialized) {
+      backend_abort_aggregate(true, "session", NULL, name, error_code, arglist);
+  } else {
+      backend_abort_no_aggregate(true, "session", NULL, name, error_code, arglist);
+  }
   va_end(arglist);
+
+  ompi_mpi_abort(NULL, err);
 }
 
 void ompi_mpi_errors_return_comm_handler(struct ompi_communicator_t **comm,

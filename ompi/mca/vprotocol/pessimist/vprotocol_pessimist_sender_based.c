@@ -24,7 +24,6 @@
 #include "opal/datatype/opal_datatype_memcpy.h"
 #include "opal/util/printf.h"
 #include <fcntl.h>
-#include "ompi/runtime/mpiruntime.h"
 
 #define sb mca_vprotocol_pessimist.sender_based
 
