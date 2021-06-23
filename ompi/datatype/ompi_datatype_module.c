@@ -43,8 +43,6 @@
 
 #include "mpi.h"
 
-static int ompi_datatype_finalize (void);
-
 /**
  * This is the number of predefined datatypes. It is different than the MAX_PREDEFINED
  * as it include all the optional datatypes (such as MPI_INTEGER?, MPI_REAL?).
@@ -689,7 +687,7 @@ int32_t ompi_datatype_init( void )
 }
 
 
-static int ompi_datatype_finalize (void)
+int ompi_datatype_finalize (void)
 {
     int ret = OMPI_SUCCESS;
 
