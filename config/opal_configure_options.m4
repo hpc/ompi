@@ -523,9 +523,6 @@ OPAL_WITH_OPTION_MIN_MAX_VALUE(pset_name_len,  512,  512, 4096)
 
 OPAL_WITH_OPTION_MIN_MAX_VALUE(stringtag_len,     1024, 256, 2048)
 
-AC_DEFINE_UNQUOTED([OPAL_ENABLE_CRDEBUG], [0],
-    [Whether we want checkpoint/restart enabled debugging functionality or not])
-
 # some systems don't want/like getpwuid
 AC_MSG_CHECKING([if want getpwuid support])
 AC_ARG_ENABLE([getpwuid],

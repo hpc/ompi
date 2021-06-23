@@ -146,8 +146,7 @@ AC_DEFUN([OMPI_CHECK_UCX],[
                                         [#include <ucp/api/ucp.h>])
                          AC_CHECK_DECLS([UCP_ATTR_FIELD_MEMORY_TYPES],
                                         [AC_DEFINE([HAVE_UCP_ATTR_MEMORY_TYPES], [1],
-                                                   [have memory types attribute])], 
-                                        [AC_DEFINE([HAVE_UCP_ATTR_MEMORY_TYPES], [0],[])],
+                                                   [have memory types attribute])], [],
                                         [#include <ucp/api/ucp.h>])
                          AC_CHECK_DECLS([ucp_tag_send_nbx,
                                          ucp_tag_send_sync_nbx,
