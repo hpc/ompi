@@ -585,9 +585,6 @@ int32_t opal_convertor_prepare_for_recv(opal_convertor_t *convertor,
 #endif
 
     assert(!(convertor->flags & CONVERTOR_SEND));
-    /*
-     * Note this macro may call return....
-     */
     OPAL_CONVERTOR_PREPARE(convertor, datatype, count, pUserBuf);
 
 #if defined(CHECKSUM)
