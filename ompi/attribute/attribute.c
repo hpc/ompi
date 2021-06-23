@@ -15,7 +15,7 @@
  *                         reserved.
  * Copyright (c) 2017      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018-2020 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -545,6 +545,12 @@ int ompi_attr_get_ref(void)
 	if (NULL == attr_subsys) {
             ret = OMPI_ERR_OUT_OF_RESOURCE;
 	    goto fn_exit;
+        }
+        if ((NULL == attr_subsys->keyval_hash) || (NULL == attr_subsys->key_bitmap)) {
+            OBJ_RELEASE(attr_subsys);
+            attr_subsys = NULL;
+            ret = OMPI_ERR_OUT_OF_RESOURCE;
+	    goto fn_exit;
 	}
     } else {
         OBJ_RETAIN(attr_subsys);
@@ -571,7 +577,6 @@ static void attr_subsys_construct(attr_subsys_t *subsys)
     int *p = (int *) &bogus;
 
     subsys->keyval_hash = OBJ_NEW(opal_hash_table_t);
-    assert (NULL != subsys->keyval_hash);
 
     subsys->key_bitmap = OBJ_NEW(opal_bitmap_t);
 
