@@ -1203,6 +1203,10 @@ static int ompi_instance_get_pmix_pset_size (ompi_instance_t *instance, const ch
 
 int ompi_group_from_pset (ompi_instance_t *instance, const char *pset_name, ompi_group_t **group_out)
 {
+    if (group_out == MPI_GROUP_NULL) {
+        return OMPI_ERR_BAD_PARAM;
+    }
+    
     if (0 == strncmp (pset_name, "mpi://", 6)) {
         pset_name += 6;
         if (0 == strcmp (pset_name, "WORLD")) {
@@ -1211,6 +1215,10 @@ int ompi_group_from_pset (ompi_instance_t *instance, const char *pset_name, ompi
         if (0 == strcmp (pset_name, "SELF")) {
             return ompi_instance_group_self (instance, group_out);
         }
+    }
+
+    if (0 == strncmp (pset_name, "mpix://", 7)) {
+        pset_name += 7;
         if (0 == strcmp (pset_name, "SHARED")) {
             return ompi_instance_group_shared (instance, group_out);
         }
