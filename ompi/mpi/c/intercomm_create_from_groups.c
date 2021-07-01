@@ -85,6 +85,11 @@ int MPI_Intercomm_create_from_groups (MPI_Group local_group, int local_leader, M
     rc = ompi_intercomm_create_from_groups (local_group, local_leader, remote_group, remote_leader, tag,
                                             &info->super, errhandler, newintercomm);
 
-    OMPI_ERRHANDLER_RETURN (rc, MPI_COMM_SELF, rc, FUNC_NAME);
+    if (MPI_SUCCESS != rc) {
+        return ompi_errhandler_invoke (errhandler, MPI_COMM_NULL, errhandler->eh_mpi_object_type,
+                                       rc, FUNC_NAME);
+    }
+
+    return rc;
 }
 

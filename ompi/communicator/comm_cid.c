@@ -39,6 +39,7 @@
 #include "opal/mca/pmix/base/base.h"
 #include "opal/mca/pmix/pmix-internal.h"
 #include "opal/util/printf.h"
+#include "opal/util/show_help.h"
 
 #include "ompi/proc/proc.h"
 #include "ompi/communicator/communicator.h"
@@ -48,6 +49,7 @@
 #include "opal/class/opal_list.h"
 #include "ompi/mca/pml/pml.h"
 #include "ompi/runtime/ompi_rte.h"
+#include "ompi/mca/pml/base/base.h"
 #include "ompi/mca/coll/base/base.h"
 #include "ompi/request/request.h"
 #include "ompi/runtime/mpiruntime.h"
@@ -428,8 +430,19 @@ int ompi_comm_nextcid_nb (ompi_communicator_t *newcomm, ompi_communicator_t *com
 
     /* old CID algorighm */
 
+    /* if we got here and comm is NULL then that means the app is  invoking MPI-4 Sessions or later
+       functions but the pml does not support these functions so return not supported */
     if (NULL == comm) {
-        return OMPI_ERR_BAD_PARAM;
+       char msg_string[1024];
+       sprintf(msg_string,"The PML being used - %s - does not support MPI sessions related features", 
+               mca_pml_base_selected_component.pmlm_version.mca_component_name);
+       opal_show_help("help-comm.txt",
+                      "MPI function not supported",
+                      true,
+                      "MPI_Comm_from_group/MPI_Intercomm_from_groups",
+                      msg_string);
+
+        return MPI_ERR_UNSUPPORTED_OPERATION;
     }
 
     newcomm->c_flags |= OMPI_COMM_GLOBAL_INDEX;
