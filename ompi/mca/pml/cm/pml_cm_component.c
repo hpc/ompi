@@ -151,7 +151,7 @@ mca_pml_cm_component_init(int* priority,
         ompi_pml_cm.super.pml_flags |= MCA_PML_BASE_FLAG_REQUIRE_WORLD;
     }
 
-    if (ompi_mtl->mtl_flags & MCA_PML_BASE_FLAG_SUPPORTS_EXT_CID) {
+    if (ompi_mtl->mtl_flags & MCA_MTL_BASE_FLAG_SUPPORTS_EXT_CID) {
         ompi_pml_cm.super.pml_flags |= MCA_PML_BASE_FLAG_SUPPORTS_EXT_CID;
     }
 
