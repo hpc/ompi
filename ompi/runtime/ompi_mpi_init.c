@@ -27,6 +27,8 @@
  * Copyright (c) 2020      Amazon.com, Inc. or its affiliates.
  *                         All Rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
+ * Copyright (c) 2021      Triad National Security, LLC. All rights
+ *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -292,17 +294,6 @@ static void fence_release(pmix_status_t status, void *cbdata)
     OPAL_POST_OBJECT(active);
 }
 
-static void evhandler_reg_callbk(pmix_status_t status,
-                                 size_t evhandler_ref,
-                                 void *cbdata)
-{
-    opal_pmix_lock_t *lock = (opal_pmix_lock_t*)cbdata;
-
-    lock->status = status;
-    OPAL_PMIX_WAKEUP_THREAD(lock);
-}
-
-
 int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
                   bool reinit_ok)
 {
@@ -312,7 +303,6 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided,
     volatile bool active;
     bool background_fence = false;
     pmix_info_t info[2];
-    pmix_status_t codes[1] = { PMIX_ERR_PROC_ABORTED };
     pmix_status_t rc;
     OMPI_TIMING_INIT(64);
 
