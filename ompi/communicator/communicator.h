@@ -22,7 +22,7 @@
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -264,8 +264,7 @@ struct ompi_communicator_t {
     char  c_name[MPI_MAX_OBJECT_NAME];
     ompi_comm_extended_cid_t      c_contextid;
     ompi_comm_extended_cid_block_t c_contextidb;
-    int                           c_index;
-    int                           *c_index_vec;
+    uint32_t                      c_index;
     int                           c_my_rank;
     uint32_t                      c_flags; /* flags, e.g. intercomm,
                                               topology, etc. */
@@ -533,9 +532,14 @@ static inline ompi_comm_extended_cid_t ompi_comm_get_extended_cid (const ompi_co
     return comm->c_contextid;
 }
 
-static inline bool ompi_communicator_cid_compare (const ompi_communicator_t *comm, const ompi_comm_extended_cid_t cid)
+static inline bool ompi_comm_cid_compare (const ompi_communicator_t *comm, const ompi_comm_extended_cid_t cid)
 {
     return comm->c_contextid.cid_base == cid.cid_base && comm->c_contextid.cid_sub.u64 == cid.cid_sub.u64;
+}
+
+static inline bool ompi_comm_compare_cids (const ompi_communicator_t *comm1, const ompi_communicator_t *comm2)
+{
+    return comm1->c_contextid.cid_base == comm2->c_contextid.cid_base && comm1->c_contextid.cid_sub.u64 == comm2->c_contextid.cid_sub.u64;
 }
 
 /* return pointer to communicator associated with context id cid,

@@ -3,6 +3,9 @@
  * Copyright (c) 2014-2021 The University of Tennessee and The University
  *                         of Tennessee Research Foundation.  All rights
  *                         reserved.
+ * Copyright (c) 2021      Triad National Security, LLC. All rights
+ *                         reserved.
+ *
  *
  * $COPYRIGHT$
  *
@@ -903,12 +906,12 @@ static void era_agreement_info_set_comm(era_agreement_info_t *ci, ompi_communica
     OBJ_RETAIN(comm);
 
     OPAL_OUTPUT_VERBOSE((30, ompi_ftmpi_output_handle,
-                         "%s ftagree:agreement (ERA) Agreement (%d.%d).%d: assigning to communicator %d\n",
+                         "%s ftagree:agreement (ERA) Agreement (%d.%d).%d: assigning to communicator %s\n",
                          OMPI_NAME_PRINT(OMPI_PROC_MY_NAME),
                          ci->agreement_id.ERAID_FIELDS.contextid,
                          ci->agreement_id.ERAID_FIELDS.epoch,
                          ci->agreement_id.ERAID_FIELDS.agreementid,
-                         comm->c_contextid));
+                         ompi_comm_print_cid(comm)));
 
     if( AGS(comm) == NULL ) {
         era_comm_agreement_specific_t *ags = OBJ_NEW(era_comm_agreement_specific_t);
@@ -2775,10 +2778,10 @@ static void era_on_comm_rank_failure(ompi_communicator_t *comm, int rank, bool r
     opal_hash_table_t *msg_table;
 
     OPAL_OUTPUT_VERBOSE((4, ompi_ftmpi_output_handle,
-                         "%s ftagree:agreement (ERA) %d in communicator (%d.%d) died\n",
+                         "%s ftagree:agreement (ERA) %d in communicator (%s.%d) died\n",
                          OMPI_NAME_PRINT(OMPI_PROC_MY_NAME),
                          rank,
-                         comm->c_contextid,
+                         ompi_comm_print_cid(comm),
                          comm->c_epoch));
 
     if( AGS(comm) != NULL ) {

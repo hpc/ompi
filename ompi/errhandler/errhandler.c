@@ -17,7 +17,7 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2015-2019 Intel, Inc.  All rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -382,10 +382,10 @@ int ompi_errhandler_proc_failed_internal(ompi_proc_t* ompi_proc, int status, boo
             if(OPAL_UNLIKELY( OMPI_SUCCESS != rc )) goto cleanup;
         }
         OPAL_OUTPUT_VERBOSE((10, ompi_ftmpi_output_handle,
-                             "%s ompi: Process %s is in comm (%d) with rank %d. [%s]",
+                             "%s ompi: Process %s is in comm (%s) with rank %d. [%s]",
                              OMPI_NAME_PRINT(OMPI_PROC_MY_NAME),
                              OMPI_NAME_PRINT(&ompi_proc->super.proc_name),
-                             comm->c_contextid,
+                             ompi_comm_print_cid(comm),
                              proc_rank,
                              (OMPI_ERRHANDLER_TYPE_PREDEFINED == comm->errhandler_type ? "P" :
                               (OMPI_ERRHANDLER_TYPE_COMM == comm->errhandler_type ? "C" :

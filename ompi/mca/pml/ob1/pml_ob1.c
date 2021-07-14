@@ -22,7 +22,7 @@
  *                         All rights reserved.
  * Copyright (c) 2018 IBM Corporation. All rights reserved.
  * Copyright (c) 2019-2020 Intel, Inc.  All rights reserved.
- * Copyright (c) 2018-2019 Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reseved.
  * $COPYRIGHT$
  *
@@ -228,7 +228,7 @@ int mca_pml_ob1_add_comm(ompi_communicator_t* comm)
         hdr = &frag->hdr.hdr_match;
 
         if (MCA_PML_OB1_HDR_TYPE_CID == frag->hdr.hdr_common.hdr_type) {
-            if (!ompi_communicator_cid_compare (comm, frag->hdr.hdr_cid.hdr_cid)) {
+            if (!ompi_comm_cid_compare (comm, frag->hdr.hdr_cid.hdr_cid)) {
                 continue;
             }
 

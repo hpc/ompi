@@ -20,7 +20,7 @@
  * Copyright (c) 2018      Sandia National Laboratories
  *                         All rights reserved.
  * Copyright (c) 2020      Google, LLC. All rights reserved.
- * Copyright (c) 2020      Triad National Security, LLC. All rights
+ * Copyright (c) 2020-2021 Triad National Security, LLC. All rights
  *                         reserved.
  *
  * $COPYRIGHT$
@@ -407,8 +407,8 @@ int mca_pml_ob1_revoke_comm( struct ompi_communicator_t* ompi_comm, bool coll_on
 #if OPAL_ENABLE_DEBUG
     if( opal_list_get_size(&nack_list) ) {
         OPAL_OUTPUT_VERBOSE((15, ompi_ftmpi_output_handle,
-                             "ob1_revoke_comm: purging unexpected and cantmatch frags for in comm %d (%s): nacking %zu frags",
-                             ompi_comm->c_contextid, coll_only ? "collective frags only" : "all revoked",
+                             "ob1_revoke_comm: purging unexpected and cantmatch frags for in comm %s (%s): nacking %zu frags",
+                             ompi_comm_print_cid(ompi_comm), coll_only ? "collective frags only" : "all revoked",
                              opal_list_get_size(&nack_list)));
         if( verbose > 15) mca_pml_ob1_dump(ompi_comm, verbose);
     }
@@ -684,7 +684,8 @@ void mca_pml_ob1_recv_frag_callback_ack (mca_btl_base_module_t *btl,
 #if OPAL_ENABLE_FT_MPI
     /* if the req_recv is NULL, the comm has been revoked at the receiver */
     if( OPAL_UNLIKELY(NULL == sendreq->req_recv.pval) ) {
-        OPAL_OUTPUT_VERBOSE((2, ompi_ftmpi_output_handle, "Recvfrag: Received a NACK to the RDV/RGET match to %d on comm %d\n", sendreq->req_send.req_base.req_peer, sendreq->req_send.req_base.req_comm->c_contextid));
+        OPAL_OUTPUT_VERBOSE((2, ompi_ftmpi_output_handle, "Recvfrag: Received a NACK to the RDV/RGET match to %d on comm %s\n", sendreq->req_send.req_base.req_peer, 
+                             ompi_comm_print_cid(sendreq->req_send.req_base.req_comm)));
         if (NULL != sendreq->rdma_frag) {
             MCA_PML_OB1_RDMA_FRAG_RETURN(sendreq->rdma_frag);
             sendreq->rdma_frag = NULL;
