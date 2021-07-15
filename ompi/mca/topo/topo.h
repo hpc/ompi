@@ -17,8 +17,6 @@
  * Copyright (c) 2015      Los Alamos National Security, LLC. All rights
  *                         reserved.
  * Copyright (c) 2016-2017 IBM Corporation. All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
- *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -42,7 +40,7 @@ typedef struct mca_topo_base_module_t mca_topo_base_module_t;
 /*
  * Initial component query, called during mca_topo_base_open.
  */
-typedef int (*mca_topo_base_component_init_query_2_3_0_fn_t)
+typedef int (*mca_topo_base_component_init_query_2_2_0_fn_t)
     (bool enable_progress_threads,
      bool enable_mpi_threads);
 
@@ -50,20 +48,20 @@ typedef int (*mca_topo_base_component_init_query_2_3_0_fn_t)
  * Communicator/group query, called during cart and graph communicator creation.
  */
 typedef struct mca_topo_base_module_t*
-(*mca_topo_base_component_query_2_3_0_fn_t)
+(*mca_topo_base_component_query_2_2_0_fn_t)
     (const ompi_communicator_t *comm, const ompi_group_t *group, int *priority, uint32_t type);
 
 /*
  * Structure for topo v2.1.0 components.This is chained to MCA v2.0.0
  */
-typedef struct mca_topo_base_component_2_3_0_t {
+typedef struct mca_topo_base_component_2_2_0_t {
     mca_base_component_t topoc_version;
     mca_base_component_data_t topoc_data;
 
-    mca_topo_base_component_init_query_2_3_0_fn_t topoc_init_query;
-    mca_topo_base_component_query_2_3_0_fn_t topoc_query;
-} mca_topo_base_component_2_3_0_t;
-typedef mca_topo_base_component_2_3_0_t mca_topo_base_component_t;
+    mca_topo_base_component_init_query_2_2_0_fn_t topoc_init_query;
+    mca_topo_base_component_query_2_2_0_fn_t topoc_query;
+} mca_topo_base_component_2_2_0_t;
+typedef mca_topo_base_component_2_2_0_t mca_topo_base_component_t;
 
 /*
  * Struct for holding graph communicator information
@@ -292,7 +290,7 @@ typedef int (*mca_topo_base_module_dist_graph_neighbors_count_fn_t)
  * automatically replaced by their default version. They will return the answers
  * based on the base information stored in the associated module extra data.
  */
-typedef struct mca_topo_base_cart_module_2_3_0_t {
+typedef struct mca_topo_base_cart_module_2_2_0_t {
     mca_topo_base_module_cart_coords_fn_t cart_coords;
     mca_topo_base_module_cart_create_fn_t cart_create;
     mca_topo_base_module_cart_get_fn_t    cart_get;
@@ -301,23 +299,23 @@ typedef struct mca_topo_base_cart_module_2_3_0_t {
     mca_topo_base_module_cart_rank_fn_t   cart_rank;
     mca_topo_base_module_cart_shift_fn_t  cart_shift;
     mca_topo_base_module_cart_sub_fn_t    cart_sub;
-} mca_topo_base_cart_module_2_3_0_t;
+} mca_topo_base_cart_module_2_2_0_t;
 
-typedef struct mca_topo_base_graph_module_2_3_0_t {
+typedef struct mca_topo_base_graph_module_2_2_0_t {
     mca_topo_base_module_graph_create_fn_t          graph_create;
     mca_topo_base_module_graph_get_fn_t             graph_get;
     mca_topo_base_module_graph_map_fn_t             graph_map;
     mca_topo_base_module_graphdims_get_fn_t         graphdims_get;
     mca_topo_base_module_graph_neighbors_fn_t       graph_neighbors;
     mca_topo_base_module_graph_neighbors_count_fn_t graph_neighbors_count;
-} mca_topo_base_graph_module_2_3_0_t;
+} mca_topo_base_graph_module_2_2_0_t;
 
-typedef struct mca_topo_base_dist_graph_module_2_3_0_t {
+typedef struct mca_topo_base_dist_graph_module_2_2_0_t {
     mca_topo_base_module_dist_graph_create_fn_t          dist_graph_create;
     mca_topo_base_module_dist_graph_create_adjacent_fn_t dist_graph_create_adjacent;
     mca_topo_base_module_dist_graph_neighbors_fn_t       dist_graph_neighbors;
     mca_topo_base_module_dist_graph_neighbors_count_fn_t dist_graph_neighbors_count;
-} mca_topo_base_dist_graph_module_2_3_0_t;
+} mca_topo_base_dist_graph_module_2_2_0_t;
 
 struct mca_topo_base_module_t {
     /* Make this structure be an object so that it has a constructor
@@ -330,9 +328,9 @@ struct mca_topo_base_module_t {
 
     /* Cart, graph or dist graph related functions */
     union {
-        mca_topo_base_cart_module_2_3_0_t cart;
-        mca_topo_base_graph_module_2_3_0_t graph;
-        mca_topo_base_dist_graph_module_2_3_0_t dist_graph;
+        mca_topo_base_cart_module_2_2_0_t cart;
+        mca_topo_base_graph_module_2_2_0_t graph;
+        mca_topo_base_dist_graph_module_2_2_0_t dist_graph;
     } topo;
 
     /* This union caches the parameters passed when the communicator
@@ -348,7 +346,7 @@ OMPI_DECLSPEC OBJ_CLASS_DECLARATION(mca_topo_base_module_t);
  * ********** Use in components that are of type topo v2.3.0 ********
  * ******************************************************************
  */
-#define MCA_TOPO_BASE_VERSION_2_3_0 \
+#define MCA_TOPO_BASE_VERSION_2_2_0 \
     OMPI_MCA_BASE_VERSION_2_1_0("topo", 2, 3, 0)
 
 #endif /* MCA_TOPO_H */

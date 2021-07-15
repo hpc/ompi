@@ -13,8 +13,6 @@
  * Copyright (c) 2012-2013 Inria.  All rights reserved.
  * Copyright (c) 2014      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
- *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -143,8 +141,8 @@ static int init_query_2_2_0(const mca_base_component_t *component,
                             bool enable_progress_threads,
                             bool enable_mpi_threads)
 {
-    mca_topo_base_component_2_3_0_t *topo =
-        (mca_topo_base_component_2_3_0_t *) component;
+    mca_topo_base_component_2_2_0_t *topo =
+        (mca_topo_base_component_2_2_0_t *) component;
 
     return topo->topoc_init_query(enable_progress_threads,
                                   enable_mpi_threads);

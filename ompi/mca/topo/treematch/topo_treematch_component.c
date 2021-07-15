@@ -6,8 +6,6 @@
  * Copyright (c) 2011-2015 INRIA.  All rights reserved.
  * Copyright (c) 2011-2015 Université Bordeaux 1
  * Copyright (c) 2016      Intel, Inc.  All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
- *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -35,11 +33,11 @@ static int mca_topo_treematch_component_register(void);
 /*
  * Public component structure
  */
-mca_topo_treematch_component_2_3_0_t mca_topo_treematch_component =
+mca_topo_treematch_component_2_2_0_t mca_topo_treematch_component =
     {
         .super = {
             .topoc_version = {
-                MCA_TOPO_BASE_VERSION_2_3_0,
+                MCA_TOPO_BASE_VERSION_2_2_0,
                 .mca_component_name = "treematch",
                 MCA_BASE_MAKE_VERSION(component, OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,
                                       OMPI_RELEASE_VERSION),

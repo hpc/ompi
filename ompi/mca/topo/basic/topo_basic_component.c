@@ -9,8 +9,6 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2015      Los Alamos National Security, LLC. All rights
  *                         reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
- *                         reserved.
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -40,7 +38,7 @@ mca_topo_basic_query(const ompi_communicator_t *comm, const ompi_group_t *group,
 mca_topo_basic_component_t mca_topo_basic_component =
 {
     .topoc_version = {
-        MCA_TOPO_BASE_VERSION_2_3_0,
+        MCA_TOPO_BASE_VERSION_2_2_0,
         .mca_component_name = "basic",
         MCA_BASE_MAKE_VERSION(component, OMPI_MAJOR_VERSION, OMPI_MINOR_VERSION,
                               OMPI_RELEASE_VERSION),
