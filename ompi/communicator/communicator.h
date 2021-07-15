@@ -314,6 +314,9 @@ struct ompi_communicator_t {
     /* Hooks for PML to hang things */
     struct mca_pml_comm_t  *c_pml_comm;
 
+    /* Hooks for MTL to hang things */
+    struct mca_mtl_comm_t  *c_mtl_comm;
+
     /* Collectives module interface and data */
     mca_coll_base_comm_coll_t *c_coll;
 

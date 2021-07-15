@@ -24,7 +24,7 @@
  * Copyright (c) 2015      Mellanox Technologies. All rights reserved.
  * Copyright (c) 2017      IBM Corporation. All rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
- * Copyright (c) 2018      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -207,18 +207,6 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
         }
 
         newcomm->c_flags |= OMPI_COMM_INTER;
-        newcomm->c_index_vec = malloc(remote_size * sizeof(int));
-        if (NULL == newcomm->c_index_vec) {
-            OBJ_RELEASE(newcomm);
-            return OMPI_ERR_OUT_OF_RESOURCE;
-        }
-        for (int i = 0; i < remote_size; i++) {
-            if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
-                newcomm->c_index_vec[i] = newcomm->c_index;
-            } else {
-                newcomm->c_index_vec[i] = -2;
-            }
-        }
 
         if (dup_comm) {
             old_localcomm = OMPI_COMM_IS_INTRA(oldcomm) ? oldcomm : oldcomm->c_local_comm;
@@ -234,18 +222,6 @@ int ompi_comm_set_nb (ompi_communicator_t **ncomm, ompi_communicator_t *oldcomm,
     } else {
         newcomm->c_remote_group = newcomm->c_local_group;
         OBJ_RETAIN(newcomm->c_remote_group);
-        newcomm->c_index_vec = malloc(local_size * sizeof(int));
-        if (NULL == newcomm->c_index_vec) {
-            OBJ_RELEASE(newcomm);
-            return OMPI_ERR_OUT_OF_RESOURCE;
-        }
-        for (int i = 0; i < local_size; i++) {
-            if (OMPI_COMM_IS_GLOBAL_INDEX(newcomm)) {
-                newcomm->c_index_vec[i] = newcomm->c_index;
-            } else {
-                newcomm->c_index_vec[i] = -2;
-            }
-        }
     }
 
     /* Check how many different jobids are represented in this communicator.
@@ -405,10 +381,6 @@ int ompi_comm_create_w_info (ompi_communicator_t *comm, ompi_group_t *group, opa
     rc = ompi_comm_nextcid (newcomp, comm, NULL, NULL, NULL, false, mode);
     if ( OMPI_SUCCESS != rc ) {
         goto exit;
-    }
-
-    if (OMPI_COMM_IS_INTRA(comm)) {
-        newcomp->c_index_vec[newcomp->c_my_rank] = newcomp->c_index;
     }
 
     /* Copy info if there is one. */
@@ -661,10 +633,6 @@ int ompi_comm_split_with_info( ompi_communicator_t* comm, int color, int key,
     rc = ompi_comm_nextcid (newcomp, comm, NULL, NULL, NULL, false, mode);
     if ( OMPI_SUCCESS != rc ) {
         goto exit;
-    }
-
-    if (!inter) {
-        newcomp->c_index_vec[newcomp->c_my_rank] = newcomp->c_index;
     }
 
     /* Set name for debugging purposes */
@@ -1648,14 +1616,13 @@ int ompi_comm_compare(ompi_communicator_t *comm1, ompi_communicator_t *comm2, in
     int cmp_result;
 
     if (comm1->instance != comm2->instance) {
-        printf("Tried to compare two comms from different sessions\n");
         return OMPI_ERR_BAD_PARAM;
     }
 
     comp1 = (ompi_communicator_t *) comm1;
     comp2 = (ompi_communicator_t *) comm2;
 
-    if ( comp1->c_index == comp2->c_index ) {
+    if (ompi_comm_compare_cids(comp1,comp2)) {
         *result = MPI_IDENT;
         return MPI_SUCCESS;
     }

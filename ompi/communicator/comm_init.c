@@ -200,10 +200,6 @@ int ompi_comm_init_mpi3 (void)
     ompi_mpi_comm_world.comm.c_contextid = ompi_mpi_comm_world.comm.c_contextidb.block_cid;
     ompi_mpi_comm_world.comm.c_index          = 0;
     ompi_mpi_comm_world.comm.c_my_rank      = group->grp_my_rank;
-    ompi_mpi_comm_world.comm.c_index_vec    = malloc(group->grp_proc_count * sizeof(int));
-    for (int i = 0; i < group->grp_proc_count; i++) {
-        ompi_mpi_comm_world.comm.c_index_vec[i] = 0;
-    }
     ompi_mpi_comm_world.comm.c_local_group  = group;
     ompi_mpi_comm_world.comm.c_remote_group = group;
     OBJ_RETAIN(ompi_mpi_comm_world.comm.c_remote_group);
@@ -260,8 +256,6 @@ int ompi_comm_init_mpi3 (void)
     ompi_mpi_comm_self.comm.c_contextid = ompi_mpi_comm_self.comm.c_contextidb.block_cid;
     ompi_mpi_comm_self.comm.c_index    = 1;
     ompi_mpi_comm_self.comm.c_my_rank      = group->grp_my_rank;
-    ompi_mpi_comm_self.comm.c_index_vec    = malloc(1 * sizeof(int));
-    ompi_mpi_comm_self.comm.c_index_vec[0] = 1;
     ompi_mpi_comm_self.comm.c_local_group  = group;
     ompi_mpi_comm_self.comm.c_remote_group = group;
     OBJ_RETAIN(ompi_mpi_comm_self.comm.c_remote_group);
@@ -315,8 +309,6 @@ ompi_communicator_t *ompi_comm_allocate ( int local_size, int remote_size )
 
     /* fill in the inscribing hyper-cube dimensions */
     new_comm->c_cube_dim = opal_cube_dim(local_size);
-    new_comm->c_index_vec = malloc(new_comm->c_local_group->grp_proc_count * sizeof(int));
-    fflush(stdout);
 
     return new_comm;
 }
@@ -435,7 +427,6 @@ static void ompi_comm_construct(ompi_communicator_t* comm)
     comm->c_flags        = 0;
     comm->c_my_rank      = 0;
     comm->c_cube_dim     = 0;
-    comm->c_index_vec    = NULL;
     comm->c_local_group  = NULL;
     comm->c_remote_group = NULL;
     comm->error_handler  = NULL;

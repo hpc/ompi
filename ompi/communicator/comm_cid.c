@@ -663,9 +663,7 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
         ompi_comm_cid_epoch -= 1; /* protected by the cid_lock */
 #endif /* OPAL_ENABLE_FT_MPI */
         context->newcomm->c_index = context->nextcid;
-        if (OMPI_COMM_IS_INTRA(context->newcomm)) {
-            context->newcomm->c_index_vec[context->newcomm->c_my_rank] = context->newcomm->c_index;
-        }
+
         /* to simplify coding always set the global CID even if it isn't used by the
          * active PML */
         context->newcomm->c_contextid.cid_base = 0;
