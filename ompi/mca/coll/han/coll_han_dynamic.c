@@ -594,7 +594,7 @@ mca_coll_han_allreduce_intra_dynamic(const void *sbuf,
         opal_output_verbose(verbosity, mca_coll_han_component.han_output,
                             "coll:han:mca_coll_han_allreduce_intra_dynamic "
                             "HAN found valid module for collective %d (%s) "
-                            "with topological level %d (%s) on communicator (%d/%s) "
+                            "with topological level %d (%s) on communicator (%s/%s) "
                             "but this module cannot handle this collective. "
                             "Please check dynamic file/mca parameters\n",
                             ALLREDUCE, mca_coll_base_colltype_to_str(ALLREDUCE),
