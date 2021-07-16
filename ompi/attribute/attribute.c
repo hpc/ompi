@@ -542,16 +542,16 @@ int ompi_attr_get_ref(void)
 
     if (NULL == attr_subsys) {
         attr_subsys = OBJ_NEW(attr_subsys_t);
-	if (NULL == attr_subsys) {
+        if (NULL == attr_subsys) {
             ret = OMPI_ERR_OUT_OF_RESOURCE;
-	    goto fn_exit;
+            goto fn_exit;
         }
         if ((NULL == attr_subsys->keyval_hash) || (NULL == attr_subsys->key_bitmap)) {
             OBJ_RELEASE(attr_subsys);
             attr_subsys = NULL;
             ret = OMPI_ERR_OUT_OF_RESOURCE;
-	    goto fn_exit;
-	}
+            goto fn_exit;
+        }
     } else {
         OBJ_RETAIN(attr_subsys);
     }
