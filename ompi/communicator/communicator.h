@@ -139,7 +139,7 @@ OMPI_DECLSPEC OBJ_CLASS_DECLARATION(ompi_communicator_t);
 #define OMPI_COMM_CID_IS_LOWER(comm1,comm2) ( ((comm1)->c_index < (comm2)->c_index)? 1:0)
 
 OMPI_DECLSPEC extern opal_hash_table_t ompi_comm_hash;
-OMPI_DECLSPEC extern opal_pointer_array_t ompi_comm_array;
+OMPI_DECLSPEC extern opal_pointer_array_t ompi_mpi_communicators;
 OMPI_DECLSPEC extern opal_pointer_array_t ompi_comm_f_to_c_table;
 
 struct ompi_comm_extended_cid_t {
@@ -550,7 +550,7 @@ static inline bool ompi_comm_compare_cids (const ompi_communicator_t *comm1, con
 static inline ompi_communicator_t *ompi_comm_lookup (const uint32_t c_index)
 {
     /* array of pointers to communicators, indexed by context ID */
-    return (ompi_communicator_t *) opal_pointer_array_get_item (&ompi_comm_array, c_index);
+    return (ompi_communicator_t *) opal_pointer_array_get_item (&ompi_mpi_communicators, c_index);
 }
 
 static inline ompi_communicator_t *ompi_comm_lookup_cid (const ompi_comm_extended_cid_t cid)

@@ -398,8 +398,8 @@ static int ompi_comm_nextcid_ext_nb (ompi_communicator_t *newcomm, ompi_communic
         (void) ompi_comm_extended_cid_block_new (block, &newcomm->c_contextidb, is_new_block);
     }
 
-    for (unsigned int i = ompi_comm_array.lowest_free ; i < mca_pml.pml_max_contextid ; ++i) {
-        bool flag = opal_pointer_array_test_and_set_item (&ompi_comm_array, i, newcomm);
+    for (unsigned int i = ompi_mpi_communicators.lowest_free ; i < mca_pml.pml_max_contextid ; ++i) {
+        bool flag = opal_pointer_array_test_and_set_item (&ompi_mpi_communicators, i, newcomm);
         if (true == flag) {
             newcomm->c_index = i;
             break;
@@ -453,7 +453,7 @@ int ompi_comm_nextcid_nb (ompi_communicator_t *newcomm, ompi_communicator_t *com
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    context->start = ompi_comm_array.lowest_free;
+    context->start = ompi_mpi_communicators.lowest_free;
 
     request = ompi_comm_request_get ();
     if (NULL == request) {
@@ -521,7 +521,7 @@ static int ompi_comm_allreduce_getnextcid (ompi_comm_request_t *request)
         flag = false;
         context->nextlocal_cid = mca_pml.pml_max_contextid;
         for (unsigned int i = context->start ; i < mca_pml.pml_max_contextid ; ++i) {
-            flag = opal_pointer_array_test_and_set_item (&ompi_comm_array, i,
+            flag = opal_pointer_array_test_and_set_item (&ompi_mpi_communicators, i,
                                                          context->comm);
             if (true == flag) {
                 context->nextlocal_cid = i;
@@ -562,7 +562,7 @@ static int ompi_comm_allreduce_getnextcid (ompi_comm_request_t *request)
     return ompi_comm_request_schedule_append (request, ompi_comm_checkcid, &subreq, 1);
 err_exit:
     if (participate && flag) {
-        opal_pointer_array_test_and_set_item(&ompi_comm_array, context->nextlocal_cid, NULL);
+        opal_pointer_array_test_and_set_item(&ompi_mpi_communicators, context->nextlocal_cid, NULL);
     }
     ompi_comm_cid_lowest_id = INT64_MAX;
     OPAL_THREAD_UNLOCK(&ompi_cid_lock);
@@ -579,7 +579,7 @@ static int ompi_comm_checkcid (ompi_comm_request_t *request)
 
     if (OMPI_SUCCESS != request->super.req_status.MPI_ERROR) {
         if (participate) {
-            opal_pointer_array_set_item(&ompi_comm_array, context->nextlocal_cid, NULL);
+            opal_pointer_array_set_item(&ompi_mpi_communicators, context->nextlocal_cid, NULL);
         }
         return request->super.req_status.MPI_ERROR;
     }
@@ -593,9 +593,9 @@ static int ompi_comm_checkcid (ompi_comm_request_t *request)
     } else {
         context->flag = (context->nextcid == context->nextlocal_cid);
         if ( participate && !context->flag) {
-            opal_pointer_array_set_item(&ompi_comm_array, context->nextlocal_cid, NULL);
+            opal_pointer_array_set_item(&ompi_mpi_communicators, context->nextlocal_cid, NULL);
 
-            context->flag = opal_pointer_array_test_and_set_item (&ompi_comm_array,
+            context->flag = opal_pointer_array_test_and_set_item (&ompi_mpi_communicators,
                                                                   context->nextcid, context->comm);
         }
     }
@@ -613,7 +613,7 @@ static int ompi_comm_checkcid (ompi_comm_request_t *request)
         ompi_comm_request_schedule_append (request, ompi_comm_nextcid_check_flag, &subreq, 1);
     } else {
         if (participate && context->flag ) {
-            opal_pointer_array_test_and_set_item(&ompi_comm_array, context->nextlocal_cid, NULL);
+            opal_pointer_array_test_and_set_item(&ompi_mpi_communicators, context->nextlocal_cid, NULL);
         }
         ompi_comm_cid_lowest_id = INT64_MAX;
     }
@@ -629,7 +629,7 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
 
     if (OMPI_SUCCESS != request->super.req_status.MPI_ERROR) {
         if (participate) {
-            opal_pointer_array_set_item(&ompi_comm_array, context->nextcid, NULL);
+            opal_pointer_array_set_item(&ompi_mpi_communicators, context->nextcid, NULL);
         }
         return request->super.req_status.MPI_ERROR;
     }
@@ -647,7 +647,7 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
             context->nextlocal_cid = mca_pml.pml_max_contextid;
             for (unsigned int i = context->start ; i < mca_pml.pml_max_contextid ; ++i) {
                 bool flag;
-                flag = opal_pointer_array_test_and_set_item (&ompi_comm_array, i,
+                flag = opal_pointer_array_test_and_set_item (&ompi_mpi_communicators, i,
                                                                 context->comm);
                 if (true == flag) {
                     context->nextlocal_cid = i;
@@ -668,7 +668,7 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
          * active PML */
         context->newcomm->c_contextid.cid_base = 0;
         context->newcomm->c_contextid.cid_sub.u64 = context->nextcid;
-        opal_pointer_array_set_item (&ompi_comm_array, context->nextcid, context->newcomm);
+        opal_pointer_array_set_item (&ompi_mpi_communicators, context->nextcid, context->newcomm);
 
         /* unlock the cid generator */
         ompi_comm_cid_lowest_id = INT64_MAX;
@@ -680,7 +680,7 @@ static int ompi_comm_nextcid_check_flag (ompi_comm_request_t *request)
 
     if (participate && (0 != context->flag)) {
         /* we could use this cid, but other don't agree */
-        opal_pointer_array_set_item (&ompi_comm_array, context->nextcid, NULL);
+        opal_pointer_array_set_item (&ompi_mpi_communicators, context->nextcid, NULL);
         context->start = context->nextcid + 1; /* that's where we can start the next round */
     }
 

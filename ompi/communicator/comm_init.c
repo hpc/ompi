@@ -58,7 +58,7 @@
 ** on cid.
 **
 */
-opal_pointer_array_t ompi_comm_array = {{0}};
+opal_pointer_array_t ompi_mpi_communicators = {{0}};
 opal_pointer_array_t ompi_comm_f_to_c_table = {{0}};
 opal_hash_table_t ompi_comm_hash = {{0}};
 
@@ -96,8 +96,8 @@ static int ompi_comm_finalize (void);
 int ompi_comm_init(void)
 {
     /* Setup communicator array */
-    OBJ_CONSTRUCT(&ompi_comm_array, opal_pointer_array_t);
-    if( OPAL_SUCCESS != opal_pointer_array_init(&ompi_comm_array, 16,
+    OBJ_CONSTRUCT(&ompi_mpi_communicators, opal_pointer_array_t);
+    if( OPAL_SUCCESS != opal_pointer_array_init(&ompi_mpi_communicators, 16,
                                                 OMPI_FORTRAN_HANDLE_MAX, 64) ) {
         return OMPI_ERROR;
     }
@@ -155,7 +155,7 @@ int ompi_comm_init(void)
 
     ompi_mpi_comm_null.comm.error_handler  = &ompi_mpi_errors_are_fatal.eh;
     OBJ_RETAIN( &ompi_mpi_errors_are_fatal.eh );
-    opal_pointer_array_set_item (&ompi_comm_array, 2, &ompi_mpi_comm_null);
+    opal_pointer_array_set_item (&ompi_mpi_communicators, 2, &ompi_mpi_comm_null);
 
     opal_string_copy(ompi_mpi_comm_null.comm.c_name, "MPI_COMM_NULL",
                      sizeof(ompi_mpi_comm_null.comm.c_name));
@@ -207,7 +207,7 @@ int ompi_comm_init_mpi3 (void)
     ompi_mpi_comm_world.comm.error_handler  = ompi_initial_error_handler_eh;
     OBJ_RETAIN( ompi_mpi_comm_world.comm.error_handler );
     OMPI_COMM_SET_PML_ADDED(&ompi_mpi_comm_world.comm);
-    opal_pointer_array_set_item (&ompi_comm_array, 0, &ompi_mpi_comm_world);
+    opal_pointer_array_set_item (&ompi_mpi_communicators, 0, &ompi_mpi_comm_world);
 
     opal_string_copy(ompi_mpi_comm_world.comm.c_name, "MPI_COMM_WORLD",
                      sizeof(ompi_mpi_comm_world.comm.c_name));
@@ -262,7 +262,7 @@ int ompi_comm_init_mpi3 (void)
     ompi_mpi_comm_self.comm.error_handler  = ompi_initial_error_handler_eh;
     OBJ_RETAIN( ompi_mpi_comm_self.comm.error_handler );
     OMPI_COMM_SET_PML_ADDED(&ompi_mpi_comm_self.comm);
-    opal_pointer_array_set_item (&ompi_comm_array, 1, &ompi_mpi_comm_self);
+    opal_pointer_array_set_item (&ompi_mpi_communicators, 1, &ompi_mpi_comm_self);
 
     opal_string_copy(ompi_mpi_comm_self.comm.c_name, "MPI_COMM_SELF",
                      sizeof(ompi_mpi_comm_self.comm.c_name));
@@ -371,13 +371,13 @@ static int ompi_comm_finalize (void)
     OBJ_DESTRUCT( &ompi_mpi_comm_null );
 
     /* Check whether we have some communicators left */
-    max = opal_pointer_array_get_size(&ompi_comm_array);
+    max = opal_pointer_array_get_size(&ompi_mpi_communicators);
     for ( i=3; i<max; i++ ) {
-        comm = (ompi_communicator_t *)opal_pointer_array_get_item(&ompi_comm_array, i);
+        comm = (ompi_communicator_t *)opal_pointer_array_get_item(&ompi_mpi_communicators, i);
         if ( NULL != comm ) {
             /* Communicator has not been freed before finalize */
             OBJ_RELEASE(comm);
-            comm=(ompi_communicator_t *)opal_pointer_array_get_item(&ompi_comm_array, i);
+            comm=(ompi_communicator_t *)opal_pointer_array_get_item(&ompi_mpi_communicators, i);
             if ( NULL != comm ) {
                 /* Still here ? */
                 if ( !OMPI_COMM_IS_EXTRA_RETAIN(comm)) {
@@ -401,7 +401,7 @@ static int ompi_comm_finalize (void)
         }
     }
 
-    OBJ_DESTRUCT (&ompi_comm_array);
+    OBJ_DESTRUCT (&ompi_mpi_communicators);
     OBJ_DESTRUCT (&ompi_comm_hash);
     OBJ_DESTRUCT (&ompi_comm_f_to_c_table);
 
@@ -538,9 +538,9 @@ static void ompi_comm_destruct(ompi_communicator_t* comm)
 
     /* mark this cid as available */
     if ( MPI_UNDEFINED != (int)comm->c_index &&
-         NULL != opal_pointer_array_get_item(&ompi_comm_array,
+         NULL != opal_pointer_array_get_item(&ompi_mpi_communicators,
                                              comm->c_index)) {
-        opal_pointer_array_set_item ( &ompi_comm_array,
+        opal_pointer_array_set_item ( &ompi_mpi_communicators,
                                       comm->c_index, NULL);
         if (!OMPI_COMM_IS_GLOBAL_INDEX(comm)) {
             opal_hash_table_remove_value_ptr (&ompi_comm_hash, &comm->c_contextid,

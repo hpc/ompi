@@ -354,9 +354,9 @@ int ompi_errhandler_proc_failed_internal(ompi_proc_t* ompi_proc, int status, boo
 
     /* Communicator State:
      * Let them know about the failure. */
-    max_num_comm = opal_pointer_array_get_size(&ompi_comm_array);
+    max_num_comm = opal_pointer_array_get_size(&ompi_mpi_communicators);
     for( i = 0; i < max_num_comm; ++i ) {
-        comm = (ompi_communicator_t *)opal_pointer_array_get_item(&ompi_comm_array, i);
+        comm = (ompi_communicator_t *)opal_pointer_array_get_item(&ompi_mpi_communicators, i);
         if( NULL == comm ) {
             continue;
         }
