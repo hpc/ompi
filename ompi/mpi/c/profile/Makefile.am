@@ -86,6 +86,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pcomm_connect.c \
         pcomm_create.c \
         pcomm_create_errhandler.c \
+        pcomm_create_from_group.c \
         pcomm_create_group.c \
         pcomm_create_keyval.c \
         pcomm_delete_attr.c \
@@ -220,6 +221,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pgroup_excl.c \
         pgroup_f2c.c \
         pgroup_free.c \
+        pgroup_from_session_pset.c \
         pgroup_incl.c \
         pgroup_intersection.c \
         pgroup_range_excl.c \
@@ -246,6 +248,7 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         pinit_thread.c \
         pinitialized.c \
         pintercomm_create.c \
+        pintercomm_create_from_groups.c \
         pintercomm_merge.c \
         piprobe.c \
         pirecv.c \
@@ -320,6 +323,16 @@ nodist_libmpi_c_pmpi_la_SOURCES = \
         psend_init.c \
         psendrecv.c \
         psendrecv_replace.c \
+        psession_c2f.c \
+        psession_create_errhandler.c \
+        psession_get_info.c \
+        psession_get_num_psets.c \
+        psession_get_nth_pset.c \
+        psession_get_pset_info.c \
+        psession_init.c \
+        psession_f2c.c \
+        psession_finalize.c \
+        psession_set_info.c \
         pssend_init.c \
         pssend.c \
         pstart.c \

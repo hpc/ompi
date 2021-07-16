@@ -246,7 +246,8 @@ int ompi_comm_shrink_internal(ompi_communicator_t* comm, ompi_communicator_t** n
     /* --------------------------------------------------------- */
     /* Set name for debugging purposes */
     snprintf(newcomp->c_name, MPI_MAX_OBJECT_NAME, "MPI COMMUNICATOR %d SHRUNK FROM %d",
-             newcomp->c_contextid, comm->c_contextid );
+             ompi_comm_get_local_cid(newcomp),
+             ompi_comm_get_local_cid(comm));
     start = PMPI_Wtime();
     /* activate communicator and init coll-module */
     ret = ompi_comm_activate( &newcomp, /* new communicator */

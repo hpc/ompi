@@ -21,7 +21,7 @@
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
  * Copyright (c) 2021      Nanook Consulting.  All rights reserved.
- * Copyright (c) 2021      Triad National Security, LLC. All rights
+ * Copyright (c) 2018-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -268,6 +268,7 @@ bcast_rportlen:
     /* initiate a list of participants for the connect,
      * starting with our own members */
     OBJ_CONSTRUCT(&mlist, opal_list_t);
+    assert(NULL != members /* would mean comm had 0-sized group! */);
     for (i=0; NULL != members[i]; i++) {
         OPAL_PMIX_CONVERT_STRING_TO_PROCT(&pxproc, members[i]);
         plt = OBJ_NEW(opal_proclist_t);
@@ -491,10 +492,9 @@ bcast_rportlen:
                          NULL  ,                   /* remote_procs */
                          NULL,                     /* attrs */
                          comm->error_handler,      /* error handler */
-                         NULL,                     /* topo component */
                          group,                    /* local group */
-                         new_group_pointer         /* remote group */
-                         );
+                         new_group_pointer,        /* remote group */
+                         0);                       /* flags */
     if (OMPI_SUCCESS != rc) {
         goto exit;
     }
@@ -689,7 +689,7 @@ static int dpm_convert(opal_list_t *infos,
     char *ck, *ptr, *help_str = NULL;
     int rc;
     char **tmp;
-    dpm_conflicts_t *modifiers;
+    dpm_conflicts_t *modifiers = NULL;
     const char *attr;
 
     /* pick the modifiers to be checked */
@@ -1674,6 +1674,9 @@ int ompi_dpm_dyn_init(void)
         ptr = &tmp[0];
     }
     port_name = strdup(ptr);
+    if (NULL == port_name) {
+        return OMPI_ERR_OUT_OF_RESOURCE;
+    }
 
     rc = ompi_dpm_connect_accept(MPI_COMM_WORLD, root, port_name, send_first, &newcomm);
     free(port_name);
@@ -1696,15 +1699,6 @@ int ompi_dpm_dyn_init(void)
     snprintf(newcomm->c_name, MPI_MAX_OBJECT_NAME, "MPI_COMM_PARENT");
     newcomm->c_flags |= OMPI_COMM_NAMEISSET;
 
-    return OMPI_SUCCESS;
-}
-
-
-/*
- * finalize the module
- */
-int ompi_dpm_finalize(void)
-{
     return OMPI_SUCCESS;
 }
 

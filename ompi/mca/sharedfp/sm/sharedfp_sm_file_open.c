@@ -61,7 +61,6 @@ int mca_sharedfp_sm_file_open (struct ompi_communicator_t *comm,
     struct mca_sharedfp_sm_offset * sm_offset_ptr;
     struct mca_sharedfp_sm_offset sm_offset;
     int sm_fd;
-    uint32_t comm_cid;
     int int_pid;
     pid_t my_pid;
 
@@ -102,8 +101,8 @@ int mca_sharedfp_sm_file_open (struct ompi_communicator_t *comm,
     ** For sharedfp we also want to put the file backed shared memory into the tmp directory
     */
     filename_basename = basename((char*)filename);
-    /* format is "%s/%s_cid-%d-%d.sm", see below */
-    sm_filename_length = strlen(ompi_process_info.job_session_dir) + 1 + strlen(filename_basename) + 5 + (3*sizeof(uint32_t)+1) + 4;
+    /* format is "%s/%s_cid-%s-%d.sm", see below */
+    sm_filename_length = strlen(ompi_process_info.job_session_dir) + 1 + strlen(filename_basename) + strlen(ompi_comm_print_cid(comm)) + 5 + (3*sizeof(uint32_t)+1) + 4;
     sm_filename = (char*) malloc( sizeof(char) * sm_filename_length);
     if (NULL == sm_filename) {
         opal_output(0, "mca_sharedfp_sm_file_open: Error, unable to malloc sm_filename\n");
@@ -112,7 +111,6 @@ int mca_sharedfp_sm_file_open (struct ompi_communicator_t *comm,
         return OMPI_ERR_OUT_OF_RESOURCE;
     }
 
-    comm_cid = ompi_comm_get_cid(comm);
     if ( 0 == fh->f_rank ) {
         my_pid = getpid();
         int_pid = (int) my_pid;
@@ -126,8 +124,8 @@ int mca_sharedfp_sm_file_open (struct ompi_communicator_t *comm,
         return err;
     }
 
-    snprintf(sm_filename, sm_filename_length, "%s/%s_cid-%d-%d.sm", ompi_process_info.job_session_dir,
-             filename_basename, comm_cid, int_pid);
+    snprintf(sm_filename, sm_filename_length, "%s/%s_cid-%s-%d.sm", ompi_process_info.job_session_dir,
+             filename_basename, ompi_comm_print_cid (comm), int_pid);
     /* open shared memory file, initialize to 0, map into memory */
     sm_fd = open(sm_filename, O_RDWR | O_CREAT,
                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);

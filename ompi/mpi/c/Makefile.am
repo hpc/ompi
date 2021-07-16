@@ -106,6 +106,7 @@ libmpi_c_mpi_la_SOURCES = \
         comm_connect.c \
         comm_create.c \
         comm_create_errhandler.c \
+        comm_create_from_group.c \
         comm_create_group.c \
         comm_create_keyval.c \
         comm_delete_attr.c \
@@ -240,6 +241,7 @@ libmpi_c_mpi_la_SOURCES = \
         group_excl.c \
         group_f2c.c \
         group_free.c \
+        group_from_session_pset.c \
         group_incl.c \
         group_intersection.c \
         group_range_excl.c \
@@ -266,6 +268,7 @@ libmpi_c_mpi_la_SOURCES = \
         init_thread.c \
         initialized.c \
         intercomm_create.c \
+        intercomm_create_from_groups.c \
         intercomm_merge.c \
         iprobe.c \
         irecv.c \
@@ -340,6 +343,16 @@ libmpi_c_mpi_la_SOURCES = \
         send_init.c \
         sendrecv.c \
         sendrecv_replace.c \
+        session_c2f.c \
+        session_create_errhandler.c \
+        session_get_info.c \
+        session_get_num_psets.c \
+        session_get_nth_pset.c \
+        session_get_pset_info.c \
+        session_init.c \
+        session_f2c.c \
+        session_finalize.c \
+        session_set_info.c \
         ssend_init.c \
         ssend.c \
         start.c \

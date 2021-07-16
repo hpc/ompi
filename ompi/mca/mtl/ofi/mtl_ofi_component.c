@@ -2,11 +2,11 @@
 /*
  * Copyright (c) 2013-2018 Intel, Inc. All rights reserved
  *
- * Copyright (c) 2014-2017 Cisco Systems, Inc.  All rights reserved
+ * Copyright (c) 2014-2021 Cisco Systems, Inc.  All rights reserved
  * Copyright (c) 2015-2016 Los Alamos National Security, LLC.  All rights
  *                         reserved.
  * Copyright (c) 2018      Amazon.com, Inc. or its affiliates.  All Rights reserved.
- * Copyright (c) 2020      Triad National Security, LLC. All rights
+ * Copyright (c) 2020-2021 Triad National Security, LLC. All rights
  *                         reserved.
  * $COPYRIGHT$
  *
@@ -40,8 +40,8 @@ static int av_type;
 static int ofi_tag_mode;
 
 #if OPAL_HAVE_THREAD_LOCAL
-    opal_thread_local int per_thread_ctx;
-    opal_thread_local struct fi_cq_tagged_entry wc[MTL_OFI_MAX_PROG_EVENT_COUNT];
+    opal_thread_local int ompi_mtl_ofi_per_thread_ctx;
+    opal_thread_local struct fi_cq_tagged_entry ompi_mtl_ofi_wc[MTL_OFI_MAX_PROG_EVENT_COUNT];
 #endif
 
 /*
@@ -340,7 +340,7 @@ select_ofi_provider(struct fi_info *providers,
     }
 
     opal_output_verbose(1, opal_common_ofi.output,
-                        "%s:%d: mtl:ofi:prov: %s\n",
+                        "%s:%d: mtl:ofi:provider: %s\n",
                         __FILE__, __LINE__,
                         (prov ? prov->fabric_attr->prov_name : "none"));
 
@@ -364,8 +364,8 @@ select_ofi_provider(struct fi_info *providers,
       */
     if (NULL != prov) {
         prov = opal_mca_common_ofi_select_provider(prov, &ompi_process_info);
-        opal_output_verbose(1, ompi_mtl_base_framework.framework_output,
-                            "%s:%d: mtl:ofi:provider: %s\n",
+        opal_output_verbose(1, opal_common_ofi.output,
+                            "%s:%d: mtl:ofi:provider:domain: %s\n",
                             __FILE__, __LINE__,
                             (prov ? prov->domain_attr->name : "none"));
     }
@@ -374,8 +374,8 @@ select_ofi_provider(struct fi_info *providers,
 }
 
 static void
-ompi_mtl_ofi_define_tag_mode(int ofi_tag_mode, int *bits_for_cid) {
-    switch (ofi_tag_mode) {
+ompi_mtl_ofi_define_tag_mode(int ofi_tag_mode_arg, int *bits_for_cid) {
+    switch (ofi_tag_mode_arg) {
         case MTL_OFI_TAG_1:
             *bits_for_cid = (int) MTL_OFI_CID_BIT_COUNT_1;
             ompi_mtl_ofi.base.mtl_max_tag = (int)((1ULL << (MTL_OFI_TAG_BIT_COUNT_1 - 1)) - 1);
@@ -639,7 +639,7 @@ ompi_mtl_ofi_component_init(bool enable_progress_threads,
        interface and local communication and remote communication. */
     hints->mode               = FI_CONTEXT | FI_CONTEXT2;
     hints->ep_attr->type      = FI_EP_RDM;
-    hints->caps               |= FI_TAGGED | FI_LOCAL_COMM | FI_REMOTE_COMM | FI_DIRECTED_RECV;
+    hints->caps               |= FI_MSG | FI_TAGGED | FI_LOCAL_COMM | FI_REMOTE_COMM | FI_DIRECTED_RECV;
     hints->tx_attr->msg_order = FI_ORDER_SAS;
     hints->rx_attr->msg_order = FI_ORDER_SAS;
     hints->rx_attr->op_flags  = FI_COMPLETION;
@@ -1060,6 +1060,10 @@ select_prov:
      * Set the ANY_SRC address.
      */
     ompi_mtl_ofi.any_addr = FI_ADDR_UNSPEC;
+    ompi_mtl_ofi.is_initialized = false;
+    ompi_mtl_ofi.has_posted_initial_buffer = false;
+    
+    ompi_mtl_ofi.base.mtl_flags |= MCA_MTL_BASE_FLAG_SUPPORTS_EXT_CID;
 
 #if OPAL_CUDA_SUPPORT
     mca_common_cuda_stage_one_init();
